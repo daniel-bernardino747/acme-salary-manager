@@ -96,23 +96,33 @@ Money is `{ "amountMinor": 1250000, "currency": "INR" }` everywhere. `amountMino
 |---|---|
 | Employee | `{ id, name, jobTitle, department, country, annualSalary: Money }` |
 | Pay statistics | `{ jobTitle, country, headcount, smallGroup, min, median, average, max }`, each stat `Money \| null` |
-| Payroll totals | `{ byCountry: [{ country, local, usd }], byDepartment: [{ department, usd }], grandTotal: { usd }, rates }` |
+| Payroll totals | `{ byCountry: [{ country, headcount, local, usd, sharePermille }], byDepartment: [{ department, headcount, usd, sharePermille }], grandTotal: { headcount, usd }, rates }` |
 | Pay comparison | `{ jobTitle, rows: [{ country, headcount, smallGroup, min, median, average, max }], rates }`, every country in fixed order, stats in USD |
-| Outlier | `{ employee, peerMedian: Money, peerHeadcount, compaRatioHundredths, direction: "below" \| "above" }` |
+| Outliers page | the list envelope `{ items, page, pageSize, total }` plus `smallGroupHeadcount`, and with `direction=below` also `costToReachThreshold: { usd }` and `rates` |
+| Outlier | `{ employee, peerMedian: Money, peerHeadcount, compaRatioHundredths, direction: "below" \| "above", gapMinor }` |
 
 - USD amounts stay in cents on the wire. Showing whole dollars is formatting only (ADR 0001).
 - `compaRatioHundredths` is an integer that the domain has already rounded with ADR 0001's directional rule (`79` shows as "0.79"). The UI never rounds a compa-ratio.
 - Every response that contains a USD figure carries `rates: { source, asOf }`, so the response states which rate table produced it.
 
+Added by ADR 0004 (UI structure):
+
+- **`sharePermille`** is a row's **share of payroll**: its USD total as tenths of a percent of the USD grand total, rounded half up once in the domain (ADR 0001). 421 shows as "42.1%". It is `null` when the grand total is 0. The UI only places the decimal point. Shares may not add up to 1000.
+- **`smallGroupHeadcount`** counts the employees matching the outlier filters whose peer group has fewer than 5 employees, so they were not checked. It is computed in the same pass that reads the peer groups.
+- **`gapMinor`** is the **gap to 0.80**, in the peer group's local currency: the smallest salary with `100·salary ≥ 80·median`, minus the current salary. It is computed in integers as `(80·median + 99) div 100 − salary`, so it is always at least 1. It is set on every underpaid row and `null` on overpaid ones, whatever the `direction` parameter.
+- **`costToReachThreshold`** is the **cost to reach 0.80**: the sum of `gapMinor` over every underpaid employee matching the filters (all pages, not only the current one), in USD. Following ADR 0001 it is summed per currency, each subtotal is converted once, and the results are added. It is present only with `direction=below`, because a mixed list has no single cost to state, and that response then carries `rates`.
+- **Fixtures:** a share that rounds half up, a zero grand total, a gap where `80·median` divides exactly by 100, and a cost spanning two currencies.
+
 ### Text and integers
 
 `parseMoney(input, currency)` and `formatMoney(money, locale, options)` in `@acme/contract` are the only places where money is converted between text and integers. Both work on strings and never do float arithmetic: no `parseFloat(x) * 100`, no `amountMinor / 10 ** exp`.
 
-- `parseMoney` splits the typed text into whole and fraction digits and returns minor units. It rejects more decimals than the currency's exponent allows (JPY has 0).
+- `parseMoney` splits the typed text into whole and fraction digits and returns minor units. It rejects more decimals than the currency's exponent allows (JPY has 0). Its input format is pinned to the app's single `en` locale (ADR 0004): digits, optional comma thousands separators and an optional `.` decimal point, with no currency symbols. Anything else is rejected.
+- `formatMoney` has a plain-input option (no grouping, no symbol), used to pre-fill the edit form.
 - `formatMoney` builds the decimal string from the integer and passes it to `Intl.NumberFormat`, which formats decimal strings exactly. Its options include whole units for payroll totals. Whole units are rounded half up in integers first (ADR 0001), then formatted with zero fraction digits, so the result doesn't depend on Intl's `roundingMode`.
 - **Fixtures:**
-  - `parseMoney`: JPY with no decimals, too many decimals rejected, and an amount at the cap.
-  - `formatMoney`: JPY, an amount near the cap, and whole-USD rounding including an exact half dollar.
+  - `parseMoney`: JPY with no decimals, too many decimals rejected, an amount at the cap, comma thousands separators accepted, and `"1.250.000,50"` rejected.
+  - `formatMoney`: JPY, an amount near the cap, whole-USD rounding including an exact half dollar, the plain-input option, and the symbols of all supported currencies being distinct in `en`.
 
 ## Considered options
 

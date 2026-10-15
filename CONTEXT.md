@@ -50,6 +50,10 @@ _Avoid_: Banker's rounding
 All employees who share one job title and one country, including the employee in question.
 _Avoid_: Cohort, segment, bucket
 
+**Small group**:
+A peer group with 1 to 4 employees. Its pay statistics are shown but marked, because so few people say little about the role and reveal individual pay. Its members are never checked for being outliers.
+_Avoid_: Unchecked employees, tiny group
+
 **Pay statistics**:
 Minimum, median, average, maximum and headcount of salaries for one peer group, in the country's currency.
 _Avoid_: Metrics, aggregates, summary
@@ -58,6 +62,10 @@ _Avoid_: Metrics, aggregates, summary
 The sum of salaries over a set of employees (a country, a department, or the whole organization). In USD, each currency is subtotalled and converted once, then the results are added, so parts may not add up exactly to the whole.
 _Avoid_: Payroll cost, spend, budget
 
+**Share of payroll**:
+A part's USD payroll total as a fraction of the USD grand total, in tenths of a percent, rounded half up once. Because each total is rounded on its own, shares may not add up to exactly 100%.
+_Avoid_: Percentage, proportion
+
 **Compa-ratio**:
 An employee's salary divided by the median salary of their peer group, as that median is shown.
 _Avoid_: Pay ratio, comparison ratio
@@ -65,3 +73,11 @@ _Avoid_: Pay ratio, comparison ratio
 **Outlier**:
 An employee whose compa-ratio is strictly below 0.80 or strictly above 1.20, in a peer group of at least 5 employees. Exactly 0.80 or 1.20 is not an outlier. Below 0.80 is **underpaid**, above 1.20 is **overpaid** (the outlier's direction).
 _Avoid_: Anomaly, exception
+
+**Gap to 0.80**:
+For an underpaid employee, how much their salary must rise to reach a compa-ratio of 0.80: the smallest salary at or above 0.80 of the peer median, minus their salary. In local currency, always at least one minor unit.
+_Avoid_: Pay gap (reads as the gender pay gap, which is out of scope), shortfall
+
+**Cost to reach 0.80**:
+The sum of the gaps to 0.80 over a set of underpaid employees, as a USD payroll total (per currency, converted once). The annual cost of bringing them all to 0.80.
+_Avoid_: Remediation budget, correction cost

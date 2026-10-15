@@ -32,7 +32,7 @@ An employee has a name, job title, department, country and annual salary; curren
 - **Job titles include the level** (e.g. "Software Engineer II", "Senior Software Engineer"), so stats compare like with like. *(Assumption.)*
 - **Currency.** Within a country, stats use local currency. Across countries, amounts convert to USD with a fixed, dated rate table shipped with the app; the date is shown. No live FX API: results stay reproducible and testable, with no external dependency.
 - **Volume.** About 10,000 employees, one organization. Filtering, pagination and stats run on the server.
-- **Outliers.** *(Assumption.)* An employee's compa-ratio is their salary divided by the median for their title in their country (the peer median stands in for a pay-grade midpoint, since pay grades are out of scope).
+- **Outliers.** *(Assumption.)* An employee's compa-ratio is their salary divided by the median for their title in their country (the peer median stands in for a pay-grade midpoint, since pay grades are out of scope). Employees below 0.80 or above 1.20 are flagged; title-and-country groups with fewer than 5 employees are skipped, because their median isn't meaningful.
 
 - **Remove** is a hard delete; keeping leavers belongs with salary history. *(Assumption.)*
 - **Seed.** Deterministic; 10,000 employees with plausible salaries per country and title.

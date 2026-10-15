@@ -16,7 +16,7 @@ The heaviest read is for outliers: at most about 10,000 rows of `(id, job_title,
 
 `createDb(path)` returns a migrated database. On a file database it sets `PRAGMA journal_mode = WAL` and a `busy_timeout`.
 
-Node 24 is pinned in `engines` and `.nvmrc`, so local Windows installs and Railpack's Linux build use matching `better-sqlite3` prebuilds. The first implementation slice must prove three things on Windows before anything else: `better-sqlite3` installs, a `:memory:` query runs, and an FTS5 table can be created.
+Node 24 is pinned in `engines` and `.nvmrc`, so local Windows installs and Railpack's Linux build use matching `better-sqlite3` prebuilds. The first implementation slice must prove these on Windows before anything else: `better-sqlite3` installs, a `:memory:` query runs, and an FTS5 table can be created. ADR 0003 adds two more checks for the shared `@acme/contract` package: Nest boots and imports a value from it, and a Vitest test in `api` imports from it and resolves a Nest provider through DI.
 
 ## Schema
 
@@ -52,7 +52,7 @@ Name search uses SQLite FTS5. `LIKE '%term%'` was rejected because it matches wr
 
 Three layers inside `api/src/`, with imports going one way only. An ESLint `no-restricted-imports` rule enforces this:
 
-- **`domain/`** imports nothing outside itself. It holds reference data, validation, money, rounding and conversion, pay statistics, payroll totals, compa-ratio and outliers. It knows nothing about storage.
+- **`domain/`** imports nothing outside itself except `@acme/contract`, which depends only on Zod (amended by ADR 0003). It holds money, rounding and conversion, pay statistics, payroll totals, compa-ratio and outliers. The reference data and request validation schemas live in `@acme/contract`. It knows nothing about storage.
 - **`persistence/`** imports `domain/`. It holds the Drizzle schema, migrations, `createDb`, the FTS MATCH builder, and repository functions that take and return plain data.
 - **Nest feature modules** import both. They hold controllers, DTOs and services. A service makes one repository read and calls one domain function. The database reaches Nest as a provider built by `createDb(process.env.DATABASE_PATH)`.
 
@@ -64,7 +64,7 @@ There is no repository interface and there are no mocks. Repositories are concre
 
 Repository and HTTP tests build their rows with a small test-data builder, never the 10,000-employee seed.
 
-If the API contract decision shares reference data through a workspace package, `domain/` (or its reference data and types) moves there. Since `domain/` has no dependencies, that move is a rename.
+ADR 0003 moves the reference data, the exchange rate table and the request and response schemas to the `@acme/contract` workspace package. Because those had no dependencies, the move is a rename. The computations stay in `domain/`.
 
 ## Considered options
 

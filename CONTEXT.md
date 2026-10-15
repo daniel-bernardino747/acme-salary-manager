@@ -63,5 +63,5 @@ An employee's salary divided by the median salary of their peer group, as that m
 _Avoid_: Pay ratio, comparison ratio
 
 **Outlier**:
-An employee whose compa-ratio is strictly below 0.80 or strictly above 1.20, in a peer group of at least 5 employees. Exactly 0.80 or 1.20 is not an outlier.
+An employee whose compa-ratio is strictly below 0.80 or strictly above 1.20, in a peer group of at least 5 employees. Exactly 0.80 or 1.20 is not an outlier. Below 0.80 is **underpaid**, above 1.20 is **overpaid** (the outlier's direction).
 _Avoid_: Anomaly, exception

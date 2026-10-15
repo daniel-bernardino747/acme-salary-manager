@@ -24,13 +24,14 @@ One table, `employees`:
 
 | column | type | constraint |
 |---|---|---|
-| `id` | `INTEGER PRIMARY KEY` | rowid alias |
+| `id` | `INTEGER PRIMARY KEY AUTOINCREMENT` | rowid alias; ids are never reused |
 | `name` | `TEXT NOT NULL` | |
 | `job_title` | `TEXT NOT NULL` | |
 | `department` | `TEXT NOT NULL` | |
 | `country` | `TEXT NOT NULL` | ISO 3166 alpha-2 code (`US`, `GB`, `DE`, `NL`, `IN`, `BR`, `JP`) |
 | `annual_salary_minor` | `INTEGER NOT NULL` | `CHECK (annual_salary_minor > 0)` |
 
+- `AUTOINCREMENT` (amended by ADR 0005): without it, deleting the employee with the highest id and then creating one reuses that id, so a stale link would show a different person. Remove is a hard delete, so that is a real risk. The seed's `--reset` clears the `employees` row in `sqlite_sequence` in the same transaction, so ids still restart at 1.
 - The UK is stored as `GB` and displayed as "United Kingdom".
 - Currency is not stored. It follows from country through the reference data, and the repository adds it when it maps rows to domain data. A stored currency would allow a row with `DE` and `USD`, which cannot exist.
 - The reference lists (country, department, job title) are enforced in code, not with `CHECK … IN (…)`. A `CHECK` would copy each list into a migration. Because the database does not guard these lists, nothing may bypass the domain validation: the seed builds its rows through the same validation and reference lists as the API.
@@ -46,7 +47,25 @@ Name search uses SQLite FTS5. `LIKE '%term%'` was rejected because it matches wr
 - `AFTER INSERT`, `AFTER UPDATE` and `AFTER DELETE` triggers keep it in sync. The update trigger issues the `'delete'` command for the old values and then inserts the new ones. Drizzle's schema does not model virtual tables or triggers, so they are created in a custom migration (`drizzle-kit generate --custom`).
 - Search is a per-word prefix match. The input is split into words, and each word is quoted (inner quotes doubled) and suffixed with `*`. The words are joined with AND. Raw input is never passed to `MATCH`. The builder uses SQLite syntax, so it lives in `persistence/` as a pure function with fixtures for accents, case, quotes and operator-like input (`AND`, `-`, `*`).
 - The list query joins the FTS table on `rowid = employees.id`, applies the filters, orders by `name, id` and paginates. The count query uses the same join. An empty search skips the join.
-- **Known limitation:** there is no infix match ("ller" does not find "Müller"). The trigram tokenizer was rejected because it needs 3 or more characters.
+- **Tokenizer fixtures** (amended by ADR 0005, whose seed names include these cases). `unicode61` splits words on apostrophes and hyphens. A quoted input word becomes a phrase whose last token is a prefix, so these work through the per-word builder. The behaviour was checked against FTS5 with this tokenizer:
+
+  | Query | Name | Matches |
+  |---|---|---|
+  | `o'connor` | O'Connor | yes (phrase "o connor*") |
+  | `connor` | O'Connor | yes |
+  | `oconnor` | O'Connor | no |
+  | `anna lena` | Anna-Lena | yes |
+  | `anna-lena` | Anna-Lena | yes |
+  | `annalena` | Anna-Lena | no |
+  | `joao` | João | yes |
+  | `muller` | Müller | yes |
+  | `gross` | Groß | no |
+  | `groß` | Groß | yes |
+
+- **Known limitations:**
+  - There is no infix match ("ller" does not find "Müller"). The trigram tokenizer was rejected because it needs 3 or more characters.
+  - Punctuation inside a name must be typed or replaced by a space: "oconnor" does not find O'Connor, and "annalena" does not find Anna-Lena.
+  - `ß` is not folded to `ss`: "gross" does not find "Groß". The seed avoids `ß` in names.
 
 ## Module seams
 

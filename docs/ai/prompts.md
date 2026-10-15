@@ -151,3 +151,48 @@ We are not looking for the most complex system, but for good engineering judgmen
 - Include all artifacts mentioned above
 - Share the repository link by replying to the same email once you are done
 ````
+
+## Phase 1 — Planning map (Wayfinder)
+
+Run in two messages: `/setup-skills` first (it configures the issue tracker the map lives on), then `/wayfinder` with the prompt below.
+
+````markdown
+We're building ACME Salary Manager, a take-home assessment for a Software Craftsperson (TypeScript) role at Incubyte, a company built on TDD, small steps and software craft. Read `docs/requirements.md` (the approved one-page requirements) and `docs/ai/prompts.md` (the prompts behind each phase) before anything else. The assessment text is at the end of `docs/ai/prompts.md`.
+
+This session **charts the map only**. Write no application code, no package.json and no scaffolding. The output is a Wayfinder map plus decision tickets on this repo's GitHub Issues. They're public and part of the deliverable: the assessment asks for "planning or design notes" and "trade-off explanations", and a reviewer will read them.
+
+## Destination
+
+Every architecture and design decision needed to build the MVP in `docs/requirements.md` is made and recorded: ADRs in `docs/adr/`, the domain glossary in `CONTEXT.md`. The way to `/to-spec` → `/to-tickets` → `/implement` is clear. Confirm this destination with me in one question; don't re-grill the requirements. Their scope is settled.
+
+## Notes for the map body
+
+- **Speed matters.** I want to start building as soon as possible. Keep the map small: aim for **6–8 tickets** and merge closely related decisions into one. Don't ticket anything a sensible default already settles. List those defaults in the map's Notes so I can veto them at a glance.
+- For every grilling question, **lead with your recommendation and a one-line reason** so I can accept it in a word. Never answer for me.
+- Skills to consult: `/grilling`, `/domain-modeling` (CONTEXT.md, ADRs), `/codebase-design` (module seams), `/tdd` (test seams), `/research` (facts outside this repo).
+- Building happens later through `/implement`, which works test-first and commits at red → green → refactor granularity. Decisions must leave **clear, fast, deterministic test seams**. Pure domain logic (money, currency conversion, stats, compa-ratio) should be testable without Nest, a database or a network.
+- Decided already. Record these, don't reopen them: NestJS + SQLite backend, React UI, Railway deploy, public GitHub repo; money as integer minor units + ISO 4217 code; a fixed, dated USD rate table; compa-ratio against the peer median, flagged below 0.80 or above 1.20, groups under 5 skipped; job titles carry the level; remove is a hard delete; auth is a stretch goal built last.
+
+## Decision areas to consider
+
+This is input, not the ticket list. You decide what becomes a ticket, what's a default, and what stays fog:
+
+- **Repo and tooling:** monorepo layout (`api/`, `web/`, shared types?), package manager and workspaces, TypeScript strictness, lint/format, test runner (Jest, Nest's default, vs Vitest).
+- **Persistence:** SQLite driver and ORM or query builder (e.g. Drizzle, Prisma, TypeORM, Kysely), migrations, indexes. **Where stats are computed:** SQL aggregates vs pure domain functions fed by a query. SQLite has no built-in median or percentile, and this choice shapes the unit tests.
+- **Domain model and glossary:** Employee, Country → currency, Job title (with level), Department, Money, Exchange rate table, Compa-ratio, Pay statistics.
+- **API contract:** endpoints for employees and the four questions, pagination and filters, validation approach, error format, how types are shared with the UI.
+- **UI:** component library, data fetching, routing, and how each of the four questions is presented.
+- **Seed:** generating plausible salaries per country and title deterministically, planting a few real outliers so question 4 has something to show, and keeping it fast and repeatable.
+- **Deploy on Railway:** one service (Nest serves the built React app) vs two, SQLite on a persistent volume, seeding on first boot, environment config. **Make this a research ticket.** It depends on current Railway facts.
+- **Testing strategy:** which seams get unit tests, which get API integration tests (in-memory SQLite), whether the UI gets any tests, and how the 500 ms target is measured.
+- **Fog:** authentication, performance write-up, demo video, README and artifact index.
+
+## Rules for this session
+
+- Follow the Wayfinder skill's "Chart the map" flow: map issue labelled `wayfinder:map`, tickets as sub-issues with `wayfinder:<type>` labels, native blocking edges, research subagents fired at the end. Create the labels if they don't exist.
+- Ticket titles and bodies must be readable by an outside reviewer: plain English, the question and why it matters, no internal shorthand.
+- **Commits.** Start the session with `docs: restore the outlier flagging rule` (only `docs/requirements.md`, already edited by me). Then commit the `/setup-skills` output if it isn't committed yet. End the session with `chore(ai): session logs` (`docs/ai/`). Push after each commit.
+- Stop after charting. Resolve no ticket in this session.
+````
+
+Next sessions, one ticket each: `/wayfinder <map URL>`. When the map is clear: `/to-spec`, `/to-tickets`, then `/implement` per ticket.

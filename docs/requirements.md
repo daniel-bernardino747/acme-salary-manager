@@ -47,6 +47,7 @@ An employee has a name, job title, department, country and annual salary; curren
 - **Pay grades.** Bands would come from policy instead of statistics; that needs HR input the MVP doesn't have.
 - **Gender pay-equity analysis.** Needs sensitive personal data and legal care.
 - **Live exchange rates.** Break reproducibility and add an external dependency.
+- **Purchasing-power (PPP) adjustment.** Cross-country amounts are nominal. Adjusting for cost of living needs a PPP data source and a policy decision on which index HR trusts.
 - **Approval workflows.** Need multiple users and roles.
 - **Bulk edits.** Safe bulk changes need preview and undo.
 - **Multi-tenancy.** There is one organization.

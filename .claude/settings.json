@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/save-session.mjs\"", "timeout": 30 }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/save-session.mjs\"", "timeout": 30 }
+        ]
+      }
+    ]
+  }
+}

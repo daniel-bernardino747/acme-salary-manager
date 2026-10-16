@@ -185,4 +185,17 @@ describe('payrollTotals', () => {
     });
     expect(totals.grandTotal).toEqual({ headcount: 2, usd: money(33_333_33, 'USD') });
   });
+
+  it('rounds a share of payroll half up once, so shares may add up to more than 100%', () => {
+    // Of $20,000.00, $8,430.00 is 421.5 permille → 422 and $11,570.00 is 578.5 → 579: 1001 in all.
+    const totals = payrollTotals(
+      [employee('US', 'Engineering', 8_430_00, 'USD'), employee('US', 'Sales', 11_570_00, 'USD')],
+      rates,
+    );
+
+    const shares = Object.fromEntries(
+      totals.byDepartment.map((row) => [row.department, row.sharePermille]),
+    );
+    expect(shares).toMatchObject({ Engineering: 422, Sales: 579 });
+  });
 });

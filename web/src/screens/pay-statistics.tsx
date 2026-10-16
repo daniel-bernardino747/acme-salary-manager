@@ -5,23 +5,13 @@ import {
   type Money,
   type PayStatisticsResponse,
 } from '@acme/contract';
-import {
-  Alert,
-  Anchor,
-  Group,
-  Paper,
-  Select,
-  SimpleGrid,
-  Skeleton,
-  Stack,
-  Text,
-  Title,
-} from '@mantine/core';
+import { Alert, Anchor, Group, Select, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { apiFetch } from '../api/api-fetch';
 import { payStatisticsPath } from '../api/pay-statistics-path';
 import { queryKey } from '../api/query-key';
+import { Figure, Muted, PageHeader, Panel, RangeBar } from '../components/document';
 import { QueryState } from '../components/query-state';
 import {
   emptyGroupText,
@@ -29,7 +19,9 @@ import {
   smallGroupNotice,
   statisticsHeading,
 } from '../format/pay-statistics-copy';
+import { pageQuestion } from '../layout/navigation';
 import { statisticsSearchSchema } from '../routes/search';
+import classes from './pay-statistics.module.css';
 
 const countryOptions = countries.map((country) => ({ value: country.code, label: country.name }));
 
@@ -53,8 +45,8 @@ export function PayStatistics() {
     void navigate({ search: (prev) => statisticsSearchSchema.parse({ ...prev, ...change }) });
 
   return (
-    <Stack gap="md">
-      <Title order={2}>Pay statistics</Title>
+    <Stack gap="lg">
+      <PageHeader title="Pay statistics" question={pageQuestion('/pay/statistics')} />
       <Group align="flex-end" gap="sm">
         <Select
           label="Job title"
@@ -64,7 +56,7 @@ export function PayStatistics() {
           onChange={(jobTitle) => pick({ jobTitle })}
           searchable
           clearable
-          w={280}
+          w={{ base: '100%', xs: 280 }}
         />
         <Select
           label="Country"
@@ -74,13 +66,17 @@ export function PayStatistics() {
           onChange={(country) => pick({ country })}
           searchable
           clearable
-          w={200}
+          w={{ base: '100%', xs: 220 }}
         />
       </Group>
       <QueryState
         query={query}
         skeleton={<StatisticsSkeleton />}
-        idle={<Text c="dimmed">Pick a job title and a country to see what ACME pays them.</Text>}
+        idle={
+          <Panel component="div">
+            <Text c="gray.7">Pick a job title and a country to see what ACME pays them.</Text>
+          </Panel>
+        }
       >
         {(statistics) => <Statistics statistics={statistics} />}
       </QueryState>
@@ -89,29 +85,51 @@ export function PayStatistics() {
 }
 
 function Statistics({ statistics }: { statistics: PayStatisticsResponse }) {
-  const { jobTitle, country, headcount } = statistics;
+  const { jobTitle, country, headcount, min, median, average, max } = statistics;
   return (
-    <Stack gap="md">
-      <Title order={3}>{statisticsHeading(statistics)}</Title>
-      {headcount === 0 ? (
+    <Panel title={statisticsHeading(statistics)}>
+      {headcount === 0 || !min || !median || !average || !max ? (
         <Text>{emptyGroupText(statistics)}</Text>
       ) : (
-        <>
+        <Stack gap="lg">
           {statistics.smallGroup && (
-            <Alert color="yellow" title="Small group">
+            <Alert color="under" variant="light" title="Small group">
               {smallGroupNotice(headcount)}
             </Alert>
           )}
-          <SimpleGrid cols={{ base: 1, xs: 2, md: 5 }}>
-            <Figure label="Headcount" value={counts.format(headcount)} />
-            <Figure label="Minimum" value={formatFigure(statistics.min)} />
-            <Figure label="Median" value={formatFigure(statistics.median)} />
-            <Figure label="Average" value={formatFigure(statistics.average)} />
-            <Figure label="Maximum" value={formatFigure(statistics.max)} />
+          <Group justify="space-between" align="flex-end" gap="lg" wrap="wrap">
+            <div>
+              <Text size="sm" c="gray.6">
+                Median
+              </Text>
+              <Figure>{formatFigure(median)}</Figure>
+            </div>
+            <div className={classes.headcount}>
+              <Text size="sm" c="gray.6">
+                Headcount
+              </Text>
+              <Text fz="xl" fw={700}>
+                {counts.format(headcount)}
+              </Text>
+            </div>
+          </Group>
+          <RangeBar
+            min={min.amountMinor}
+            max={max.amountMinor}
+            median={median.amountMinor}
+            average={average.amountMinor}
+            smallGroup={statistics.smallGroup}
+            label={`The salary range of ${statisticsHeading(statistics)}, from minimum to maximum, with the median and the average marked`}
+          />
+          <SimpleGrid cols={{ base: 1, xs: 3 }} spacing="md">
+            <Figurette label="Minimum" value={formatFigure(min)} />
+            <Figurette label="Average" value={formatFigure(average)} align="center" />
+            <Figurette label="Maximum" value={formatFigure(max)} align="right" />
           </SimpleGrid>
-        </>
+          <Muted size="xs">The tick is the median and the diamond the average.</Muted>
+        </Stack>
       )}
-      <Group gap="lg">
+      <Group gap="lg" mt="lg" className={classes.links}>
         <Anchor
           renderRoot={(props) => <Link {...props} to="/employees" search={{ jobTitle, country }} />}
         >
@@ -130,7 +148,7 @@ function Statistics({ statistics }: { statistics: PayStatisticsResponse }) {
           See who&apos;s paid out of line
         </Anchor>
       </Group>
-    </Stack>
+    </Panel>
   );
 }
 
@@ -139,29 +157,38 @@ function formatFigure(figure: Money | null): string {
   return figure === null ? '–' : formatMoney(figure, 'en');
 }
 
-function Figure({ label, value }: { label: string; value: string }) {
+function Figurette({
+  label,
+  value,
+  align = 'left',
+}: {
+  label: string;
+  value: string;
+  align?: 'left' | 'center' | 'right';
+}) {
   return (
-    <Paper withBorder p="md">
-      <Text size="sm" c="dimmed">
+    <div className={classes.figurette} data-align={align}>
+      <Text size="sm" c="gray.6">
         {label}
       </Text>
-      <Text size="xl" fw={600} style={{ whiteSpace: 'nowrap' }}>
+      <Text fz="lg" fw={600} style={{ whiteSpace: 'nowrap' }}>
         {value}
       </Text>
-    </Paper>
+    </div>
   );
 }
 
 function StatisticsSkeleton() {
   return (
     <Stack gap="md" aria-busy="true" aria-label="Loading">
-      <Skeleton height={28} width="45%" />
-      <SimpleGrid cols={{ base: 1, xs: 2, md: 5 }}>
-        {Array.from({ length: 5 }, (_, figure) => (
-          <Skeleton key={figure} height={72} />
+      <Skeleton height={24} width="45%" />
+      <Skeleton height={48} width="35%" />
+      <Skeleton height={28} />
+      <SimpleGrid cols={{ base: 1, xs: 3 }}>
+        {Array.from({ length: 3 }, (_, figure) => (
+          <Skeleton key={figure} height={48} />
         ))}
       </SimpleGrid>
-      <Skeleton height={16} width="60%" />
     </Stack>
   );
 }

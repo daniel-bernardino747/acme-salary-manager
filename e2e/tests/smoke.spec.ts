@@ -54,7 +54,7 @@ test("question 4's headline costs the planted gaps, as the seed story test expec
 });
 
 /** Added, edited and deleted below. No seeded name has this family name. */
-const added = { name: 'Aarav Playwright', jobTitle: 'Data Analyst', department: 'Data' };
+const addedEmployee = { name: 'Aarav Playwright', jobTitle: 'Data Analyst', department: 'Data' };
 
 test('adding an employee in India saves the salary typed as 1,250,000.50 to the paisa', async ({
   page,
@@ -62,32 +62,32 @@ test('adding an employee in India saves the salary typed as 1,250,000.50 to the 
   await page.goto('/employees');
   await page.getByRole('link', { name: 'Add employee' }).click();
 
-  await page.getByRole('textbox', { name: 'Name', exact: true }).fill(added.name);
+  await page.getByRole('textbox', { name: 'Name', exact: true }).fill(addedEmployee.name);
   await page.getByRole('combobox', { name: 'Job title' }).click();
-  await page.getByRole('option', { name: added.jobTitle, exact: true }).click();
+  await page.getByRole('option', { name: addedEmployee.jobTitle, exact: true }).click();
   await page.getByRole('combobox', { name: 'Department' }).click();
-  await page.getByRole('option', { name: added.department, exact: true }).click();
+  await page.getByRole('option', { name: addedEmployee.department, exact: true }).click();
   await page.getByRole('combobox', { name: 'Country' }).click();
   await page.getByRole('option', { name: 'India', exact: true }).click();
   await page.getByRole('textbox', { name: 'Annual salary' }).fill('1,250,000.50');
   await page.getByRole('button', { name: 'Add employee' }).click();
 
-  await expect(page.getByRole('heading', { name: added.name, level: 2 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: addedEmployee.name, level: 2 })).toBeVisible();
   await expect(page.getByText('₹1,250,000.50 INR', { exact: true })).toBeVisible();
 });
 
 /** Finds the added employee by name on the list and opens their page. */
-async function openAdded(page: Page) {
+async function openAddedEmployee(page: Page) {
   await page.goto('/employees');
-  await page.getByRole('textbox', { name: 'Search' }).fill(added.name);
+  await page.getByRole('textbox', { name: 'Search' }).fill(addedEmployee.name);
   // The search reaches the list after its debounce; the assertion waits for it, never a timer.
   await expect(page.getByText('1–1 of 1', { exact: true })).toBeVisible();
-  await page.getByRole('link', { name: added.name, exact: true }).click();
-  await expect(page.getByRole('heading', { name: added.name, level: 2 })).toBeVisible();
+  await page.getByRole('link', { name: addedEmployee.name, exact: true }).click();
+  await expect(page.getByRole('heading', { name: addedEmployee.name, level: 2 })).toBeVisible();
 }
 
 test('editing that employee starts from their salary and saves a raise', async ({ page }) => {
-  await openAdded(page);
+  await openAddedEmployee(page);
   await page.getByRole('link', { name: 'Edit' }).click();
 
   const salary = page.getByRole('textbox', { name: 'Annual salary' });
@@ -95,20 +95,20 @@ test('editing that employee starts from their salary and saves a raise', async (
   await salary.fill('1,300,000');
   await page.getByRole('button', { name: 'Save changes' }).click();
 
-  await expect(page.getByText(`Saved ${added.name}`, { exact: true })).toBeVisible();
+  await expect(page.getByText(`Saved ${addedEmployee.name}`, { exact: true })).toBeVisible();
   await expect(page.getByText('₹1,300,000.00 INR', { exact: true })).toBeVisible();
 });
 
 test('deleting that employee, after a confirmation naming them, removes them from the list', async ({
   page,
 }) => {
-  await openAdded(page);
+  await openAddedEmployee(page);
   await page.getByRole('button', { name: 'Delete', exact: true }).click();
 
-  const confirmation = page.getByRole('dialog', { name: `Delete ${added.name}?` });
-  await confirmation.getByRole('button', { name: `Delete ${added.name}` }).click();
+  const confirmation = page.getByRole('dialog', { name: `Delete ${addedEmployee.name}?` });
+  await confirmation.getByRole('button', { name: `Delete ${addedEmployee.name}` }).click();
 
   await expect(page).toHaveURL(/\/employees(\?|$)/);
-  await page.getByRole('textbox', { name: 'Search' }).fill(added.name);
+  await page.getByRole('textbox', { name: 'Search' }).fill(addedEmployee.name);
   await expect(page.getByText('No employees match these filters.', { exact: true })).toBeVisible();
 });

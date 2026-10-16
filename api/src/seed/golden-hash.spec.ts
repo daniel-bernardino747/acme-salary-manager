@@ -12,4 +12,14 @@ describe('generatorGoldenHash', () => {
       GENERATOR_GOLDEN_HASH,
     );
   });
+
+  it('is the same on a second run, which gives identical output', () => {
+    const first = generateEmployees();
+    const second = generateEmployees();
+
+    expect(second).toEqual(first);
+    expect(generatorGoldenHash(second.map((g) => g.employee))).toBe(
+      generatorGoldenHash(first.map((g) => g.employee)),
+    );
+  });
 });

@@ -28,8 +28,16 @@ import { createEmployee } from '../persistence/create-employee';
 import type { Db } from '../persistence/db';
 import { deleteEmployee } from '../persistence/delete-employee';
 import { findEmployee } from '../persistence/find-employee';
-import { replaceEmployee } from '../persistence/replace-employee';
 import { listEmployees } from '../persistence/list-employees';
+import { replaceEmployee } from '../persistence/replace-employee';
+
+/** The `:id` of every single-employee route: a positive integer, or a 400 (ADR 0003). */
+const employeeId = new ZodValidationPipe(employeeIdSchema);
+const employeeBody = new ZodValidationPipe(employeeRequestSchema);
+
+function employeeNotFound(id: number): NotFoundException {
+  return new NotFoundException(`Employee ${id} does not exist`);
+}
 
 @Controller('employees')
 export class EmployeesController {
@@ -44,15 +52,15 @@ export class EmployeesController {
   }
 
   @Get(':id')
-  view(@Param('id', new ZodValidationPipe(employeeIdSchema)) id: number): EmployeeResponse {
+  view(@Param('id', employeeId) id: number): EmployeeResponse {
     const employee = findEmployee(this.db, id);
-    if (!employee) throw new NotFoundException(`Employee ${id} does not exist`);
+    if (!employee) throw employeeNotFound(id);
     return employee;
   }
 
   @Post()
   add(
-    @Body(new ZodValidationPipe(employeeRequestSchema)) body: EmployeeRequest,
+    @Body(employeeBody) body: EmployeeRequest,
     @Res({ passthrough: true }) res: Response,
   ): EmployeeResponse {
     const employee = createEmployee(this.db, body);
@@ -62,19 +70,17 @@ export class EmployeesController {
 
   @Put(':id')
   edit(
-    @Param('id', new ZodValidationPipe(employeeIdSchema)) id: number,
-    @Body(new ZodValidationPipe(employeeRequestSchema)) body: EmployeeRequest,
+    @Param('id', employeeId) id: number,
+    @Body(employeeBody) body: EmployeeRequest,
   ): EmployeeResponse {
     const employee = replaceEmployee(this.db, id, body);
-    if (!employee) throw new NotFoundException(`Employee ${id} does not exist`);
+    if (!employee) throw employeeNotFound(id);
     return employee;
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id', new ZodValidationPipe(employeeIdSchema)) id: number): void {
-    if (!deleteEmployee(this.db, id)) {
-      throw new NotFoundException(`Employee ${id} does not exist`);
-    }
+  remove(@Param('id', employeeId) id: number): void {
+    if (!deleteEmployee(this.db, id)) throw employeeNotFound(id);
   }
 }

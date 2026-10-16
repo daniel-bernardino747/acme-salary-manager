@@ -11,7 +11,7 @@ import records from '../components/records.module.css';
 import { countText, employeeCount } from '../format/counts';
 import { countryName } from '../format/country-name';
 import { shareBars } from '../format/overview';
-import { payrollFootnote, shareText } from '../format/payroll-copy';
+import { outliersInCountryText, payrollFootnote, shareText } from '../format/payroll-copy';
 import { wholeUnits } from '../format/whole-units';
 import { pageQuestion } from '../layout/navigation';
 import classes from './payroll-totals.module.css';
@@ -175,11 +175,7 @@ function TotalsTable({
                   )}
                   onClick={(event) => event.stopPropagation()}
                 >
-                  Outliers in{' '}
-                  {row.country === 'US' || row.country === 'GB' || row.country === 'NL'
-                    ? 'the '
-                    : ''}
-                  {row.name}
+                  {outliersInCountryText(row.country)}
                 </Anchor>
               </Table.Td>
             )}

@@ -13,3 +13,8 @@ export function listRange({ page, pageSize, total }: ListPage): string {
   const last = Math.min(page * pageSize, total);
   return `${counts.format(first)}–${counts.format(last)} of ${counts.format(total)}`;
 }
+
+/** How many pages the list has, a partial last page included. */
+export function pageCount({ pageSize, total }: Pick<ListPage, 'pageSize' | 'total'>): number {
+  return Math.ceil(total / pageSize);
+}

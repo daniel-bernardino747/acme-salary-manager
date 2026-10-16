@@ -1,7 +1,11 @@
 import { currencyOf } from '@acme/contract';
 import { describe, expect, it } from 'vitest';
+import { compaRatioHundredths } from '../domain/compa-ratio';
 import { findOutliers, type PeerGroupMember } from '../domain/outliers';
+import { median } from '../domain/statistics';
+import { inCell } from './cell';
 import { generateEmployees } from './generate-employees';
+import { boundaryPlants } from './plants';
 
 // ADR 0005, *Tests*, *The story*: question 4 on the full seed finds exactly what was planted.
 
@@ -35,5 +39,21 @@ describe('the outlier story on the full seed', () => {
 
     expect(planted).toHaveLength(20);
     expect(flagged.toSorted(byId)).toEqual(planted);
+  });
+
+  it('flags neither boundary plant, whose compa-ratios are exactly 80 and 120 hundredths, shown as "0.80" and "1.20"', () => {
+    const flaggedIds = new Set(findOutliers(everyone).outliers.map((o) => o.employee.id));
+
+    for (const plant of boundaryPlants) {
+      const { employee } = everyone[generated.findIndex((g) => g.plant === plant)] ?? {};
+      const group = everyone.filter((m) => inCell(plant.jobTitle, plant.country)(m.employee));
+      const peerMedian = median(group.map((m) => m.employee.annualSalary.amountMinor));
+
+      expect(employee && peerMedian).toBeTruthy();
+      expect(flaggedIds.has(employee?.id ?? 0)).toBe(false);
+      expect(compaRatioHundredths(employee?.annualSalary.amountMinor ?? 0, peerMedian ?? 1)).toBe(
+        plant.ratioHundredths,
+      );
+    }
   });
 });

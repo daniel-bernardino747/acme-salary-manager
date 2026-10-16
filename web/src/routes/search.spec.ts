@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { employeesSearchSchema } from './search';
+import { employeesSearchSchema, outliersSearchSchema } from './search';
 
 describe('employeesSearchSchema', () => {
   it('keeps valid values', () => {
@@ -42,5 +42,25 @@ describe('employeesSearchSchema', () => {
 
   it('ignores unknown parameters', () => {
     expect(employeesSearchSchema.parse({ contry: 'IN' })).toEqual({ page: 1 });
+  });
+});
+
+describe('outliersSearchSchema', () => {
+  it('opens on the underpaid, first page', () => {
+    expect(outliersSearchSchema.parse({})).toEqual({ page: 1, direction: 'below' });
+  });
+
+  it('keeps a valid direction and filters', () => {
+    expect(
+      outliersSearchSchema.parse({ page: 3, direction: 'all', country: 'NL', department: 'Data' }),
+    ).toEqual({ page: 3, direction: 'all', country: 'NL', department: 'Data' });
+  });
+
+  it('falls back to the underpaid for an unknown direction', () => {
+    expect(outliersSearchSchema.parse({ direction: 'sideways', jobTitle: 'Accountant' })).toEqual({
+      page: 1,
+      direction: 'below',
+      jobTitle: 'Accountant',
+    });
   });
 });

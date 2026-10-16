@@ -1,7 +1,7 @@
-import type { OutliersQuery, OutliersResponse } from '@acme/contract';
+import { exchangeRates, type OutliersQuery, type OutliersResponse } from '@acme/contract';
 import { Inject, Injectable } from '@nestjs/common';
 import { DB } from '../database.module';
-import { findOutliers } from '../domain/outliers';
+import { costToReachThreshold, findOutliers } from '../domain/outliers';
 import type { Db } from '../persistence/db';
 import { peerGroupMembers } from '../persistence/peer-group-members';
 
@@ -18,6 +18,15 @@ export class OutliersService {
       peerGroupMembers(this.db, filters),
       direction,
     );
-    return { items: outliers, page, pageSize, total: outliers.length, smallGroupHeadcount };
+    const listed = { items: outliers, page, pageSize, total: outliers.length, smallGroupHeadcount };
+    if (direction !== 'below') {
+      return listed;
+    }
+    // Only an underpaid list has one cost, over every page, with the rates that converted it.
+    return {
+      ...listed,
+      costToReachThreshold: { usd: costToReachThreshold(outliers) },
+      rates: { source: exchangeRates.source, asOf: exchangeRates.asOf },
+    };
   }
 }

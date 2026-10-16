@@ -2,7 +2,6 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
-  redirect,
   type RouterHistory,
 } from '@tanstack/react-router';
 import { AppLayout } from './layout/app-layout';
@@ -19,6 +18,7 @@ import { EmployeeList } from './screens/employee-list';
 import { EmployeeView } from './screens/employee-view';
 import { NotFound } from './screens/not-found';
 import { Outliers } from './screens/outliers';
+import { Overview } from './screens/overview';
 import { PayComparison } from './screens/pay-comparison';
 import { PayStatistics } from './screens/pay-statistics';
 import { PayrollTotals } from './screens/payroll-totals';
@@ -30,13 +30,14 @@ const rootRoute = createRootRoute({
   notFoundComponent: NotFound,
 });
 
-/** The app opens on the grand total, the first number the HR Manager asks for (ADR 0001). */
+/**
+ * The app opens on the Overview, whose first figure is still the grand total (ADR 0001; ADR 0004,
+ * *Overview*, as amended by #40).
+ */
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  beforeLoad: () => {
-    throw redirect({ to: '/pay/payroll', replace: true });
-  },
+  component: Overview,
 });
 
 const employeesRoute = createRoute({

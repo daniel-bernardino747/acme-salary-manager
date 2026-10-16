@@ -35,9 +35,16 @@ export interface DepartmentPayroll {
   sharePermille: number | null;
 }
 
+/** The whole organization's payroll total in USD, the first number the HR Manager asks for. */
+export interface GrandTotal {
+  headcount: number;
+  usd: Money;
+}
+
 export interface PayrollTotals {
   byCountry: CountryPayroll[];
   byDepartment: DepartmentPayroll[];
+  grandTotal: GrandTotal;
 }
 
 /**
@@ -68,7 +75,7 @@ function sharePermille(part: Money, grandTotal: Money): number {
 
 /**
  * Question 2: the payroll total of every country and every department, each in fixed order, with
- * its share of the grand total. Those without employees are listed too, at 0.
+ * its share of the grand total, and the grand total. Those without employees are listed too, at 0.
  */
 export function payrollTotals(
   employees: readonly PayrollEmployee[],
@@ -104,5 +111,5 @@ export function payrollTotals(
       sharePermille: sharePermille(usd, grandTotal),
     };
   });
-  return { byCountry, byDepartment };
+  return { byCountry, byDepartment, grandTotal: { headcount: employees.length, usd: grandTotal } };
 }

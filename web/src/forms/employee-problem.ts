@@ -10,14 +10,14 @@ export interface EmployeeProblem {
 }
 
 /** Each request body field, by its name in the body, as the form field that shows it. */
-const formFieldOf: Record<string, FormField> = {
-  name: 'name',
-  jobTitle: 'jobTitle',
-  department: 'department',
-  country: 'country',
+const formFieldOf = new Map<unknown, FormField>([
+  ['name', 'name'],
+  ['jobTitle', 'jobTitle'],
+  ['department', 'department'],
+  ['country', 'country'],
   // The one rename (ADR 0004, *Forms: add and edit*).
-  annualSalaryMinor: 'annualSalary',
-};
+  ['annualSalaryMinor', 'annualSalary'],
+]);
 
 /**
  * Maps a problem's errors onto the form by `path[0]` (ADR 0004, *Forms: add and edit*), so each
@@ -31,9 +31,7 @@ export function employeeProblem(problem: Problem): EmployeeProblem {
   const fieldErrors: EmployeeProblem['fieldErrors'] = {};
   const unmapped: string[] = [];
   for (const error of problem.errors) {
-    const field = Object.hasOwn(formFieldOf, String(error.path[0]))
-      ? formFieldOf[String(error.path[0])]
-      : undefined;
+    const field = formFieldOf.get(error.path[0]);
     if (field) {
       fieldErrors[field] ??= error.message;
     } else {

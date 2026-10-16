@@ -43,4 +43,21 @@ describe('anchoredSalaries', () => {
     );
     expect(median(planted)).toBe(baseMinor);
   });
+
+  it('refuses a planted salary inside the draw range, or more plants on a side than it has draws', () => {
+    const group = { baseMinor, stepMinor, size: 7 };
+
+    expect(() => anchoredSalaries(streamFor('a'), { ...group, underpaid: [lowest] })).toThrow(
+      RangeError,
+    );
+    expect(() => anchoredSalaries(streamFor('a'), { ...group, overpaid: [highest] })).toThrow(
+      RangeError,
+    );
+    expect(() =>
+      anchoredSalaries(streamFor('a'), {
+        ...group,
+        overpaid: [109_590_00, 110_000_00, 120_000_00, 130_000_00],
+      }),
+    ).toThrow(RangeError);
+  });
 });

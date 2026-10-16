@@ -66,8 +66,12 @@ function usdTotal(salaries: readonly Money[], ratesPerUsd: RatesPerUsd): Money {
 /**
  * A part's share of payroll: its USD total in tenths of a percent of the grand total, rounded half
  * up once (ADR 0003, *Money on the wire*). `part · 1000` can pass 2⁵³, so it divides in BigInt.
+ * `null` when the grand total is 0: nothing has a share of nothing.
  */
-function sharePermille(part: Money, grandTotal: Money): number {
+function sharePermille(part: Money, grandTotal: Money): number | null {
+  if (grandTotal.amountMinor === 0) {
+    return null;
+  }
   return Number(
     divideRoundHalfUpBigInt(BigInt(part.amountMinor) * 1000n, BigInt(grandTotal.amountMinor)),
   );

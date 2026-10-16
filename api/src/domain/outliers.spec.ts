@@ -77,8 +77,8 @@ describe('findOutliers', () => {
   });
 
   it('checks a peer group of exactly 5 and never a group of 4', () => {
-    // Both groups have the same salaries but one, and the same median: ₹20,00,000.00 for the 4
-    // (the mean of the two middle ones) and for the 5. ₹10,00,000.00 is 0.50 of it in both.
+    // Both groups have the same salaries but one, and the same median: ₹2,000,000.00 for the 4
+    // (the mean of the two middle ones) and for the 5. ₹1,000,000.00 is 0.50 of it in both.
     const small = { jobTitle: 'Data Analyst', country: 'IN' } as const;
     const checked = { jobTitle: 'Data Scientist', country: 'IN' } as const;
     const underpaid = member(1_000_000_00, checked);
@@ -152,7 +152,7 @@ describe('findOutliers', () => {
 describe('findOutliers ranking', () => {
   it('ranks the most extreme first, by distance from 1.00, across peer groups and directions', () => {
     // US median $10,000.00: 1.40 is 0.40 away, 0.75 is 0.25, 0.795 is 0.205 and 0.7996 is 0.2004.
-    // IN median ₹20,00,000.00: 0.65 is 0.35 away. 0.795 and 0.7996 both show as 0.79, so only the
+    // IN median ₹2,000,000.00: 0.65 is 0.35 away. 0.795 and 0.7996 both show as 0.79, so only the
     // exact distance tells them apart.
     const us = (salary: number) => member(salary, { jobTitle: 'Product Manager', country: 'US' });
     const india = (salary: number) => member(salary, { jobTitle: 'Accountant', country: 'IN' });

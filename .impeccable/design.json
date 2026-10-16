@@ -1,0 +1,610 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-16T20:43:04.458Z",
+  "title": "Design System: ACME Salary Manager",
+  "extensions": {
+    "colorMeta": {
+      "cover-navy": {
+        "role": "secondary",
+        "displayName": "Cover Navy",
+        "canonical": "theme.colors.cover[7] (--acme-rail)",
+        "tonalRamp": [
+          "#0c1120",
+          "#131a30",
+          "#1b2440",
+          "#2a3557",
+          "#3d4b78",
+          "#586795",
+          "#7e8bb0",
+          "#a9b2cb",
+          "#d3d8e5",
+          "#eceef4"
+        ]
+      },
+      "cover-raised": {
+        "role": "secondary",
+        "displayName": "Cover Raised",
+        "canonical": "theme.colors.cover[6]",
+        "tonalRamp": [
+          "#0c1120",
+          "#131a30",
+          "#1b2440",
+          "#2a3557",
+          "#3d4b78",
+          "#586795",
+          "#7e8bb0",
+          "#a9b2cb",
+          "#d3d8e5",
+          "#eceef4"
+        ]
+      },
+      "cover-mist": {
+        "role": "secondary",
+        "displayName": "Cover Mist",
+        "canonical": "theme.colors.cover[1]",
+        "tonalRamp": [
+          "#0c1120",
+          "#131a30",
+          "#1b2440",
+          "#2a3557",
+          "#3d4b78",
+          "#586795",
+          "#7e8bb0",
+          "#a9b2cb",
+          "#d3d8e5",
+          "#eceef4"
+        ]
+      },
+      "cover-haze": {
+        "role": "secondary",
+        "displayName": "Cover Haze",
+        "canonical": "theme.colors.cover[2]",
+        "tonalRamp": [
+          "#0c1120",
+          "#131a30",
+          "#1b2440",
+          "#2a3557",
+          "#3d4b78",
+          "#586795",
+          "#7e8bb0",
+          "#a9b2cb",
+          "#d3d8e5",
+          "#eceef4"
+        ]
+      },
+      "visa-teal": {
+        "role": "primary",
+        "displayName": "Visa Teal",
+        "canonical": "theme.colors.visa[6] (primaryColor, primaryShade 6, --acme-action)",
+        "tonalRamp": [
+          "#14322f",
+          "#1d4541",
+          "#265853",
+          "#2f6b66",
+          "#3d827b",
+          "#549a93",
+          "#7bb3ad",
+          "#a8cdc9",
+          "#d3e6e4",
+          "#eaf3f2"
+        ]
+      },
+      "visa-deep": {
+        "role": "primary",
+        "displayName": "Visa Deep",
+        "canonical": "theme.colors.visa[7]",
+        "tonalRamp": [
+          "#14322f",
+          "#1d4541",
+          "#265853",
+          "#2f6b66",
+          "#3d827b",
+          "#549a93",
+          "#7bb3ad",
+          "#a8cdc9",
+          "#d3e6e4",
+          "#eaf3f2"
+        ]
+      },
+      "visa-line": {
+        "role": "primary",
+        "displayName": "Visa Line",
+        "canonical": "theme.colors.visa[4]",
+        "tonalRamp": [
+          "#14322f",
+          "#1d4541",
+          "#265853",
+          "#2f6b66",
+          "#3d827b",
+          "#549a93",
+          "#7bb3ad",
+          "#a8cdc9",
+          "#d3e6e4",
+          "#eaf3f2"
+        ]
+      },
+      "visa-light": {
+        "role": "primary",
+        "displayName": "Visa Light",
+        "canonical": "theme.colors.visa[2]",
+        "tonalRamp": [
+          "#14322f",
+          "#1d4541",
+          "#265853",
+          "#2f6b66",
+          "#3d827b",
+          "#549a93",
+          "#7bb3ad",
+          "#a8cdc9",
+          "#d3e6e4",
+          "#eaf3f2"
+        ]
+      },
+      "visa-wash": {
+        "role": "primary",
+        "displayName": "Visa Wash",
+        "canonical": "theme.colors.visa[0]",
+        "tonalRamp": [
+          "#14322f",
+          "#1d4541",
+          "#265853",
+          "#2f6b66",
+          "#3d827b",
+          "#549a93",
+          "#7bb3ad",
+          "#a8cdc9",
+          "#d3e6e4",
+          "#eaf3f2"
+        ]
+      },
+      "underpaid-orange": {
+        "role": "tertiary",
+        "displayName": "Underpaid Orange",
+        "canonical": "theme.colors.under[6] (--acme-under)",
+        "tonalRamp": [
+          "#52240a",
+          "#6e310d",
+          "#8a3e10",
+          "#a64b14",
+          "#b85a1e",
+          "#cc6e32",
+          "#e08f5b",
+          "#ebb591",
+          "#f5d9c6",
+          "#fbefe7"
+        ]
+      },
+      "overpaid-plum": {
+        "role": "tertiary",
+        "displayName": "Overpaid Plum",
+        "canonical": "theme.colors.over[6] (--acme-over)",
+        "tonalRamp": [
+          "#321b3a",
+          "#452550",
+          "#583065",
+          "#6b3a7a",
+          "#7d4b90",
+          "#9564a8",
+          "#b086bf",
+          "#cbaed5",
+          "#e5d5ea",
+          "#f4edf6"
+        ]
+      },
+      "document-ink": {
+        "role": "neutral",
+        "displayName": "Document Ink",
+        "canonical": "theme.black (--acme-ink)",
+        "tonalRamp": [
+          "#1a1f18",
+          "#2f352c",
+          "#454c40",
+          "#596254",
+          "#7a8273",
+          "#9ba394",
+          "#bcc4b6",
+          "#d9ded3",
+          "#e7ebe2",
+          "#f3f5ef"
+        ]
+      },
+      "document-white": {
+        "role": "neutral",
+        "displayName": "Document White",
+        "canonical": "theme.white (--acme-panel)",
+        "tonalRamp": [
+          "#1a1f18",
+          "#2f352c",
+          "#454c40",
+          "#596254",
+          "#7a8273",
+          "#9ba394",
+          "#bcc4b6",
+          "#d9ded3",
+          "#e7ebe2",
+          "#f3f5ef"
+        ]
+      },
+      "security-tint": {
+        "role": "neutral",
+        "displayName": "Security Tint",
+        "canonical": "theme.colors.gray[0] (--acme-ground)",
+        "tonalRamp": [
+          "#1a1f18",
+          "#2f352c",
+          "#454c40",
+          "#596254",
+          "#7a8273",
+          "#9ba394",
+          "#bcc4b6",
+          "#d9ded3",
+          "#e7ebe2",
+          "#f3f5ef"
+        ]
+      },
+      "tint-wash": {
+        "role": "neutral",
+        "displayName": "Tint Wash",
+        "canonical": "theme.colors.gray[1]",
+        "tonalRamp": [
+          "#1a1f18",
+          "#2f352c",
+          "#454c40",
+          "#596254",
+          "#7a8273",
+          "#9ba394",
+          "#bcc4b6",
+          "#d9ded3",
+          "#e7ebe2",
+          "#f3f5ef"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "theme.colors.gray[2] (--acme-hairline)",
+        "tonalRamp": [
+          "#1a1f18",
+          "#2f352c",
+          "#454c40",
+          "#596254",
+          "#7a8273",
+          "#9ba394",
+          "#bcc4b6",
+          "#d9ded3",
+          "#e7ebe2",
+          "#f3f5ef"
+        ]
+      },
+      "field-line": {
+        "role": "neutral",
+        "displayName": "Field Line",
+        "canonical": "theme.colors.gray[3]",
+        "tonalRamp": [
+          "#1a1f18",
+          "#2f352c",
+          "#454c40",
+          "#596254",
+          "#7a8273",
+          "#9ba394",
+          "#bcc4b6",
+          "#d9ded3",
+          "#e7ebe2",
+          "#f3f5ef"
+        ]
+      },
+      "hatch-grey": {
+        "role": "neutral",
+        "displayName": "Hatch Grey",
+        "canonical": "theme.colors.gray[4]",
+        "tonalRamp": [
+          "#1a1f18",
+          "#2f352c",
+          "#454c40",
+          "#596254",
+          "#7a8273",
+          "#9ba394",
+          "#bcc4b6",
+          "#d9ded3",
+          "#e7ebe2",
+          "#f3f5ef"
+        ]
+      },
+      "muted-ink": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "theme.colors.gray[6] (--acme-muted)",
+        "tonalRamp": [
+          "#1a1f18",
+          "#2f352c",
+          "#454c40",
+          "#596254",
+          "#7a8273",
+          "#9ba394",
+          "#bcc4b6",
+          "#d9ded3",
+          "#e7ebe2",
+          "#f3f5ef"
+        ]
+      },
+      "label-ink": {
+        "role": "neutral",
+        "displayName": "Label Ink",
+        "canonical": "theme.colors.gray[7]",
+        "tonalRamp": [
+          "#1a1f18",
+          "#2f352c",
+          "#454c40",
+          "#596254",
+          "#7a8273",
+          "#9ba394",
+          "#bcc4b6",
+          "#d9ded3",
+          "#e7ebe2",
+          "#f3f5ef"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "The answer on a page: a total, a count, a median. 2.0625rem below 36em."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "The page h1, followed by its question."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "h2 headings and the outlier headline sentence."
+      },
+      "panel-title": {
+        "displayName": "Panel Title",
+        "purpose": "The title of each document panel."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text and table cells; tabular figures throughout."
+      },
+      "body-small": {
+        "displayName": "Body Small",
+        "purpose": "Meta lines, records, rail links, search triggers."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Table headers in sentence case, footnotes, badges."
+      },
+      "stamp": {
+        "displayName": "Stamp",
+        "purpose": "Only inside the country stamp."
+      }
+    },
+    "shadows": [
+      {
+        "name": "xs",
+        "value": "0 1px 2px rgba(27, 36, 64, 0.06)",
+        "purpose": "A pressable field, at rest or on hover."
+      },
+      {
+        "name": "sm",
+        "value": "0 1px 3px rgba(27, 36, 64, 0.08), 0 1px 2px rgba(27, 36, 64, 0.04)",
+        "purpose": "The Overview find field on hover."
+      },
+      {
+        "name": "md",
+        "value": "0 6px 16px -4px rgba(27, 36, 64, 0.14), 0 2px 4px rgba(27, 36, 64, 0.06)",
+        "purpose": "Combobox dropdowns."
+      },
+      {
+        "name": "xl",
+        "value": "0 24px 64px -16px rgba(27, 36, 64, 0.32)",
+        "purpose": "The global search overlay."
+      },
+      {
+        "name": "focus-row",
+        "value": "inset 0 0 0 1px #7bb3ad",
+        "purpose": "A table row under keyboard focus, with the visa-wash background."
+      },
+      {
+        "name": "focus-outline",
+        "value": "outline: 2px solid #2f6b66; outline-offset: 2px",
+        "purpose": "Global :focus-visible; on the rail, #a8cdc9 offset 1px."
+      },
+      {
+        "name": "header-glass",
+        "value": "background: color-mix(in srgb, #f3f5ef 92%, transparent); backdrop-filter: saturate(1.4) blur(8px)",
+        "purpose": "The header over scrolled content, above a hairline."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-acme",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "All state transitions (--acme-ease)."
+      },
+      {
+        "name": "duration-control",
+        "value": "150ms",
+        "purpose": "Rail links, search fields: background, border, shadow."
+      },
+      {
+        "name": "duration-row",
+        "value": "120ms",
+        "purpose": "Table row hover background."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "0.01ms",
+        "purpose": "All animation and transition durations under prefers-reduced-motion: reduce; Mantine respectReducedMotion on."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "36em"
+      },
+      {
+        "name": "drawer",
+        "value": "48em"
+      },
+      {
+        "name": "two-column",
+        "value": "62em"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one filled action per view, e.g. Add employee.",
+      "html": "<button class=\"ds-btn-primary\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg>Add employee</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 18px; background: #2f6b66; color: #fff; border: 0; border-radius: 4px; font-family: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: background-color 150ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-btn-primary:hover { background: #265853; } .ds-btn-primary:focus-visible { outline: 2px solid #2f6b66; outline-offset: 2px; }"
+    },
+    {
+      "name": "Country Stamp",
+      "kind": "custom",
+      "refersTo": "country-stamp",
+      "description": "The double-hairline frame round a country and its currency, wherever either appears.",
+      "html": "<span class=\"ds-stamp\">IN · INR</span> <span class=\"ds-stamp ds-stamp-lg\">BR · BRL</span>",
+      "css": ".ds-stamp { display: inline-block; font-family: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; line-height: 1; white-space: nowrap; color: #265853; padding: 3px 5px; border: 1px solid #549a93; outline: 1px solid #549a93; outline-offset: 1.5px; border-radius: 1px; margin: 2px 3px; } .ds-stamp-lg { font-size: 0.875rem; padding: 5px 8px; outline-offset: 2px; }"
+    },
+    {
+      "name": "Page Header with Security Band",
+      "kind": "custom",
+      "refersTo": "headline",
+      "description": "Every page title: h1, its question, and the guilloche band.",
+      "html": "<header class=\"ds-page\"><h1 class=\"ds-h1\">Across countries</h1><p class=\"ds-question\">How does pay for a job title compare across countries?</p><div class=\"ds-band\" aria-hidden=\"true\"></div></header>",
+      "css": ".ds-page { background: #f3f5ef; padding: 24px; font-family: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-h1 { margin: 0; font-size: 2.0625rem; font-weight: 700; line-height: 1.15; color: #1a1f2b; } .ds-question { margin: 4px 0 0; color: #596254; } .ds-band { height: 12px; margin-top: 16px; background: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='12' viewBox='0 0 48 12'%3E%3Cg fill='none' stroke-width='0.7'%3E%3Cpath d='M0 6C6 0 6 0 12 6S18 12 24 6 30 0 36 6 42 12 48 6' stroke='%232f6b66' stroke-opacity='0.45'/%3E%3Cpath d='M0 6C6 12 6 12 12 6S18 0 24 6 30 12 36 6 42 0 48 6' stroke='%232f6b66' stroke-opacity='0.45'/%3E%3Cpath d='M0 3C12 10 12 10 24 3S36 -4 48 3' stroke='%231b2440' stroke-opacity='0.22'/%3E%3Cpath d='M0 9C12 2 12 2 24 9S36 16 48 9' stroke='%231b2440' stroke-opacity='0.22'/%3E%3C/g%3E%3C/svg%3E\") left center / 48px 12px repeat-x; }"
+    },
+    {
+      "name": "Document Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "A white panel with a hairline edge on the tint; never nested, no resting shadow.",
+      "html": "<div class=\"ds-ground\"><section class=\"ds-panel\"><h2 class=\"ds-panel-title\">Annual payroll</h2><div class=\"ds-figure\">$669,197,391</div><p class=\"ds-muted\">10,000 employees</p></section></div>",
+      "css": ".ds-ground { background: #f3f5ef; padding: 24px; font-family: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #1a1f2b; font-variant-numeric: tabular-nums; } .ds-panel { background: #fff; border: 1px solid #d9ded3; border-radius: 6px; padding: 24px; } .ds-panel-title { margin: 0 0 12px; font-size: 1.1875rem; font-weight: 700; line-height: 1.3; } .ds-figure { font-size: 2.5rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; } .ds-muted { margin: 4px 0 0; color: #596254; font-size: 0.875rem; }"
+    },
+    {
+      "name": "Rail Navigation",
+      "kind": "nav",
+      "refersTo": "nav-rail",
+      "description": "The cover-navy rail: links, an uppercase group label, the outlier count, the active item lifted white.",
+      "html": "<nav class=\"ds-rail\"><a class=\"ds-link\" href=\"#\">Overview</a><a class=\"ds-link\" data-active href=\"#\">Employees</a><div class=\"ds-group\">Pay</div><a class=\"ds-link\" href=\"#\">Outliers<span class=\"ds-count\">14</span></a><a class=\"ds-link\" href=\"#\">Payroll</a></nav>",
+      "css": ".ds-rail { width: 240px; padding: 16px; background: #1b2440; font-family: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; } .ds-link { display: flex; align-items: center; justify-content: space-between; min-height: 40px; box-sizing: border-box; padding: 8px 10px; border-radius: 4px; color: #d3d8e5; font-size: 0.875rem; font-weight: 500; text-decoration: none; transition: background-color 150ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-link:hover:not([data-active]) { background: #2a3557; color: #fff; } .ds-link[data-active] { background: #fff; color: #1b2440; font-weight: 700; } .ds-link:focus-visible { outline: 2px solid #a8cdc9; outline-offset: 1px; } .ds-group { padding: 24px 10px 6px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #a9b2cb; } .ds-count { min-width: 24px; box-sizing: border-box; padding: 1px 6px; border-radius: 2px; background: #a64b14; color: #fff; font-size: 0.75rem; font-weight: 700; text-align: center; }"
+    },
+    {
+      "name": "Search Trigger",
+      "kind": "input",
+      "refersTo": "search-trigger",
+      "description": "The header field that opens global search, with its Ctrl K hint in the app face.",
+      "html": "<button class=\"ds-search\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\"><circle cx=\"11\" cy=\"11\" r=\"6.5\"/><path d=\"m16 16 4.5 4.5\"/></svg>Search employees, job titles, countries…<kbd class=\"ds-kbd\">Ctrl K</kbd></button>",
+      "css": ".ds-search { display: flex; align-items: center; gap: 10px; width: min(560px, 100%); height: 40px; padding: 0 10px 0 12px; border: 1px solid #bcc4b6; border-radius: 4px; background: #fff; color: #596254; font-family: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 0.875rem; text-align: left; cursor: pointer; transition: border-color 150ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 150ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-search:hover { border-color: #549a93; box-shadow: 0 1px 2px rgba(27, 36, 64, 0.06); } .ds-search:focus-visible { outline: 2px solid #2f6b66; outline-offset: 2px; } .ds-kbd { margin-left: auto; font-family: inherit; padding: 1px 6px; border: 1px solid #bcc4b6; border-radius: 3px; font-size: 0.75rem; font-weight: 600; color: #596254; background: #f3f5ef; }"
+    },
+    {
+      "name": "Direction Badges",
+      "kind": "chip",
+      "refersTo": "badge-underpaid",
+      "description": "Below and Above: the outlier direction in its colour and always in words.",
+      "html": "<span class=\"ds-badge ds-under\">Below</span> <span class=\"ds-badge ds-over\">Above</span>",
+      "css": ".ds-badge { display: inline-block; padding: 2px 8px; border-radius: 2px; font-family: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; } .ds-under { background: #f5d9c6; color: #a64b14; } .ds-over { background: #e5d5ea; color: #6b3a7a; }"
+    },
+    {
+      "name": "Data Table",
+      "kind": "custom",
+      "refersTo": "table-header",
+      "description": "Hairline-framed table, tinted header in sentence case, right-aligned tabular money, focus lifts the row.",
+      "html": "<div class=\"ds-table-wrap\"><table class=\"ds-table\"><thead><tr><th>Country</th><th class=\"ds-num\">Headcount</th><th class=\"ds-num\">Median</th></tr></thead><tbody><tr tabindex=\"0\"><td><a href=\"#\">India</a> <span class=\"ds-stamp-sm\">IN · INR</span></td><td class=\"ds-num\">423</td><td class=\"ds-num\"><b>$18,782</b></td></tr><tr tabindex=\"0\"><td><a href=\"#\">Brazil</a> <span class=\"ds-stamp-sm\">BR · BRL</span></td><td class=\"ds-num\">167</td><td class=\"ds-num\"><b>$29,984</b></td></tr></tbody></table></div>",
+      "css": ".ds-table-wrap { background: #fff; border: 1px solid #d9ded3; border-radius: 6px; overflow: hidden; font-family: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; color: #1a1f2b; font-variant-numeric: tabular-nums; } .ds-table { width: 100%; border-collapse: collapse; } .ds-table th { background: #f3f5ef; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.02em; color: #454c40; text-align: left; padding: 12px 16px; border-bottom: 1px solid #d9ded3; } .ds-table td { padding: 12px 16px; border-bottom: 1px solid #d9ded3; } .ds-table .ds-num { text-align: right; white-space: nowrap; } .ds-table a { color: #2f6b66; font-weight: 500; text-decoration: none; } .ds-table tbody tr { transition: background-color 120ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-table tbody tr:hover { background: #f2f8f7; } .ds-table tbody tr:focus-within, .ds-table tbody tr:focus { outline: none; background: #eaf3f2; box-shadow: inset 0 0 0 1px #7bb3ad; } .ds-stamp-sm { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; line-height: 1; white-space: nowrap; color: #265853; padding: 3px 5px; border: 1px solid #549a93; outline: 1px solid #549a93; outline-offset: 1.5px; border-radius: 1px; }"
+    },
+    {
+      "name": "Range and Share Bars",
+      "kind": "custom",
+      "refersTo": "share-bar",
+      "description": "Geometry from amountMinor and sharePermille; the small group hatched, never only paler.",
+      "html": "<div class=\"ds-bars\"><div class=\"ds-range\"><div class=\"ds-track\"></div><div class=\"ds-tick\" style=\"left:55%\"></div><div class=\"ds-diamond\" style=\"left:60%\"></div><div class=\"ds-dot\" style=\"left:30%\"></div></div><div class=\"ds-range\"><div class=\"ds-track ds-small\"></div><div class=\"ds-tick\" style=\"left:40%\"></div></div><div class=\"ds-share\"><div class=\"ds-fill\" style=\"width:62%\"></div></div></div>",
+      "css": ".ds-bars { display: grid; gap: 16px; width: 320px; padding: 16px; background: #fff; } .ds-range { position: relative; height: 28px; } .ds-track { position: absolute; top: 12px; left: 0; right: 0; height: 4px; border-radius: 2px; background: #a8cdc9; } .ds-small { background: repeating-linear-gradient(135deg, #bcc4b6 0 3px, transparent 3px 6px); } .ds-tick { position: absolute; z-index: 1; top: 4px; width: 2px; height: 20px; margin-left: -1px; background: #265853; } .ds-diamond { position: absolute; top: 10px; width: 8px; height: 8px; margin-left: -4px; transform: rotate(45deg); background: #fff; border: 2px solid #2a3557; box-sizing: border-box; } .ds-dot { position: absolute; top: 7px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: #1b2440; border: 3px solid #fff; box-sizing: border-box; box-shadow: 0 1px 3px rgba(27, 36, 64, 0.3); } .ds-share { height: 6px; border-radius: 2px; background: #e7ebe2; overflow: hidden; } .ds-fill { height: 100%; border-radius: 2px; background: #2f6b66; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Passport Data Page",
+    "overview": "Seven countries, one official document. The app is set like the data page of a well-made passport: a deep cover-ink rail, a calm security-tint ground, white document panels with hairline edges, and every country and its currency stamped the same way everywhere. The person using it is an HR Manager, often answering someone who is waiting. The answer comes first: the count, the total or the median, set large in tabular figures. The method and the rate date sit directly beneath it, in muted small type, so the figure can be trusted.\n\nThe density is that of an operational tool. Panels are flat, edged by hairlines rather than shadows, and never nested. Colour is spent sparingly. Teal marks what can be acted on, orange means underpaid, plum means overpaid, and the navy cover holds the navigation. Everything else comes from one stepped neutral ramp tinted toward the security-print ground. The system is themed entirely through Mantine's `createTheme` and a small set of CSS custom properties (`--acme-*`). There is no Tailwind and no second styling layer.\n\nThe system rejects the category default it was set against: a grey sidebar, white KPI cards and one blue accent.",
+    "keyCharacteristics": [
+      "A navy cover rail (240px) beside a security-tint ground; white document panels on the ground.",
+      "One family (Public Sans, self-hosted, variable weight) on a strict 1.2 scale, with tabular figures everywhere.",
+      "The country stamp, a double-hairline frame around `IN · INR`, wherever a country or currency appears.",
+      "A faint guilloche security-print band under every page title.",
+      "Outlier directions in colours of their own, always paired with a word.",
+      "Small groups hatched, never just paler.",
+      "Focus treated as a first-class state."
+    ],
+    "rules": [
+      {
+        "name": "The Word-and-Colour Rule",
+        "body": "Underpaid and overpaid always carry a word (\"Below\", \"Above\", \"underpaid\", \"overpaid\") next to their colour. Colour alone never states a direction.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Ramp Rule",
+        "body": "Every neutral is a step of the security-tint ramp. Step 0 is the ground, step 2 is the hairline and step 6 is muted text. Never introduce a grey from outside it.",
+        "section": "colors"
+      },
+      {
+        "name": "The Teal Means Action Rule",
+        "body": "Teal is reserved for what can be clicked, what is selected, and the country stamp. It is not decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Rule",
+        "body": "Every figure is set in tabular numerals (`tnum`, set on `body`). Money columns are right-aligned and do not wrap.",
+        "section": "typography"
+      },
+      {
+        "name": "The Money Through One Door Rule",
+        "body": "Money is only ever shown as text through `formatMoney` or `placeDecimal`, in exact minor units. Whole units (via `wholeUnits`) are allowed only where ADR 0004 permits them: payroll totals and the cross-country comparison. Geometry, such as share bars, ranges and chart bars, is computed from `amountMinor` or `sharePermille` as plain numbers and is never shown as text.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sentence Case Rule",
+        "body": "Headings, table headers and search group labels are in sentence case. Uppercase with tracking is used only for rail group labels (\"PAY\"), the brand line on the rail, the uppercase field terms on the employee view, and Mantine's badge text.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Sideways Scroll Rule",
+        "body": "Below 48em, tables become stacked records. Each record is a white list on a hairline frame, with a hairline between items and 12px 14px padding. A key figure is never reached by scrolling sideways. The rail becomes a drawer that opens under the header. The filter bar collapses behind a \"Filters\" button, and its fields stack at full width.",
+        "section": "layout"
+      },
+      {
+        "name": "The Hairline Not Shadow Rule",
+        "body": "Document surfaces are separated by a 1px hairline (hairline), never by a resting shadow. A shadow means the thing floats or responds.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Hatch Rule",
+        "body": "A group with fewer than 5 employees is hatched, never only paler. The range track uses a 135° stripe of field-line, 3px on and 3px off. The legend swatch uses a 45° stripe of hatch-grey on tint, 2px on and 2px off. The comparison chart fills small-group bars with an inline SVG hatch pattern. The legend always names the hatch (\"fewer than 5 employees\").",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "**Do** theme through Mantine `createTheme` and the `--acme-*` custom properties in `global.css`. Take every colour from the five tuples (`cover`, `visa`, `under`, `over`, `gray`).",
+      "**Do** put a country stamp wherever a country or currency appears, and the security band under every page title.",
+      "**Do** pair underpaid and overpaid with a word every time: \"Below\" or \"Above\", \"underpaid\" or \"overpaid\".",
+      "**Do** hatch groups of fewer than 5 employees, and name the hatch in the legend.",
+      "**Do** show money only through `formatMoney` or `placeDecimal` in exact minor units, and use whole units only where ADR 0004 allows (payroll totals and the cross-country comparison).",
+      "**Do** draw share bars, ranges and chart bars from `amountMinor` or `sharePermille` as plain numbers, and keep those numbers out of the text.",
+      "**Do** keep the method, the rate date and every footnote and small-group notice directly under the figure they qualify.",
+      "**Do** keep focus visible: the 2px teal outline offset 2px on the ground, visa light on the rail, and a lifted row in tables.",
+      "**Do** meet WCAG AA contrast for all text, including text on tinted and signal backgrounds."
+    ],
+    "donts": [
+      "**Don't** use a grey sidebar with white KPI cards and one blue accent. This is the category default the system was set against.",
+      "**Don't** signal a pay direction by colour alone, or use orange or plum for anything except underpaid and overpaid.",
+      "**Don't** show a small group only as a paler shade.",
+      "**Don't** give resting panels a shadow or nest one panel inside another.",
+      "**Don't** add a second type family, a monospace face for keyboard hints, or a size off the 1.2 scale.",
+      "**Don't** make users scroll sideways to reach a key figure on a phone. Stack the records instead.",
+      "**Don't** use Tailwind or any other styling layer next to the Mantine theme."
+    ]
+  }
+}

@@ -45,5 +45,8 @@ export function smallGroupNotice(headcount: number): string {
 
 /** The link from the figures to the peer group's employee list, e.g. "See these 47 employees". */
 export function seeEmployeesText(headcount: number): string {
+  if (headcount === 0) {
+    return 'See the employee list for this group';
+  }
   return headcount === 1 ? 'See this employee' : `See these ${employeeCount(headcount)}`;
 }

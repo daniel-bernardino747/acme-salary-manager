@@ -20,8 +20,9 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
-import { apiFetch, ApiProblem } from '../api/api-fetch';
+import { apiFetch } from '../api/api-fetch';
 import { employeePath, employeesPath } from '../api/employees-path';
+import { errorText } from '../api/error-text';
 import { queryKey } from '../api/query-key';
 import { useEmployee } from '../api/use-employee';
 import { EmployeeNotFound } from '../components/employee-not-found';
@@ -33,7 +34,10 @@ const countryNames = new Map<string, string>(
   countries.map((country) => [country.code, country.name]),
 );
 
-/** One employee: their name, job title, department, country and salary, with Edit, Delete and "Compare with peers" (ADR 0004, *Employee view*). */
+/**
+ * One employee: their name, job title, department, country and salary, with Edit, Delete and
+ * "Compare with peers" (ADR 0004, *Employee view*).
+ */
 export function EmployeeView() {
   const { id: idParam } = useParams({ from: '/employees/$id' });
   const { query, notFound } = useEmployee(idParam);
@@ -147,9 +151,7 @@ function DeleteEmployee({ employee, opened, onClose }: DeleteEmployeeProps) {
         </Text>
         {remove.isError && (
           <Alert color="red" title="Could not delete">
-            {remove.error instanceof ApiProblem
-              ? remove.error.message
-              : 'The server could not be reached. Check your connection and try again.'}
+            {errorText(remove.error)}
           </Alert>
         )}
         <Group justify="flex-end" gap="sm">

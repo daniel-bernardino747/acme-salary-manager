@@ -13,6 +13,7 @@ import { useCanGoBack, useNavigate, useParams, useRouter } from '@tanstack/react
 import { useState } from 'react';
 import { apiFetch, ApiProblem } from '../api/api-fetch';
 import { employeePath } from '../api/employees-path';
+import { errorText } from '../api/error-text';
 import { useEmployee } from '../api/use-employee';
 import { EmployeeNotFound } from '../components/employee-not-found';
 import { QueryState } from '../components/query-state';
@@ -75,8 +76,6 @@ interface EmployeeFormProps {
   send: (body: EmployeeRequest) => Promise<EmployeeResponse>;
 }
 
-const NO_CONNECTION = 'The server could not be reached. Check your connection and try again.';
-
 /**
  * The add and edit form (ADR 0004, *Forms: add and edit*). It validates against the contract's
  * schema objects on blur and on submit, and maps server problems onto its fields, keeping what was
@@ -105,7 +104,7 @@ function EmployeeForm({ initialValues, submitLabel, send }: EmployeeFormProps) {
     },
     onError: (error) => {
       if (!(error instanceof ApiProblem)) {
-        setFormError(NO_CONNECTION);
+        setFormError(errorText(error));
         return;
       }
       const { fieldErrors, formError } = employeeProblem(error.problem);

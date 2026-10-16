@@ -1,6 +1,7 @@
 import { BarChart } from '@mantine/charts';
 import { countries, jobTitles, type JobTitle, type PayComparisonResponse } from '@acme/contract';
 import { Anchor, Badge, Box, Group, Select, Skeleton, Stack, Table, Text } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
@@ -12,6 +13,7 @@ import { QueryState } from '../components/query-state';
 import records from '../components/records.module.css';
 import { comparisonFootnote, highestMedianFirst, medianBars } from '../format/comparison-copy';
 import { countText, employeeCount } from '../format/counts';
+import { countryStamp } from '../format/country-stamp';
 import { countryName } from '../format/country-name';
 import { wholeUnits } from '../format/whole-units';
 import { pageQuestion } from '../layout/navigation';
@@ -86,6 +88,7 @@ function Comparison({ comparison }: { comparison: PayComparisonResponse }) {
   const rows = highestMedianFirst(comparison.rows);
   const bars = medianBars(rows);
   const codeOf = new Map(rows.map((row) => [countryName(row.country), row.country]));
+  const narrow = useMediaQuery('(max-width: 48em)') ?? false;
   return (
     <Stack gap="lg">
       <Panel title={`Median salary of ${jobTitle}, in USD`}>
@@ -104,7 +107,9 @@ function Comparison({ comparison }: { comparison: PayComparisonResponse }) {
               orientation="vertical"
               series={[{ name: 'medianUsdMinor', label: 'Median', color: barColor.fiveOrMore }]}
               valueFormatter={wholeUsd}
-              yAxisProps={{ width: 120 }}
+              yAxisProps={{ width: 190, tick: (props: TickProps) => <CountryTick {...props} /> }}
+              // A phone has room for three evenly spaced labels, a desktop for five.
+              xAxisProps={{ tickCount: narrow ? 3 : 5 }}
               gridAxis="x"
               barProps={{
                 radius: 2,
@@ -119,7 +124,7 @@ function Comparison({ comparison }: { comparison: PayComparisonResponse }) {
                 },
               }}
             />
-            <Group gap="lg">
+            <Group gap="md">
               <LegendEntry kind="full">5 or more employees</LegendEntry>
               <LegendEntry kind="small">fewer than 5 employees</LegendEntry>
             </Group>
@@ -136,6 +141,57 @@ function Comparison({ comparison }: { comparison: PayComparisonResponse }) {
       </Panel>
       <Muted size="xs">{comparisonFootnote(comparison.rates)}</Muted>
     </Stack>
+  );
+}
+
+/** The chart's country axis: the country's name, then its stamp, drawn in the chart's SVG. */
+/** What Recharts passes a custom axis tick. */
+interface TickProps {
+  x?: number | string;
+  y?: number | string;
+  payload?: { value?: unknown };
+}
+
+function CountryTick({ x, y, payload }: TickProps) {
+  const name = String(payload?.value ?? '');
+  const code = countries.find((country) => country.name === name)?.code;
+  return (
+    <g transform={`translate(${x ?? 0},${y ?? 0})`}>
+      <text x={-74} dy={4} textAnchor="end" fontSize={12} fill="var(--mantine-color-gray-7)">
+        {name}
+      </text>
+      {code && (
+        <>
+          <rect
+            x={-66}
+            y={-9}
+            width={60}
+            height={18}
+            fill="none"
+            stroke="var(--mantine-color-visa-4)"
+          />
+          <rect
+            x={-64}
+            y={-7}
+            width={56}
+            height={14}
+            fill="none"
+            stroke="var(--mantine-color-visa-4)"
+          />
+          <text
+            x={-36}
+            dy={4}
+            textAnchor="middle"
+            fontSize={10}
+            fontWeight={700}
+            letterSpacing="0.06em"
+            fill="var(--mantine-color-visa-7)"
+          >
+            {countryStamp(code)}
+          </text>
+        </>
+      )}
+    </g>
   );
 }
 

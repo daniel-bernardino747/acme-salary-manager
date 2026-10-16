@@ -22,3 +22,13 @@ export function outliersHeadline(total: number, direction: Direction): string {
 export function costText(usd: Money): string {
   return `Bringing them to 0.80 would cost ${formatMoney(usd, 'en', { wholeUnits: true })} a year.`;
 }
+
+/**
+ * How many matching employees sit in small groups and so weren't checked, so an empty result is
+ * never ambiguous between "nobody is out of line" and "nobody could be checked" (ADR 0004).
+ */
+export function uncheckedText(smallGroupHeadcount: number): string {
+  return smallGroupHeadcount === 1
+    ? "1 employee in a small group wasn't checked."
+    : `${employeeCount(smallGroupHeadcount)} in small groups weren't checked.`;
+}

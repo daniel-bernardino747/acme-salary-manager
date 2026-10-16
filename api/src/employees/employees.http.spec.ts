@@ -269,4 +269,15 @@ describe('PUT /api/employees/:id', () => {
     const stored = await t.http().get(`/api/employees/${id}`).expect(200);
     expect(employeeResponseSchema.parse(stored.body)).toEqual(replaced);
   });
+
+  it('answers an id with no employee with a 404 problem, and adds nobody', async () => {
+    const removed = insertEmployee(t.db);
+    clearEmployees(t.db);
+
+    const res = await t.http().put(`/api/employees/${removed.id}`).send(priya).expect(404);
+
+    expect(problemSchema.parse(res.body)).toMatchObject({ title: 'Not Found', status: 404 });
+    const list = await t.http().get('/api/employees').expect(200);
+    expect(employeeListResponseSchema.parse(list.body).total).toBe(0);
+  });
 });

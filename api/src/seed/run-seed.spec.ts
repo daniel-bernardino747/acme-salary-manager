@@ -84,4 +84,22 @@ describe('seed command', () => {
     expect(databaseGoldenHash(db)).toBe(DATABASE_GOLDEN_HASH);
     expect(lines[1]).toBe(`Database golden hash: ${DATABASE_GOLDEN_HASH}`);
   });
+
+  it('runs the reset and every insert in one transaction, so a failed seed leaves the previous data intact', () => {
+    insertEmployee(db);
+    insertEmployee(db, { name: 'Kenji Watanabe', country: 'JP', annualSalaryMinor: 9_000_000 });
+    const before = employeesById(db);
+    // A real SQLite failure halfway through the inserts, after the reset has run.
+    db.$client.exec(`
+      CREATE TRIGGER fail_halfway BEFORE INSERT ON employees
+      WHEN (SELECT count(*) FROM employees) >= 5000
+      BEGIN SELECT RAISE(ABORT, 'disk full'); END
+    `);
+
+    expect(() => seed(['--reset'])).toThrow(/disk full/);
+
+    expect(employeesById(db)).toEqual(before);
+    db.$client.exec('DROP TRIGGER fail_halfway');
+    expect(insertEmployee(db).id).toBe(3);
+  });
 });

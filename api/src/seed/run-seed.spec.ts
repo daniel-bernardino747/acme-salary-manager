@@ -111,4 +111,16 @@ describe('seed command', () => {
 
     expect(countEmployees(db)).toBe(0);
   });
+
+  it.each([[['--rest']], [['--reset', '--if-empty']]])(
+    'refuses %j, exits non-zero, names the modes and writes nothing',
+    (args) => {
+      expect(seed(args)).toBe(1);
+
+      expect(lines).toEqual([
+        `Seed failed: expected no option, --if-empty or --reset, got "${args.join(' ')}".`,
+      ]);
+      expect(countEmployees(db)).toBe(0);
+    },
+  );
 });

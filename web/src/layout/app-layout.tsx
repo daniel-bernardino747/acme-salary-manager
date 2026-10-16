@@ -1,4 +1,5 @@
-import { AppShell, NavLink, Text, Title } from '@mantine/core';
+import { AppShell, Burger, Group, NavLink, Text, Title } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 
 /** Each pay question is labelled as the question it answers (ADR 0004, *Routing*). */
@@ -11,15 +12,30 @@ const payQuestions = [
 
 export function AppLayout() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  // On narrow screens the sidebar is a drawer, closed again by every navigation.
+  const [navOpen, nav] = useDisclosure(false);
 
   return (
-    <AppShell header={{ height: 56 }} navbar={{ width: 300, breakpoint: 'sm' }} padding="md">
-      <AppShell.Header px="md" style={{ display: 'flex', alignItems: 'center' }}>
-        <Title order={1} size="h4">
-          ACME Salary Manager
-        </Title>
+    <AppShell
+      header={{ height: 56 }}
+      navbar={{ width: 300, breakpoint: 'sm', collapsed: { mobile: !navOpen } }}
+      padding="md"
+    >
+      <AppShell.Header px="md">
+        <Group h="100%">
+          <Burger
+            opened={navOpen}
+            onClick={nav.toggle}
+            hiddenFrom="sm"
+            size="sm"
+            aria-label="Toggle navigation"
+          />
+          <Title order={1} size="h4">
+            ACME Salary Manager
+          </Title>
+        </Group>
       </AppShell.Header>
-      <AppShell.Navbar p="xs" component="nav" aria-label="Main">
+      <AppShell.Navbar p="xs" component="nav" aria-label="Main" onClick={nav.close}>
         <NavLink
           component={Link}
           to="/employees"

@@ -134,3 +134,35 @@ describe('findOutliers', () => {
     expect(outliers[0]).toMatchObject({ peerMedian: usd(10_000_00), peerHeadcount: 5 });
   });
 });
+
+describe('findOutliers ranking', () => {
+  it('ranks the most extreme first, by distance from 1.00, across peer groups and directions', () => {
+    // US median $10,000.00: 1.40 is 0.40 away, 0.75 is 0.25, 0.795 is 0.205 and 0.7996 is 0.2004.
+    // IN median ₹20,00,000.00: 0.65 is 0.35 away. 0.795 and 0.7996 both show as 0.79, so only the
+    // exact distance tells them apart.
+    const us = (salary: number) => member(salary, { jobTitle: 'Product Manager', country: 'US' });
+    const india = (salary: number) => member(salary, { jobTitle: 'Accountant', country: 'IN' });
+    const at140 = us(14_000_00);
+    const at075 = us(7_500_00);
+    const at0795 = us(7_950_00);
+    const at07996 = us(7_996_00);
+    const at065 = india(1_300_000_00);
+    const group = [
+      at07996,
+      at075,
+      us(10_000_00),
+      at140,
+      us(10_000_00),
+      us(10_000_00),
+      at0795,
+      at065,
+      ...[1, 2, 3, 4].map(() => india(2_000_000_00)),
+    ];
+
+    const { outliers } = findOutliers(group);
+
+    expect(outliers.map((o) => o.employee)).toEqual(
+      [at140, at065, at075, at0795, at07996].map((m) => m.employee),
+    );
+  });
+});

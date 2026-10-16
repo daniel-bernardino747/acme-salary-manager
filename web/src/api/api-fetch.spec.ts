@@ -90,4 +90,28 @@ describe('apiFetch', () => {
       detail: 'The server answered 500 with a response the app cannot read.',
     });
   });
+
+  it('reads Problem Details that carry extra members, such as instance, dropping them', async () => {
+    serve(
+      Response.json(
+        {
+          type: 'about:blank',
+          title: 'Not Found',
+          status: 404,
+          detail: 'Employee 7 does not exist',
+          instance: '/api/employees/7',
+        },
+        { status: 404, headers: { 'Content-Type': 'application/problem+json' } },
+      ),
+    );
+
+    const error = await apiFetch('/api/employees/7').catch((e: unknown) => e);
+
+    expect((error as ApiProblem).problem).toEqual({
+      type: 'about:blank',
+      title: 'Not Found',
+      status: 404,
+      detail: 'Employee 7 does not exist',
+    });
+  });
 });

@@ -25,16 +25,20 @@ export function isSmallGroup(headcount: number): boolean {
   return headcount >= 1 && headcount <= SMALL_GROUP_MAX_HEADCOUNT;
 }
 
-/** The pay statistics of one peer group, each figure rounded once by the rounding rule. */
+/**
+ * The pay statistics of one peer group, the median and average each rounded once by the rounding
+ * rule. An empty group has null figures, never 0 (ADR 0001, *Edge cases*).
+ */
 export function payStatistics({ currency, salariesMinor }: PeerGroupSalaries): PayStatistics {
-  const money = (amountMinor: number | null): Money | null =>
-    amountMinor === null ? null : { amountMinor, currency };
+  const sorted = [...salariesMinor].sort((a, b) => a - b);
+  const money = (amountMinor: number | null | undefined): Money | null =>
+    amountMinor == null ? null : { amountMinor, currency };
   return {
-    headcount: salariesMinor.length,
-    smallGroup: isSmallGroup(salariesMinor.length),
-    min: money(Math.min(...salariesMinor)),
-    median: money(median(salariesMinor)),
-    average: money(average(salariesMinor)),
-    max: money(Math.max(...salariesMinor)),
+    headcount: sorted.length,
+    smallGroup: isSmallGroup(sorted.length),
+    min: money(sorted[0]),
+    median: money(median(sorted)),
+    average: money(average(sorted)),
+    max: money(sorted.at(-1)),
   };
 }

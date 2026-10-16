@@ -27,6 +27,7 @@
     "@nestjs/testing": "^11.2.7",
     "@swc/core": "^1.16.18",
     "@types/better-sqlite3": "^9.6.0",
+    "@types/express": "^5.0.6",
     "@types/node": "^24.19.2",
     "@types/supertest": "^7.2.1",
     "drizzle-kit": "^0.31.11",

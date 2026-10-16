@@ -86,4 +86,43 @@ describe('payrollTotals', () => {
       },
     ]);
   });
+
+  it('gives every department, in fixed order, its USD total, converting each currency subtotal once', () => {
+    // Engineering's GBP subtotal £110,000.02 converts once to $55,000.01. Converting each salary
+    // would give $25,000.01 + $30,000.01 = $55,000.02. So Engineering is $155,000.01, Sales
+    // $45,000.00, and the grand total $200,000.01.
+    // Shares: 15,500,001/20,000,001 = 0.7750000… → 775, and 4,500,000/20,000,001 = 0.2249999… → 225.
+    const totals = payrollTotals(
+      [
+        employee('US', 'Engineering', 100_000_00, 'USD'),
+        employee('GB', 'Engineering', 50_000_01, 'GBP'),
+        employee('GB', 'Engineering', 60_000_01, 'GBP'),
+        employee('US', 'Sales', 45_000_00, 'USD'),
+      ],
+      rates,
+    );
+
+    const none = (department: Department) => ({
+      department,
+      headcount: 0,
+      usd: money(0, 'USD'),
+      sharePermille: 0,
+    });
+    expect(totals.byDepartment).toEqual([
+      {
+        department: 'Engineering',
+        headcount: 3,
+        usd: money(155_000_01, 'USD'),
+        sharePermille: 775,
+      },
+      none('Product'),
+      none('Design'),
+      none('Data'),
+      { department: 'Sales', headcount: 1, usd: money(45_000_00, 'USD'), sharePermille: 225 },
+      none('Marketing'),
+      none('Customer Support'),
+      none('People'),
+      none('Finance'),
+    ]);
+  });
 });

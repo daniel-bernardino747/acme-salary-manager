@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   employeeFormSchema,
+  employeeFormValues,
   salaryAfterCountryChange,
   salaryPreview,
   type EmployeeFormValues,
@@ -126,5 +127,42 @@ describe('salaryAfterCountryChange', () => {
   it('has nothing to clear when no salary is typed, or no country was picked before', () => {
     expect(salaryAfterCountryChange('US', 'JP', '')).toEqual({ annualSalary: '', message: null });
     expect(salaryAfterCountryChange('', 'JP', '')).toEqual({ annualSalary: '', message: null });
+  });
+});
+
+describe('employeeFormValues', () => {
+  it('pre-fills the edit form, the salary as plain input with no grouping or symbol', () => {
+    const employee = {
+      id: 7,
+      name: 'Priya Sharma',
+      jobTitle: 'Software Engineer II',
+      department: 'Engineering',
+      country: 'IN',
+      annualSalary: { amountMinor: 1_250_000_50, currency: 'INR' },
+    } as const;
+
+    expect(employeeFormValues(employee)).toEqual({
+      name: 'Priya Sharma',
+      jobTitle: 'Software Engineer II',
+      department: 'Engineering',
+      country: 'IN',
+      annualSalary: '1250000.50',
+    });
+  });
+
+  it('pre-fills a JPY salary as whole yen, which saves back unchanged', () => {
+    const kenji = {
+      id: 8,
+      name: 'Kenji Watanabe',
+      jobTitle: 'Data Analyst',
+      department: 'Data',
+      country: 'JP',
+      annualSalary: { amountMinor: 7_000_000, currency: 'JPY' },
+    } as const;
+
+    const values = employeeFormValues(kenji);
+
+    expect(values.annualSalary).toBe('7000000');
+    expect(employeeFormSchema.parse(values).annualSalaryMinor).toBe(7_000_000);
   });
 });

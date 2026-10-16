@@ -139,4 +139,12 @@ describe('payrollTotals', () => {
 
     expect(totals.grandTotal).toEqual({ headcount: 3, usd: money(11_01, 'USD') });
   });
+
+  it('gives no share, never 0, when the grand total is 0', () => {
+    const totals = payrollTotals([], rates);
+
+    expect(totals.grandTotal).toEqual({ headcount: 0, usd: money(0, 'USD') });
+    expect(totals.byCountry.map((row) => row.sharePermille)).toEqual(Array(7).fill(null));
+    expect(totals.byDepartment.map((row) => row.sharePermille)).toEqual(Array(9).fill(null));
+  });
 });

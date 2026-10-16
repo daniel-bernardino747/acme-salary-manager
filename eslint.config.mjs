@@ -51,6 +51,10 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   {
     languageOptions: { globals: globals.node },
+    rules: {
+      // A parameter that is there only for its decorator, e.g. a strict `@Query` with nothing to read.
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    },
   },
   {
     files: ['web/src/**/*.{ts,tsx}'],

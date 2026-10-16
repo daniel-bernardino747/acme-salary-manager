@@ -58,4 +58,37 @@ describe('renderResults', () => {
       ].join('\n'),
     );
   });
+
+  it('fails when any p95 server time reaches 500 ms, naming those endpoints', () => {
+    const at = (p95: number) => ({ cold: 900, p50: 100, p95, max: 900 });
+    const markdown = renderResults(run, [
+      {
+        request: { label: 'Payroll totals', path: '/api/payroll-totals' },
+        server: at(500),
+        client: at(600),
+      },
+      {
+        request: { label: 'Outliers, all', path: '/api/outliers' },
+        server: at(499.99),
+        client: at(600),
+      },
+      {
+        request: { label: 'Pay comparison', path: '/api/pay-comparison' },
+        server: at(731.5),
+        client: at(800),
+      },
+    ]);
+
+    expect(markdown).toContain(
+      '**Result: fail.** The p95 server time is 500 ms or more on Payroll totals and Pay comparison.',
+    );
+    expect(markdown).not.toContain('Result: pass');
+    expect(markdown).toContain(
+      [
+        '| Payroll totals | `GET /api/payroll-totals` | 900.00 | 100.00 | 500.00 | 900.00 | 900.00 | 100.00 | 600.00 | 900.00 | fail |',
+        '| Outliers, all | `GET /api/outliers` | 900.00 | 100.00 | 499.99 | 900.00 | 900.00 | 100.00 | 600.00 | 900.00 | pass |',
+        '| Pay comparison | `GET /api/pay-comparison` | 900.00 | 100.00 | 731.50 | 900.00 | 900.00 | 100.00 | 800.00 | 900.00 | fail |',
+      ].join('\n'),
+    );
+  });
 });

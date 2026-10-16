@@ -60,4 +60,16 @@ describe('anchoredSalaries', () => {
       }),
     ).toThrow(RangeError);
   });
+
+  it('comes back shuffled, so the order says nothing about rank', () => {
+    const salaries = anchoredSalaries(streamFor('a'), {
+      baseMinor,
+      stepMinor,
+      size: 25,
+      underpaid: [59_010_00],
+    });
+
+    expect(salaries).not.toEqual([...salaries].sort((a, b) => a - b));
+    expect(salaries[0]).not.toBe(59_010_00);
+  });
 });

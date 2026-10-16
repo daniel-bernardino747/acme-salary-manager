@@ -107,7 +107,7 @@ function Employee({ employee }: { employee: EmployeeResponse }) {
       </Box>
       <Group justify="space-between" className={classes.danger} wrap="wrap" gap="sm">
         <Muted>Deleting removes {employee.name} for good. It cannot be undone.</Muted>
-        <Button color="red" variant="subtle" onClick={confirm.open}>
+        <Button color="red.8" variant="subtle" onClick={confirm.open}>
           Delete
         </Button>
       </Group>

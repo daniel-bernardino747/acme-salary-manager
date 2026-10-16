@@ -28,9 +28,7 @@ import { QueryState } from '../components/query-state';
 import { listRange, pageCount } from '../format/list-range';
 import { lastEmployeesSearch } from '../routes/last-employees-search';
 import { changeEmployeesSearch, type EmployeesSearchChange } from '../routes/search';
-
-/** How long the search box waits after the last keystroke before searching (ADR 0004). */
-const SEARCH_DEBOUNCE_MS = 300;
+import { SEARCH_DEBOUNCE_MS } from '../search/debounce';
 
 const countryOptions = countries.map((country) => ({ value: country.code, label: country.name }));
 const countryNames = new Map<string, string>(

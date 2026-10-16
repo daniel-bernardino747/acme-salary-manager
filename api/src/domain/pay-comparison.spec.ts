@@ -101,4 +101,22 @@ describe('payComparison', () => {
       max: usd(35_000_00),
     });
   });
+
+  it('converts JPY, which has no minor unit, from whole yen to US cents', () => {
+    // The median of ¥7,500,000 and ¥7,500,001 is 7,500,000.5 → ¥7,500,001 as shown. At ¥150 to the
+    // dollar, ¥7,500,001 is 750,000,100¢ / 150 = 5,000,000.67¢ → $50,000.01, and ¥7,500,000 is
+    // exactly $50,000.00.
+    const rows = payComparison(
+      [salary('JP', 7_500_000, 'JPY'), salary('JP', 7_500_001, 'JPY')],
+      rates,
+    );
+
+    expect(rows.find((row) => row.country === 'JP')).toMatchObject({
+      headcount: 2,
+      min: usd(50_000_00),
+      median: usd(50_000_01),
+      average: usd(50_000_01),
+      max: usd(50_000_01),
+    });
+  });
 });

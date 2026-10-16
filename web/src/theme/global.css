@@ -1,0 +1,56 @@
+/* Browser surfaces in the passport palette (DESIGN.md). */
+
+:root {
+  --acme-ground: var(--mantine-color-gray-0);
+  --acme-panel: #ffffff;
+  --acme-hairline: var(--mantine-color-gray-2);
+  --acme-muted: var(--mantine-color-gray-6);
+  --acme-ink: var(--mantine-color-black);
+  --acme-rail: var(--mantine-color-cover-7);
+  --acme-action: var(--mantine-color-visa-6);
+  --acme-under: var(--mantine-color-under-6);
+  --acme-over: var(--mantine-color-over-6);
+  --acme-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  scrollbar-color: var(--mantine-color-gray-3) transparent;
+}
+
+body {
+  background: var(--acme-ground);
+  color: var(--acme-ink);
+  font-feature-settings: 'tnum' 1;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--mantine-color-visa-1);
+  color: var(--mantine-color-visa-9);
+}
+
+:focus-visible {
+  outline: 2px solid var(--acme-action);
+  outline-offset: 2px;
+}
+
+a {
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+}
+
+input {
+  caret-color: var(--acme-action);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

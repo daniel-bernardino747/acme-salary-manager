@@ -4,9 +4,9 @@ import { insertEmployee } from '../../test/builders';
 import { useTestApp } from '../../test/http';
 import { clearEmployees } from '../persistence/clear-employees';
 
-describe('GET /api/employees', () => {
-  const t = useTestApp();
+const t = useTestApp();
 
+describe('GET /api/employees', () => {
   it('returns the first page of 25 in the list envelope', async () => {
     const zoe = insertEmployee(t.db, { name: 'Zoë Visser', country: 'NL' });
     const kenji = insertEmployee(t.db, {
@@ -126,8 +126,6 @@ describe('GET /api/employees', () => {
 });
 
 describe('GET /api/employees/:id', () => {
-  const t = useTestApp();
-
   it("returns the employee with the salary in its country's currency", async () => {
     const kenji = insertEmployee(t.db, {
       name: 'Kenji Watanabe',
@@ -161,8 +159,6 @@ describe('GET /api/employees/:id', () => {
 });
 
 describe('the :id of /api/employees/:id', () => {
-  const t = useTestApp();
-
   it.each(['abc', '0', '-3', '2.5', '1e3', '0x10', '007', '9007199254740993'])(
     'answers %s with a 400 problem, since an id is a positive integer written plainly',
     async (id) => {

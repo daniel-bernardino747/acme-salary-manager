@@ -19,8 +19,8 @@ import { countryName } from '../format/country-name';
 import {
   emptyGroupText,
   seeEmployeesText,
+  peerGroupName,
   smallGroupNotice,
-  statisticsHeading,
 } from '../format/pay-statistics-copy';
 import { lastEmployeesSearch } from '../routes/last-employees-search';
 import { employeesSearchAfterDelete, type EmployeesSearch } from '../routes/search';
@@ -64,16 +64,7 @@ function Employee({ employee }: { employee: EmployeeResponse }) {
           </Anchor>
         }
         title={employee.name}
-        meta={
-          <>
-            <MetaLink search={{ page: 1, jobTitle }}>{jobTitle}</MetaLink>
-            {' · '}
-            <MetaLink search={{ page: 1, department }}>{department}</MetaLink>
-            {' · '}
-            <MetaLink search={{ page: 1, country }}>{countryName(country)}</MetaLink>{' '}
-            <CountryStamp country={country} />
-          </>
-        }
+        meta={<CountryStamp country={country} size="lg" />}
         actions={
           <Button
             renderRoot={(props) => <Link {...props} to="/employees/$id/edit" params={{ id }} />}
@@ -86,6 +77,31 @@ function Employee({ employee }: { employee: EmployeeResponse }) {
         <Panel title="Annual salary">
           <Figure>{`${formatMoney(employee.annualSalary, 'en')} ${employee.annualSalary.currency}`}</Figure>
           <Muted>Annual gross base pay, in the currency of {countryName(country)}.</Muted>
+          {/* The data page: small labels over values, each value opening the employees who share it. */}
+          <dl className={classes.fields}>
+            <div>
+              <dt>Job title</dt>
+              <dd>
+                <MetaLink search={{ page: 1, jobTitle }}>{jobTitle}</MetaLink>
+              </dd>
+            </div>
+            <div>
+              <dt>Department</dt>
+              <dd>
+                <MetaLink search={{ page: 1, department }}>{department}</MetaLink>
+              </dd>
+            </div>
+            <div>
+              <dt>Country</dt>
+              <dd>
+                <MetaLink search={{ page: 1, country }}>{countryName(country)}</MetaLink>
+              </dd>
+            </div>
+            <div>
+              <dt>Currency</dt>
+              <dd>{employee.annualSalary.currency}</dd>
+            </div>
+          </dl>
         </Panel>
         <Peers employee={employee} />
       </Box>
@@ -102,11 +118,7 @@ function Employee({ employee }: { employee: EmployeeResponse }) {
 
 function MetaLink({ search, children }: { search: EmployeesSearch; children: ReactNode }) {
   return (
-    <Anchor
-      inherit
-      c="gray.7"
-      renderRoot={(props) => <Link {...props} to="/employees" search={search} />}
-    >
+    <Anchor inherit renderRoot={(props) => <Link {...props} to="/employees" search={search} />}>
       {children}
     </Anchor>
   );
@@ -126,7 +138,9 @@ function Peers({ employee }: { employee: EmployeeResponse }) {
   });
   return (
     <Panel title="Peers">
-      <Muted>{statisticsHeading(search)}</Muted>
+      <Text size="sm" c="gray.7">
+        {peerGroupName(search)} <CountryStamp country={country} />
+      </Text>
       <QueryState query={query} skeleton={<Skeleton height={120} mt="sm" />}>
         {(statistics) => {
           const { min, median, average, max, headcount } = statistics;

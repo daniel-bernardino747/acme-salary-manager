@@ -4,7 +4,6 @@ import {
   formatMoney,
   jobTitles,
   MAX_SEARCH_LENGTH,
-  type EmployeeListResponse,
   type EmployeeResponse,
 } from '@acme/contract';
 import {
@@ -24,9 +23,7 @@ import { useDebouncedCallback } from '@mantine/hooks';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useState, type ReactNode } from 'react';
-import { apiFetch } from '../api/api-fetch';
-import { employeesPath } from '../api/employees-path';
-import { queryKey } from '../api/query-key';
+import { employeesQuery } from '../api/employees-query';
 import { QueryState } from '../components/query-state';
 import { listRange, pageCount } from '../format/list-range';
 import { lastEmployeesSearch } from '../routes/last-employees-search';
@@ -44,11 +41,7 @@ const countryNames = new Map<string, string>(
 export function EmployeeList() {
   const search = useSearch({ from: '/employees' });
   const navigate = useNavigate({ from: '/employees' });
-  const query = useQuery({
-    queryKey: queryKey('employees', search),
-    queryFn: () => apiFetch<EmployeeListResponse>(employeesPath(search)),
-    placeholderData: keepPreviousData,
-  });
+  const query = useQuery({ ...employeesQuery(search), placeholderData: keepPreviousData });
   // A delete from the employee view comes back to this page of the list.
   useEffect(() => lastEmployeesSearch.set(search), [search]);
 

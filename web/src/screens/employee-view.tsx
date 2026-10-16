@@ -1,9 +1,4 @@
-import {
-  countries,
-  formatMoney,
-  type EmployeeListResponse,
-  type EmployeeResponse,
-} from '@acme/contract';
+import { countries, formatMoney, type EmployeeResponse } from '@acme/contract';
 import {
   Alert,
   Anchor,
@@ -21,7 +16,8 @@ import { useDisclosure } from '@mantine/hooks';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { apiFetch } from '../api/api-fetch';
-import { employeePath, employeesPath } from '../api/employees-path';
+import { employeePath } from '../api/employees-path';
+import { employeesQuery } from '../api/employees-query';
 import { errorText } from '../api/error-text';
 import { queryKey } from '../api/query-key';
 import { useEmployee } from '../api/use-employee';
@@ -128,12 +124,7 @@ function DeleteEmployee({ employee, opened, onClose }: DeleteEmployeeProps) {
       void queryClient.invalidateQueries();
       const search = lastEmployeesSearch.get();
       // The delete is done whatever happens here; if the page cannot be read, the list shows why.
-      const page = await queryClient
-        .fetchQuery({
-          queryKey: queryKey('employees', search),
-          queryFn: () => apiFetch<EmployeeListResponse>(employeesPath(search)),
-        })
-        .catch(() => null);
+      const page = await queryClient.fetchQuery(employeesQuery(search)).catch(() => null);
       onClose();
       void navigate({
         to: '/employees',

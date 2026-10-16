@@ -305,3 +305,14 @@ describe('PUT /api/employees/:id', () => {
     expect(employeeResponseSchema.parse(stored.body).name).toBe('Kenji Watanabe');
   });
 });
+
+describe('DELETE /api/employees/:id', () => {
+  it('removes the employee and answers 204 with no body', async () => {
+    const { id } = insertEmployee(t.db);
+
+    const res = await t.http().delete(`/api/employees/${id}`).expect(204);
+
+    expect(res.text).toBe('');
+    await t.http().get(`/api/employees/${id}`).expect(404);
+  });
+});

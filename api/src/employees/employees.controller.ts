@@ -72,8 +72,8 @@ export class EmployeesController {
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id') id: string): void {
-    if (!deleteEmployee(this.db, Number(id))) {
+  remove(@Param('id', new ZodValidationPipe(employeeIdSchema)) id: number): void {
+    if (!deleteEmployee(this.db, id)) {
       throw new NotFoundException(`Employee ${id} does not exist`);
     }
   }

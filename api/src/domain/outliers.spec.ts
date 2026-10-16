@@ -1,6 +1,6 @@
-import type { EmployeeResponse } from '@acme/contract';
+import { exchangeRates, type CurrencyCode, type EmployeeResponse } from '@acme/contract';
 import { describe, expect, it } from 'vitest';
-import { findOutliers, type PeerGroupMember } from './outliers';
+import { costToReachThreshold, findOutliers, type PeerGroupMember } from './outliers';
 
 let nextId = 1;
 
@@ -241,5 +241,25 @@ describe('findOutliers ranking', () => {
     expect(outliers.map((o) => o.employee)).toEqual(
       expected.map((ratio) => outliersBy[ratio]?.employee),
     );
+  });
+});
+
+describe('costToReachThreshold', () => {
+  // A round rate keeps the hand arithmetic readable: £2 to the dollar.
+  const rates = { ...exchangeRates.ratesPerUsd, GBP: 2_000_000 };
+  const row = (gapMinor: number | null, currency: CurrencyCode) => ({
+    gapMinor,
+    peerMedian: { amountMinor: 100_000_00, currency },
+  });
+
+  it('sums the gaps per currency and converts each subtotal to USD once, leaving out the overpaid', () => {
+    // £1.01 + £1.01 = £2.02 converts once to $1.01; converting each gap would give 51¢ + 51¢.
+    // With $4.00 in USD, the cost is $5.01. The overpaid row has no gap to add.
+    const cost = costToReachThreshold(
+      [row(1_01, 'GBP'), row(4_00, 'USD'), row(null, 'USD'), row(1_01, 'GBP')],
+      rates,
+    );
+
+    expect(cost).toEqual({ amountMinor: 5_01, currency: 'USD' });
   });
 });

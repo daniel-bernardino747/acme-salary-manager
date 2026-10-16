@@ -32,3 +32,14 @@ export function uncheckedText(smallGroupHeadcount: number): string {
     ? "1 employee in a small group wasn't checked."
     : `${employeeCount(smallGroupHeadcount)} in small groups weren't checked.`;
 }
+
+const nobody: Record<Direction, string> = {
+  below: 'No underpaid employees',
+  above: 'No overpaid employees',
+  all: 'No employees paid out of line',
+};
+
+/** An empty result; the small-group count still shows next to it (ADR 0004, *Question 4*). */
+export function noOutliersText(direction: Direction): string {
+  return `${nobody[direction]} for these filters.`;
+}

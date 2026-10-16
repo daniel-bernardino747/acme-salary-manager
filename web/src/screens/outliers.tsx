@@ -36,14 +36,18 @@ import {
   smallGroupCountText,
 } from '../format/outliers-copy';
 import { placeDecimal } from '../format/place-decimal';
-import { changeOutliersSearch, type OutliersSearchChange } from '../routes/search';
+import {
+  changeOutliersSearch,
+  type OutliersSearch,
+  type OutliersSearchChange,
+} from '../routes/search';
 
 const countryOptions = countries.map((country) => ({ value: country.code, label: country.name }));
 const countryNames = new Map<string, string>(
   countries.map((country) => [country.code, country.name]),
 );
 
-const directionOptions = [
+const directionOptions: { value: OutliersSearch['direction']; label: string }[] = [
   { value: 'below', label: 'Underpaid' },
   { value: 'above', label: 'Overpaid' },
   { value: 'all', label: 'All' },
@@ -77,7 +81,7 @@ export function Outliers() {
           </Text>
         )}
       </Stack>
-      <SegmentedControl
+      <SegmentedControl<OutliersSearch['direction']>
         data={directionOptions}
         value={search.direction}
         onChange={(direction) => change({ direction })}

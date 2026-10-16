@@ -1,7 +1,6 @@
 import type { CountryCode, Money, Rates } from '@acme/contract';
 import { inCountry } from './pay-statistics-copy';
 import { placeDecimal } from './place-decimal';
-import { wholeUnits } from './whole-units';
 
 /**
  * A share of payroll as the domain rounded it, e.g. 421 → "42.1%" (ADR 0004, *Question 2*). No

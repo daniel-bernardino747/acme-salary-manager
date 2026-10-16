@@ -2,6 +2,7 @@ packages:
   - packages/*
   - api
   - web
+  - e2e
 allowBuilds:
   '@swc/core': true
   better-sqlite3: true

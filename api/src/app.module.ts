@@ -1,6 +1,8 @@
 import { Module, type DynamicModule } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
 import { DatabaseModule } from './database.module';
 import { HealthController } from './health/health.controller';
+import { ProblemFilter } from './http/problem.filter';
 
 export interface AppOptions {
   databasePath: string;
@@ -13,6 +15,7 @@ export class AppModule {
       module: AppModule,
       imports: [DatabaseModule.forRoot(options.databasePath)],
       controllers: [HealthController],
+      providers: [{ provide: APP_FILTER, useClass: ProblemFilter }],
     };
   }
 }

@@ -1,39 +1,32 @@
-import {
-  countries,
-  departments,
-  formatMoney,
-  jobTitles,
-  MAX_SEARCH_LENGTH,
-  type EmployeeResponse,
-} from '@acme/contract';
+import { formatMoney, MAX_SEARCH_LENGTH, type EmployeeResponse } from '@acme/contract';
 import {
   Anchor,
+  Box,
   Button,
   Group,
   Pagination,
-  Select,
   Skeleton,
   Stack,
   Table,
   Text,
   TextInput,
-  Title,
 } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { useEffect, useState, type ReactNode } from 'react';
 import { employeesQuery } from '../api/employees-query';
+import { CountryStamp, PageHeader } from '../components/document';
+import { FilterBar } from '../components/filter-bar';
+import { ArrowRightIcon, PlusIcon, SearchIcon } from '../components/icons';
 import { QueryState } from '../components/query-state';
+import records from '../components/records.module.css';
+import { employeeCount } from '../format/counts';
+import { countryName } from '../format/country-name';
 import { listRange, pageCount } from '../format/list-range';
 import { lastEmployeesSearch } from '../routes/last-employees-search';
 import { changeEmployeesSearch, type EmployeesSearchChange } from '../routes/search';
 import { SEARCH_DEBOUNCE_MS } from '../search/debounce';
-
-const countryOptions = countries.map((country) => ({ value: country.code, label: country.name }));
-const countryNames = new Map<string, string>(
-  countries.map((country) => [country.code, country.name]),
-);
 
 /** The employee list (ADR 0004, *Employee list*). All its state lives in the URL. */
 export function EmployeeList() {
@@ -46,7 +39,7 @@ export function EmployeeList() {
   // What is typed while its search waits to reach the URL; null once it has, or was cancelled.
   const [typed, setTyped] = useState<string | null>(null);
   // A search replaces the history entry, so Back skips each debounced step (ADR 0004, *Routing*).
-  // Debounced here and nowhere else (ADR 0004, *Data fetching*).
+  // Debounced here and in the global search, with one shared delay (ADR 0004, *Data fetching*).
   const sendSearch = useDebouncedCallback((q: string) => {
     setTyped(null);
     void navigate({ search: (prev) => changeEmployeesSearch(prev, { q }), replace: true });
@@ -63,54 +56,61 @@ export function EmployeeList() {
   const filtered = Boolean(
     search.q?.trim() || search.country || search.department || search.jobTitle,
   );
+  const { jobTitle, country } = search;
 
   return (
-    <Stack gap="md">
-      <Title order={2}>Employees</Title>
-      <Group align="flex-end" gap="sm">
-        <TextInput
-          label="Search"
-          placeholder="Search by name"
-          value={typed ?? search.q ?? ''}
-          maxLength={MAX_SEARCH_LENGTH}
-          onChange={(event) => {
-            setTyped(event.currentTarget.value);
-            sendSearch(event.currentTarget.value);
-          }}
-          w={240}
-        />
-        <Select
-          label="Country"
-          placeholder="Any country"
-          data={countryOptions}
-          value={search.country ?? null}
-          onChange={(country) => filter({ country })}
-          clearable
-          w={180}
-        />
-        <Select
-          label="Department"
-          placeholder="Any department"
-          data={departments}
-          value={search.department ?? null}
-          onChange={(department) => filter({ department })}
-          clearable
-          w={190}
-        />
-        <Select
-          label="Job title"
-          placeholder="Any job title"
-          data={jobTitles}
-          value={search.jobTitle ?? null}
-          onChange={(jobTitle) => filter({ jobTitle })}
-          clearable
-          searchable
-          w={260}
-        />
-        <Button component={Link} to="/employees/new" ml="auto">
-          Add employee
-        </Button>
-      </Group>
+    <Stack gap="lg">
+      <PageHeader
+        title="Employees"
+        meta={query.data && !filtered ? employeeCount(query.data.total) : undefined}
+        actions={
+          <Button
+            hiddenFrom="sm"
+            component={Link}
+            to="/employees/new"
+            leftSection={<PlusIcon size={16} />}
+          >
+            Add employee
+          </Button>
+        }
+      />
+      <FilterBar
+        filters={search}
+        onChange={filter}
+        leading={
+          <TextInput
+            label="Search"
+            placeholder="Search by name"
+            leftSection={<SearchIcon size={16} />}
+            value={typed ?? search.q ?? ''}
+            maxLength={MAX_SEARCH_LENGTH}
+            onChange={(event) => {
+              setTyped(event.currentTarget.value);
+              sendSearch(event.currentTarget.value);
+            }}
+            w={{ base: '100%', sm: 260 }}
+          />
+        }
+        trailing={
+          filtered && (
+            <Button variant="subtle" onClick={clearFilters}>
+              Clear filters
+            </Button>
+          )
+        }
+      />
+      {jobTitle && country && (
+        <Anchor
+          renderRoot={(props) => (
+            <Link {...props} to="/pay/statistics" search={{ jobTitle, country }} />
+          )}
+        >
+          <Group gap={6} component="span">
+            Pay statistics for {jobTitle} in {countryName(country)}
+            <ArrowRightIcon size={16} />
+          </Group>
+        </Anchor>
+      )}
       <QueryState query={query} skeleton={<ListSkeleton />}>
         {(list) => {
           if (list.total === 0) {
@@ -131,7 +131,14 @@ export function EmployeeList() {
           return (
             <Stack gap="sm">
               {list.items.length > 0 ? (
-                <EmployeeTable employees={list.items} />
+                <>
+                  <Box visibleFrom="sm">
+                    <EmployeeTable employees={list.items} />
+                  </Box>
+                  <Box hiddenFrom="sm">
+                    <EmployeeRecords employees={list.items} />
+                  </Box>
+                </>
               ) : (
                 <EmptyState text={`Page ${list.page} is past the end of the list.`}>
                   <Button
@@ -142,14 +149,16 @@ export function EmployeeList() {
                   </Button>
                 </EmptyState>
               )}
-              <Group justify="space-between">
-                <Text size="sm" c="dimmed">
+              <Group justify="space-between" gap="sm">
+                <Text size="sm" c="gray.6">
                   {list.items.length > 0 && listRange(list)}
                 </Text>
                 {/* The URL's page, so it moves on click while keepPreviousData shows the old one. */}
                 <Pagination
                   total={pageCount(list)}
                   value={search.page}
+                  siblings={1}
+                  boundaries={1}
                   onChange={(page) => void navigate({ search: (prev) => ({ ...prev, page }) })}
                 />
               </Group>
@@ -164,15 +173,15 @@ export function EmployeeList() {
 function EmployeeTable({ employees }: { employees: EmployeeResponse[] }) {
   const navigate = useNavigate();
   return (
-    <Table.ScrollContainer minWidth={760}>
-      <Table highlightOnHover>
+    <div className={records.tableWrap}>
+      <Table className={records.table}>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Name</Table.Th>
             <Table.Th>Job title</Table.Th>
             <Table.Th>Department</Table.Th>
             <Table.Th>Country</Table.Th>
-            <Table.Th ta="right">Salary</Table.Th>
+            <Table.Th className={records.money}>Salary</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -180,13 +189,10 @@ function EmployeeTable({ employees }: { employees: EmployeeResponse[] }) {
             const view = { to: '/employees/$id', params: { id: String(employee.id) } } as const;
             return (
               // The whole row opens the employee; the name is the link for keyboard and screen readers.
-              <Table.Tr
-                key={employee.id}
-                onClick={() => void navigate(view)}
-                style={{ cursor: 'pointer' }}
-              >
+              <Table.Tr key={employee.id} data-link onClick={() => void navigate(view)}>
                 <Table.Td>
                   <Anchor
+                    fw={600}
                     renderRoot={(props) => <Link {...props} {...view} />}
                     onClick={(event) => event.stopPropagation()}
                   >
@@ -195,8 +201,10 @@ function EmployeeTable({ employees }: { employees: EmployeeResponse[] }) {
                 </Table.Td>
                 <Table.Td>{employee.jobTitle}</Table.Td>
                 <Table.Td>{employee.department}</Table.Td>
-                <Table.Td>{countryNames.get(employee.country)}</Table.Td>
-                <Table.Td ta="right" style={{ whiteSpace: 'nowrap' }}>
+                <Table.Td style={{ whiteSpace: 'nowrap' }}>
+                  {countryName(employee.country)} <CountryStamp country={employee.country} />
+                </Table.Td>
+                <Table.Td className={records.money}>
                   {formatMoney(employee.annualSalary, 'en')}
                 </Table.Td>
               </Table.Tr>
@@ -204,14 +212,36 @@ function EmployeeTable({ employees }: { employees: EmployeeResponse[] }) {
           })}
         </Table.Tbody>
       </Table>
-    </Table.ScrollContainer>
+    </div>
+  );
+}
+
+/** On a phone each employee is one stacked record: name, job title · country, salary. */
+function EmployeeRecords({ employees }: { employees: EmployeeResponse[] }) {
+  return (
+    <ul className={records.records}>
+      {employees.map((employee) => (
+        <li key={employee.id}>
+          <Link className={records.record} to="/employees/$id" params={{ id: String(employee.id) }}>
+            <div className={records.recordTop}>
+              <span className={records.recordName}>{employee.name}</span>
+              <span className={records.money}>{formatMoney(employee.annualSalary, 'en')}</span>
+            </div>
+            <div className={records.recordMeta}>
+              {employee.jobTitle} · {employee.department}{' '}
+              <CountryStamp country={employee.country} />
+            </div>
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }
 
 function EmptyState({ text, children }: { text: string; children: ReactNode }) {
   return (
-    <Stack align="center" gap="sm" py="xl">
-      <Text>{text}</Text>
+    <Stack align="center" gap="sm" py="xl" className={records.tableWrap}>
+      <Text fw={600}>{text}</Text>
       {children}
     </Stack>
   );
@@ -221,7 +251,7 @@ function ListSkeleton() {
   return (
     <Stack gap="sm" aria-busy="true" aria-label="Loading">
       {Array.from({ length: 10 }, (_, row) => (
-        <Skeleton key={row} height={28} />
+        <Skeleton key={row} height={36} />
       ))}
       <Group justify="space-between">
         <Skeleton height={16} width={140} />

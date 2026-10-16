@@ -77,5 +77,19 @@ export default tseslint.config(
       ],
     },
   },
+  // Every random draw in the seed comes from sfc32 (ADR 0005, *Determinism*).
+  {
+    files: ['api/src/seed/**/*.ts'],
+    rules: {
+      'no-restricted-properties': [
+        'error',
+        {
+          object: 'Math',
+          property: 'random',
+          message: 'Seed code draws only from sfc32 in ./prng, so the data stays deterministic.',
+        },
+      ],
+    },
+  },
   prettier,
 );

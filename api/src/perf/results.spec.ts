@@ -79,8 +79,9 @@ describe('renderResults', () => {
       },
     ]);
 
+    // Quoted, since a label such as "Outliers, underpaid" holds commas of its own.
     expect(markdown).toContain(
-      '**Result: fail.** The p95 server time is 500 ms or more on Payroll totals and Pay comparison.',
+      '**Result: fail.** The p95 server time is 500 ms or more on "Payroll totals" and "Pay comparison".',
     );
     expect(markdown).not.toContain('Result: pass');
     expect(markdown).toContain(

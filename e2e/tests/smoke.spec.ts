@@ -1,5 +1,7 @@
+import { formatMoney } from '@acme/contract';
 import { expect, test } from '@playwright/test';
 import { generateEmployees } from '../../api/src/seed/generate-employees';
+import { plantedCostToReachThreshold } from '../../api/test/seed-story';
 
 // ADR 0006, *One end-to-end smoke test*: the built app on the default seed, with exact values. The
 // seeded figures are checked before anything changes them, so the tests run in order.
@@ -32,4 +34,16 @@ test('question 4 opens on Underpaid, listing the planted Senior Data Scientist i
   await expect(row).toHaveCount(1);
   await expect(row).toContainText('Senior Data Scientist');
   await expect(row).toContainText('Netherlands');
+});
+
+test("question 4's headline costs the planted gaps, as the seed story test expects", async ({
+  page,
+}) => {
+  const cost = formatMoney(plantedCostToReachThreshold(), 'en', { wholeUnits: true });
+
+  await page.goto('/pay/outliers');
+
+  await expect(
+    page.getByText(`Bringing them to 0.80 would cost ${cost} a year.`, { exact: true }),
+  ).toBeVisible();
 });

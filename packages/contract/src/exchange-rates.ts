@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import type { CurrencyCode } from './reference.js';
 
 /** Rates are local currency units per 1 USD, scaled to 6 decimals (ADR 0001). */
@@ -69,3 +70,10 @@ export const exchangeRates = {
   asOf: string;
   ratesPerUsd: Record<CurrencyCode, number>;
 };
+
+/** Which rate table produced a response's USD figures (ADR 0003, *Money on the wire*). */
+export const ratesSchema = z.strictObject({
+  source: z.string().min(1),
+  asOf: z.iso.date(),
+});
+export type Rates = z.infer<typeof ratesSchema>;

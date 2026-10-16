@@ -17,11 +17,11 @@ describe('routes (ADR 0004, Routing)', () => {
     return () => vi.unstubAllGlobals();
   });
 
-  it('opens on the payroll', async () => {
+  it('opens on the Overview, with no redirect', async () => {
     const state = await load('/');
 
-    expect(state.location.pathname).toBe('/pay/payroll');
-    expect(leafRoute(state)).toBe('/pay/payroll');
+    expect(state.location.pathname).toBe('/');
+    expect(leafRoute(state)).toBe('/');
   });
 
   it.each([

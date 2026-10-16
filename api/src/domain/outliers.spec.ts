@@ -133,6 +133,20 @@ describe('findOutliers', () => {
     expect(outliers.map((o) => o.employee)).toEqual([shownUnderpaid.employee]);
     expect(outliers[0]).toMatchObject({ peerMedian: usd(10_000_00), peerHeadcount: 5 });
   });
+
+  it('gives each underpaid outlier their gap to 0.80, and each overpaid one none', () => {
+    // Median $10,000.00: $7,500.00 is $500.00 short of $8,000.00. $13,000.00 has no gap.
+    const underpaid = member(7_500_00);
+    const overpaid = member(13_000_00);
+    const group = [underpaid, overpaid, ...[1, 2, 3].map(() => member(10_000_00))];
+
+    const { outliers } = findOutliers(group);
+
+    expect(outliers.map((o) => [o.employee, o.gapMinor])).toEqual([
+      [overpaid.employee, null],
+      [underpaid.employee, 500_00],
+    ]);
+  });
 });
 
 describe('findOutliers ranking', () => {

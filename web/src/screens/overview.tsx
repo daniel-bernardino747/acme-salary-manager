@@ -47,7 +47,7 @@ const countryOptions = countries.map((country) => ({ value: country.code, label:
  */
 export function Overview() {
   return (
-    <Stack gap={0}>
+    <Stack gap="lg">
       <PageHeader
         title="Overview"
         question="Start here: find someone, look up pay, act on outliers."
@@ -57,7 +57,7 @@ export function Overview() {
         <span>Find an employee by name, or a job title</span>
         <kbd className={classes.kbd}>Ctrl K</kbd>
       </button>
-      <Box className={classes.grid} mt="lg">
+      <Box className={classes.grid}>
         <OutOfLine />
         <Stack gap="lg">
           <WhatDoWePay />

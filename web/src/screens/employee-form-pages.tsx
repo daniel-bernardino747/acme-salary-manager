@@ -36,7 +36,7 @@ const countryOptions = countries.map((country) => ({ value: country.code, label:
 /** `/employees/new` (ADR 0004, *Forms: add and edit*). */
 export function AddEmployee() {
   return (
-    <Stack gap={0}>
+    <Stack gap="lg">
       <PageHeader title="Add employee" back={<BackLink />} />
       <EmployeeForm
         initialValues={emptyEmployeeForm}
@@ -57,7 +57,7 @@ export function EditEmployee() {
   return (
     <QueryState query={query}>
       {(employee) => (
-        <Stack gap={0}>
+        <Stack gap="lg">
           <PageHeader title={`Edit ${employee.name}`} back={<BackLink />} />
           <EmployeeForm
             key={employee.id}

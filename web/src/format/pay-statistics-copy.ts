@@ -11,7 +11,7 @@ export interface PeerGroupNames {
 const takesThe = new Set<CountryCode>(['US', 'GB', 'NL']);
 
 /** "in India", "in the United Kingdom". */
-function inCountry(country: CountryCode): string {
+export function inCountry(country: CountryCode): string {
   const name = countryName(country);
   return takesThe.has(country) ? `in the ${name}` : `in ${name}`;
 }

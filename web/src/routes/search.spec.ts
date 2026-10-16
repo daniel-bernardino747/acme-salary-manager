@@ -231,6 +231,8 @@ describe('activeFilterCount', () => {
   it('counts the country, department and job title filters that are set', () => {
     expect(activeFilterCount({})).toBe(0);
     expect(activeFilterCount({ country: 'IN', jobTitle: 'Data Analyst' })).toBe(2);
-    expect(activeFilterCount({ country: 'IN', department: 'Data', jobTitle: 'Accountant' })).toBe(3);
+    expect(activeFilterCount({ country: 'IN', department: 'Data', jobTitle: 'Accountant' })).toBe(
+      3,
+    );
   });
 });

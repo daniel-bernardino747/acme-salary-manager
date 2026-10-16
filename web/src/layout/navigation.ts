@@ -1,11 +1,6 @@
 /** A destination in the sidebar. */
 export type NavPath =
-  | '/'
-  | '/employees'
-  | '/pay/statistics'
-  | '/pay/outliers'
-  | '/pay/payroll'
-  | '/pay/comparison';
+  '/' | '/employees' | '/pay/statistics' | '/pay/outliers' | '/pay/payroll' | '/pay/comparison';
 
 export interface NavItem {
   to: NavPath;

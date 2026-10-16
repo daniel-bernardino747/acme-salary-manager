@@ -16,9 +16,7 @@ describe('isEmployeeQuery', () => {
 
 describe('employeeSearchPath', () => {
   it("asks the list's own endpoint for the first 8 matches", () => {
-    expect(employeeSearchPath('  Rohan Sh ')).toBe(
-      '/api/employees?page=1&pageSize=8&q=Rohan+Sh',
-    );
+    expect(employeeSearchPath('  Rohan Sh ')).toBe('/api/employees?page=1&pageSize=8&q=Rohan+Sh');
   });
 });
 

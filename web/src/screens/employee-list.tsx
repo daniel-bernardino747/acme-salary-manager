@@ -49,10 +49,23 @@ export function EmployeeList() {
     placeholderData: keepPreviousData,
   });
 
-  // A search replaces the history entry, so Back skips each debounced step; a filter pushes one.
-  const change = (searchChange: EmployeesSearchChange, replace = false) =>
-    void navigate({ search: (prev) => changeEmployeesSearch(prev, searchChange), replace });
-  const clearFilters = () => void navigate({ search: { page: 1 } });
+  // What is typed while its search waits to reach the URL; null once it has, or was cancelled.
+  const [typed, setTyped] = useState<string | null>(null);
+  // A search replaces the history entry, so Back skips each debounced step (ADR 0004, *Routing*).
+  // Debounced here and nowhere else (ADR 0004, *Data fetching*).
+  const sendSearch = useDebouncedCallback((q: string) => {
+    setTyped(null);
+    void navigate({ search: (prev) => changeEmployeesSearch(prev, { q }), replace: true });
+  }, SEARCH_DEBOUNCE_MS);
+  // A filter pushes a history entry.
+  const filter = (change: EmployeesSearchChange) =>
+    void navigate({ search: (prev) => changeEmployeesSearch(prev, change) });
+  const clearFilters = () => {
+    // A search still waiting would put what was typed back after the clear.
+    sendSearch.cancel();
+    setTyped(null);
+    void navigate({ search: { page: 1 } });
+  };
   const filtered = Boolean(
     search.q?.trim() || search.country || search.department || search.jobTitle,
   );
@@ -61,13 +74,23 @@ export function EmployeeList() {
     <Stack gap="md">
       <Title order={2}>Employees</Title>
       <Group align="flex-end" gap="sm">
-        <SearchBox q={search.q ?? ''} onSearch={(q) => change({ q }, true)} />
+        <TextInput
+          label="Search"
+          placeholder="Search by name"
+          value={typed ?? search.q ?? ''}
+          maxLength={MAX_SEARCH_LENGTH}
+          onChange={(event) => {
+            setTyped(event.currentTarget.value);
+            sendSearch(event.currentTarget.value);
+          }}
+          w={240}
+        />
         <Select
           label="Country"
           placeholder="Any country"
           data={countryOptions}
           value={search.country ?? null}
-          onChange={(country) => change({ country })}
+          onChange={(country) => filter({ country })}
           clearable
           w={180}
         />
@@ -76,7 +99,7 @@ export function EmployeeList() {
           placeholder="Any department"
           data={departments}
           value={search.department ?? null}
-          onChange={(department) => change({ department })}
+          onChange={(department) => filter({ department })}
           clearable
           w={190}
         />
@@ -85,7 +108,7 @@ export function EmployeeList() {
           placeholder="Any job title"
           data={jobTitles}
           value={search.jobTitle ?? null}
-          onChange={(jobTitle) => change({ jobTitle })}
+          onChange={(jobTitle) => filter({ jobTitle })}
           clearable
           searchable
           w={260}
@@ -141,42 +164,6 @@ export function EmployeeList() {
         }}
       </QueryState>
     </Stack>
-  );
-}
-
-/**
- * The search box keeps what is typed and sends it to the URL once typing pauses: the one place the
- * search is debounced (ADR 0004, *Data fetching*). A search changed elsewhere, by Back or
- * "Clear filters", replaces what is typed.
- */
-function SearchBox({ q, onSearch }: { q: string; onSearch: (q: string) => void }) {
-  const [text, setText] = useState(q);
-  // The URL's search as this box last sent or saw it, to tell an outside change from its own.
-  const [known, setKnown] = useState(q);
-  const send = useDebouncedCallback((value: string) => {
-    // A blank search leaves the URL, so the URL will read it back as empty.
-    setKnown(value.trim() ? value : '');
-    onSearch(value);
-  }, SEARCH_DEBOUNCE_MS);
-
-  if (q !== known) {
-    send.cancel();
-    setKnown(q);
-    setText(q);
-  }
-
-  return (
-    <TextInput
-      label="Search"
-      placeholder="Search by name"
-      value={text}
-      maxLength={MAX_SEARCH_LENGTH}
-      onChange={(event) => {
-        setText(event.currentTarget.value);
-        send(event.currentTarget.value);
-      }}
-      w={240}
-    />
   );
 }
 

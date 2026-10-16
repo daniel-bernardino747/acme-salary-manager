@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { intInRange, sfc32 } from './prng';
+import { intInRange, sfc32, streamFor } from './prng';
 
 const take = (next: () => number, n: number) => Array.from({ length: n }, next);
 
@@ -30,5 +30,16 @@ describe('intInRange', () => {
 
     expect(intInRange(next, 10, 12)).toBe(10 + (0xffff_fffe % 3));
     expect(script).toEqual([]);
+  });
+});
+
+describe('streamFor', () => {
+  it('seeds the same stream from the same keys, and a different one from any other keys', () => {
+    const cell = take(streamFor('acme', 'Data Scientist', 'NL'), 100);
+
+    expect(take(streamFor('acme', 'Data Scientist', 'NL'), 100)).toEqual(cell);
+    expect(take(streamFor('acme', 'Data Scientist', 'DE'), 100)).not.toEqual(cell);
+    // Keys are kept apart, never concatenated.
+    expect(take(streamFor('ab', 'c'), 100)).not.toEqual(take(streamFor('a', 'bc'), 100));
   });
 });

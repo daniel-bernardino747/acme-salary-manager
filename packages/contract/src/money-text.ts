@@ -44,22 +44,43 @@ function toDecimalString(amountMinor: number, exponent: number): `${number}` {
   return `${digits.slice(0, point)}.${digits.slice(point)}` as `${number}`;
 }
 
+export interface FormatMoneyOptions {
+  /** Whole major units (payroll totals, the comparison), rounded half up in integers first. */
+  wholeUnits?: boolean;
+}
+
+/** Whole major units of `amountMinor`, rounded half up by integer quotient and remainder (ADR 0001). */
+function roundToWholeUnits(amountMinor: number, exponent: number): number {
+  const unit = 10 ** exponent;
+  const remainder = amountMinor % unit;
+  const quotient = (amountMinor - remainder) / unit;
+  return 2 * remainder >= unit ? quotient + 1 : quotient;
+}
+
 /**
  * Shows money as text with its own currency's symbol (ADR 0003, *Text and integers*). The decimal
  * string is built from the integer with string operations, and `Intl.NumberFormat` only groups it
- * and adds the symbol, always in the explicit locale, never the machine's default.
+ * and adds the symbol, always in the explicit locale, never the machine's default. Whole units are
+ * rounded in integers before formatting, so the result never depends on Intl's `roundingMode`.
  */
-export function formatMoney(money: Money, locale: AppLocale): string {
+export function formatMoney(
+  money: Money,
+  locale: AppLocale,
+  options: FormatMoneyOptions = {},
+): string {
   if (!Number.isSafeInteger(money.amountMinor) || money.amountMinor < 0) {
     throw new RangeError(
       `formatMoney needs a non-negative safe integer, got ${money.amountMinor}.`,
     );
   }
   const { exponent } = currencies[money.currency];
+  const [amount, decimals] = options.wholeUnits
+    ? [roundToWholeUnits(money.amountMinor, exponent), 0]
+    : [money.amountMinor, exponent];
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: money.currency,
-    minimumFractionDigits: exponent,
-    maximumFractionDigits: exponent,
-  }).format(toDecimalString(money.amountMinor, exponent));
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  }).format(toDecimalString(amount, decimals));
 }

@@ -1,5 +1,6 @@
 import { employeeRequestSchema } from '@acme/contract';
 import { describe, expect, it } from 'vitest';
+import { median } from '../domain/statistics';
 import { generateEmployees } from './generate-employees';
 import { baseSalaryMinor, salaryStepMinor } from './base-salaries';
 import { homeDepartment } from './home-departments';
@@ -50,5 +51,22 @@ describe('generateEmployees', () => {
       expect(found && 100 * found.employee.annualSalaryMinor).toBe(plant.ratioHundredths * base);
     }
     expect(generated.filter((g) => g.plant)).toHaveLength(22);
+  });
+
+  it("keeps every employee who isn't planted within 0.85–1.15 of their group's final median, in every group of 5 or more", () => {
+    for (const { jobTitle, country, count } of headcountQuotas().filter((q) => q.count >= 5)) {
+      const group = generated.filter(
+        (g) => g.employee.jobTitle === jobTitle && g.employee.country === country,
+      );
+      const groupMedian = median(group.map((g) => g.employee.annualSalaryMinor));
+      expect(group).toHaveLength(count);
+      expect(groupMedian).toBe(baseSalaryMinor(jobTitle, country));
+
+      for (const { employee } of group.filter((g) => !g.plant)) {
+        // Integer cross-multiplication, as for outliers (ADR 0001).
+        expect(100 * employee.annualSalaryMinor).toBeGreaterThanOrEqual(85 * (groupMedian ?? 0));
+        expect(100 * employee.annualSalaryMinor).toBeLessThanOrEqual(115 * (groupMedian ?? 0));
+      }
+    }
   });
 });

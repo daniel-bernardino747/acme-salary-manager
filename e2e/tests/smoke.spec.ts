@@ -1,5 +1,5 @@
 import { formatMoney } from '@acme/contract';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { generateEmployees } from '../../api/src/seed/generate-employees';
 import { plantedCostToReachThreshold } from '../../api/test/seed-story';
 
@@ -69,4 +69,27 @@ test('adding an employee in India saves the salary typed as 1,250,000.50 to the 
 
   await expect(page.getByRole('heading', { name: added.name, level: 2 })).toBeVisible();
   await expect(page.getByText('₹1,250,000.50 INR', { exact: true })).toBeVisible();
+});
+
+/** Finds the added employee by name on the list and opens their page. */
+async function openAdded(page: Page) {
+  await page.goto('/employees');
+  await page.getByRole('textbox', { name: 'Search' }).fill(added.name);
+  // The search reaches the list after its debounce; the assertion waits for it, never a timer.
+  await expect(page.getByText('1–1 of 1', { exact: true })).toBeVisible();
+  await page.getByRole('link', { name: added.name, exact: true }).click();
+  await expect(page.getByRole('heading', { name: added.name, level: 2 })).toBeVisible();
+}
+
+test('editing that employee starts from their salary and saves a raise', async ({ page }) => {
+  await openAdded(page);
+  await page.getByRole('link', { name: 'Edit' }).click();
+
+  const salary = page.getByRole('textbox', { name: 'Annual salary' });
+  await expect(salary).toHaveValue('1250000.50');
+  await salary.fill('1,300,000');
+  await page.getByRole('button', { name: 'Save changes' }).click();
+
+  await expect(page.getByText(`Saved ${added.name}`, { exact: true })).toBeVisible();
+  await expect(page.getByText('₹1,300,000.00 INR', { exact: true })).toBeVisible();
 });

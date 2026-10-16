@@ -6,16 +6,20 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { apiFetch } from '../api/api-fetch';
+import { outliersQuery, underpaidSearch } from '../api/outliers-query';
 import { queryKey } from '../api/query-key';
 import { CountryStamp } from '../components/document';
 import { GlobeIcon, PersonIcon, PlusIcon, SearchIcon, TagIcon } from '../components/icons';
+import { countText } from '../format/counts';
 import { countryName } from '../format/country-name';
 import { SEARCH_DEBOUNCE_MS } from '../search/debounce';
 import {
+  EMPLOYEE_RESULTS,
   employeeSearchPath,
   isEmployeeQuery,
   matchingCountries,
   matchingJobTitles,
+  matches,
 } from '../search/global-search';
 import classes from './shell.module.css';
 
@@ -33,10 +37,12 @@ export function GlobalSearch() {
   const [debounced] = useDebouncedValue(query.trim(), SEARCH_DEBOUNCE_MS);
   const searching = isEmployeeQuery(debounced);
   const employees = useQuery({
-    queryKey: queryKey('employees', { q: debounced, page: 1, pageSize: 8 }),
+    queryKey: queryKey('employees', { q: debounced, page: 1, pageSize: EMPLOYEE_RESULTS }),
     queryFn: () => apiFetch<EmployeeListResponse>(employeeSearchPath(debounced)),
     enabled: searching,
   });
+  // The nav's and the Overview's cached query, so the count costs no request of its own.
+  const underpaid = useQuery(outliersQuery(underpaidSearch));
   const titles = matchingJobTitles(query);
   const places = matchingCountries(query);
   const typed = query.trim();
@@ -57,7 +63,9 @@ export function GlobalSearch() {
     },
     {
       id: 'underpaid',
-      label: 'Underpaid employees',
+      label: underpaid.data
+        ? `Underpaid employees (${countText(underpaid.data.total)})`
+        : 'Underpaid employees',
       icon: <TagIcon />,
       go: () => navigate({ to: '/pay/outliers' }),
     },
@@ -74,9 +82,7 @@ export function GlobalSearch() {
       go: () => navigate({ to: '/pay/payroll' }),
     },
   ];
-  const shownActions = typed
-    ? actions.filter((action) => action.label.toLowerCase().includes(typed.toLowerCase()))
-    : actions;
+  const shownActions = typed ? actions.filter((action) => matches(action.label, typed)) : actions;
 
   return (
     <Spotlight.Root
@@ -131,8 +137,7 @@ export function GlobalSearch() {
                 }
               >
                 <Text size="sm" c="visa.7" fw={600}>
-                  See all {employees.data.total.toLocaleString('en')} employees matching “
-                  {debounced}”
+                  See all {countText(employees.data.total)} employees matching “{debounced}”
                 </Text>
               </Spotlight.Action>
             )}

@@ -1,12 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ApiProblem, apiFetch } from './api-fetch';
 
-/** Answers every request with `response`, as the network would. */
-function serve(response: Response): void {
-  vi.stubGlobal(
-    'fetch',
-    vi.fn(async () => response),
-  );
+/** Answers every request with `response`, as the network would, and records the requests. */
+function serve(response: Response) {
+  const fetch = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) => response);
+  vi.stubGlobal('fetch', fetch);
+  return fetch;
 }
 
 afterEach(() => {
@@ -18,6 +17,18 @@ describe('apiFetch', () => {
     serve(Response.json({ status: 'ok' }));
 
     await expect(apiFetch<{ status: string }>('/api/health')).resolves.toEqual({ status: 'ok' });
+  });
+
+  it('sends a body as JSON', async () => {
+    const fetch = serve(Response.json({ id: 7 }, { status: 201 }));
+
+    await apiFetch('/api/employees', { method: 'POST', body: { name: 'Priya Sharma' } });
+
+    const [path, init] = fetch.mock.calls[0]!;
+    expect(path).toBe('/api/employees');
+    expect(init?.method).toBe('POST');
+    expect(new Headers(init?.headers).get('Content-Type')).toBe('application/json');
+    expect(init?.body).toBe('{"name":"Priya Sharma"}');
   });
 
   it('does not parse a 204, which has no body', async () => {

@@ -4,7 +4,7 @@ import { z } from 'zod';
 export const PROBLEM_CONTENT_TYPE = 'application/problem+json';
 
 /** RFC 9457 Problem Details. `errors[].path` is the Zod issue path, so the UI can map it to a field. */
-export const problemSchema = z.object({
+export const problemSchema = z.strictObject({
   type: z.string(),
   title: z.string(),
   status: z.int(),

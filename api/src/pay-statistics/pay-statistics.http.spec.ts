@@ -12,7 +12,11 @@ describe('GET /api/pay-statistics', () => {
     insertEmployee(t.db, { ...peer, department: 'Data', annualSalaryMinor: 240_000_00 });
     // Same title elsewhere, and another title here: neither is a peer.
     insertEmployee(t.db, { jobTitle: 'Data Scientist', country: 'IN', annualSalaryMinor: 1_00 });
-    insertEmployee(t.db, { jobTitle: 'Data Analyst', country: 'BR', annualSalaryMinor: 9_000_000_00 });
+    insertEmployee(t.db, {
+      jobTitle: 'Data Analyst',
+      country: 'BR',
+      annualSalaryMinor: 9_000_000_00,
+    });
 
     const res = await t.http().get('/api/pay-statistics').query(peer).expect(200);
 

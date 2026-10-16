@@ -9,12 +9,19 @@ export interface EmployeeProblem {
   formError: string | null;
 }
 
-/** The request body's field names that differ from the form's (ADR 0004, *Forms*). */
-const renamed: Record<string, FormField> = { annualSalaryMinor: 'annualSalary' };
+/** Each request body field, by its name in the body, as the form field that shows it. */
+const formFieldOf: Record<string, FormField> = {
+  name: 'name',
+  jobTitle: 'jobTitle',
+  department: 'department',
+  country: 'country',
+  // The one rename (ADR 0004, *Forms: add and edit*).
+  annualSalaryMinor: 'annualSalary',
+};
 
 /**
  * Maps a problem's errors onto the form by `path[0]` (ADR 0004, *Forms: add and edit*), so each
- * message shows on the field it belongs to. A problem with no errors (a 404, a 500, or the generic
+ * message shows on the field it belongs to. An error on no form field, or a problem with no errors (a 404, a 500, or the generic
  * problem of an unreadable response) is a form-level alert, and the form keeps what was typed.
  */
 export function employeeProblem(problem: Problem): EmployeeProblem {
@@ -22,10 +29,16 @@ export function employeeProblem(problem: Problem): EmployeeProblem {
     return { fieldErrors: {}, formError: problem.detail ?? problem.title };
   }
   const fieldErrors: EmployeeProblem['fieldErrors'] = {};
+  const unmapped: string[] = [];
   for (const error of problem.errors) {
-    const key = String(error.path[0]);
-    const field = renamed[key] ?? (key as FormField);
-    fieldErrors[field] ??= error.message;
+    const field = Object.hasOwn(formFieldOf, String(error.path[0]))
+      ? formFieldOf[String(error.path[0])]
+      : undefined;
+    if (field) {
+      fieldErrors[field] ??= error.message;
+    } else {
+      unmapped.push(`${error.message}.`);
+    }
   }
-  return { fieldErrors, formError: null };
+  return { fieldErrors, formError: unmapped.length > 0 ? unmapped.join(' ') : null };
 }

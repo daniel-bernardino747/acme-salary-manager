@@ -306,6 +306,9 @@ importers:
       '@mantine/notifications':
         specifier: 9.7.2
         version: 9.7.2(@mantine/core@9.7.2(@mantine/hooks@9.7.2(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@mantine/hooks@9.7.2(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@mantine/spotlight':
+        specifier: 9.7.2
+        version: 9.7.2(@mantine/core@9.7.2(@mantine/hooks@9.7.2(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@mantine/hooks@9.7.2(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@tanstack/react-query':
         specifier: ^5.104.3
         version: 5.104.3(react@19.3.1)
@@ -1201,6 +1204,14 @@ packages:
 
   '@mantine/notifications@9.7.2':
     resolution: {integrity: sha512-Lf/oS2bpWgalgJ7Uy2Gh2V/kqnIIM3zkeWYy+GZKunfbiQGyuDBasOGd/4RYu5ga7b8vxJzC/zINi/UdpFuxoQ==}
+    peerDependencies:
+      '@mantine/core': 9.7.2
+      '@mantine/hooks': 9.7.2
+      react: ^19.2.0
+      react-dom: ^19.2.0
+
+  '@mantine/spotlight@9.7.2':
+    resolution: {integrity: sha512-QvpxQ0Axy1Pa3pWuAMyNK8mhzR0/PqhSsz9tA7iTpi5zUgVAqODFP36FyPk6ajRL9hvlF094Pjj5b/UKHLKk+w==}
     peerDependencies:
       '@mantine/core': 9.7.2
       '@mantine/hooks': 9.7.2
@@ -4445,6 +4456,14 @@ snapshots:
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
       react-transition-group: 4.4.5(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+
+  '@mantine/spotlight@9.7.2(@mantine/core@9.7.2(@mantine/hooks@9.7.2(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(@mantine/hooks@9.7.2(react@19.3.1))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+    dependencies:
+      '@mantine/core': 9.7.2(@mantine/hooks@9.7.2(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@mantine/hooks': 9.7.2(react@19.3.1)
+      '@mantine/store': 9.7.2(react@19.3.1)
+      react: 19.3.1
+      react-dom: 19.3.1(react@19.3.1)
 
   '@mantine/store@9.7.2(react@19.3.1)':
     dependencies:

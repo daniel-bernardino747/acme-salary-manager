@@ -1,7 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { countEmployees } from '../persistence/count-employees';
 import { createDb, type Db } from '../persistence/db';
+import { databaseGoldenHash } from './golden-hash';
 import { runSeed } from './run-seed';
+
+// The committed database golden hash (ADR 0005, *Tests*): the rows read back from a migrated
+// `:memory:` database, ordered by id, with ids. It changes only with the generator golden hash.
+const DATABASE_GOLDEN_HASH = '';
 
 describe('seed command', () => {
   let db: Db;
@@ -17,5 +22,11 @@ describe('seed command', () => {
     expect(seed([])).toBe(0);
 
     expect(countEmployees(db)).toBe(10_000);
+  });
+
+  it('gives rows that, read back by id with their ids, match the committed database golden hash', () => {
+    seed([]);
+
+    expect(databaseGoldenHash(db)).toBe(DATABASE_GOLDEN_HASH);
   });
 });

@@ -1,5 +1,6 @@
-import { countries, currencyOf, type CountryCode, type JobTitle } from '@acme/contract';
+import { currencyOf, type CountryCode, type JobTitle } from '@acme/contract';
 import { employeeCount } from './counts';
+import { countryName } from './country-name';
 
 export interface PeerGroupNames {
   jobTitle: JobTitle;
@@ -11,7 +12,7 @@ const takesThe = new Set<CountryCode>(['US', 'GB', 'NL']);
 
 /** "in India", "in the United Kingdom". */
 function inCountry(country: CountryCode): string {
-  const name = countries.find((c) => c.code === country)?.name ?? country;
+  const name = countryName(country);
   return takesThe.has(country) ? `in the ${name}` : `in ${name}`;
 }
 

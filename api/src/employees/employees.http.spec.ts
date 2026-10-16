@@ -6,6 +6,7 @@ import {
 import { describe, expect, it } from 'vitest';
 import { insertEmployee } from '../../test/builders';
 import { useTestApp } from '../../test/http';
+import { clearEmployees } from '../persistence/clear-employees';
 
 describe('GET /api/employees', () => {
   const t = useTestApp();
@@ -150,5 +151,15 @@ describe('GET /api/employees/:id', () => {
       country: 'JP',
       annualSalary: { amountMinor: 7_000_000, currency: 'JPY' },
     });
+  });
+
+  it('answers an id with no employee with a 404 problem', async () => {
+    const removed = insertEmployee(t.db);
+    clearEmployees(t.db);
+
+    const res = await t.http().get(`/api/employees/${removed.id}`).expect(404);
+
+    expect(res.headers['content-type']).toMatch(/^application\/problem\+json/);
+    expect(problemSchema.parse(res.body)).toMatchObject({ title: 'Not Found', status: 404 });
   });
 });

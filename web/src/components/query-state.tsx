@@ -1,7 +1,7 @@
 import { Alert, Button, Group, Skeleton, Stack, Text } from '@mantine/core';
 import type { UseQueryResult } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
-import { ApiProblem } from '../api/api-fetch';
+import { errorText } from '../api/error-text';
 import { queryPhase } from './query-phase';
 
 interface QueryStateProps<T> {
@@ -29,7 +29,7 @@ export function QueryState<T>({ query, skeleton, idle = null, children }: QueryS
     return (
       <Alert color="red" title="Could not load this page">
         <Stack gap="sm">
-          <Text size="sm">{describeError(query.error)}</Text>
+          <Text size="sm">{errorText(query.error)}</Text>
           <Group>
             <Button
               size="xs"
@@ -57,11 +57,4 @@ function DefaultSkeleton() {
       <Skeleton height={16} width="70%" />
     </Stack>
   );
-}
-
-function describeError(error: Error): string {
-  if (error instanceof ApiProblem) {
-    return error.message;
-  }
-  return 'The server could not be reached. Check your connection and try again.';
 }

@@ -5,6 +5,7 @@ export * from './health.js';
 export * from './money.js';
 export * from './money-text.js';
 export * from './pay-statistics.js';
+export * from './payroll-totals.js';
 export * from './problem.js';
 export * from './reference.js';
 export * from './rounding.js';

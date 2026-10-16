@@ -1,5 +1,5 @@
 import type { EmployeeResponse, Money } from '@acme/contract';
-import { compaRatioHundredths, isAboveThreshold, isBelowThreshold } from './compa-ratio';
+import { compaRatioHundredths, gapMinor, isAboveThreshold, isBelowThreshold } from './compa-ratio';
 import { isSmallGroup } from './pay-statistics';
 import { median } from './statistics';
 
@@ -22,6 +22,8 @@ export interface Outlier {
   peerHeadcount: number;
   compaRatioHundredths: number;
   direction: OutlierDirection;
+  /** The gap to 0.80 in the peer group's currency, on underpaid rows only. */
+  gapMinor: number | null;
 }
 
 export interface OutlierFindings {
@@ -101,6 +103,7 @@ export function findOutliers(
           peerHeadcount: group.length,
           compaRatioHundredths: compaRatioHundredths(salary, peerMedian),
           direction,
+          gapMinor: direction === 'below' ? gapMinor(salary, peerMedian) : null,
         });
       }
     }

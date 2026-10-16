@@ -16,6 +16,21 @@ describe('nameMatch', () => {
     expect(nameMatch('"')).toBe('""""*');
   });
 
+  // The tokenizer folds case and accents, so the builder leaves them alone.
+  it.each([
+    ['João MÜLLER', '"João"* AND "MÜLLER"*'],
+    ['pri AND sha', '"pri"* AND "AND"* AND "sha"*'],
+    ['OR NOT NEAR', '"OR"* AND "NOT"* AND "NEAR"*'],
+    ['-sharma', '"-sharma"*'],
+    ['pri -', '"pri"* AND "-"*'],
+    ['*', '"*"*'],
+    ['name:priya', '"name:priya"*'],
+    ['(priya)', '"(priya)"*'],
+    ['^pri', '"^pri"*'],
+  ])('keeps %j as quoted text, never FTS5 syntax', (search, match) => {
+    expect(nameMatch(search)).toBe(match);
+  });
+
   it('is null for an empty or whitespace-only search, which means no search', () => {
     expect(nameMatch('')).toBeNull();
     expect(nameMatch(' \t ')).toBeNull();

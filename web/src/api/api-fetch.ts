@@ -12,12 +12,26 @@ export class ApiProblem extends Error {
   }
 }
 
+export interface ApiRequest {
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  /** Sent as JSON. */
+  body?: unknown;
+}
+
 /**
  * Sends a request to the API and returns its JSON body, typed by the caller (ADR 0004).
  * A non-2xx response throws an `ApiProblem`.
  */
-export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const response = await fetch(path, { ...init, headers: { Accept: 'application/json' } });
+export async function apiFetch<T>(path: string, request: ApiRequest = {}): Promise<T> {
+  const headers: Record<string, string> = { Accept: 'application/json' };
+  if (request.body !== undefined) {
+    headers['Content-Type'] = 'application/json';
+  }
+  const response = await fetch(path, {
+    method: request.method ?? 'GET',
+    headers,
+    body: request.body === undefined ? undefined : JSON.stringify(request.body),
+  });
   if (!response.ok) {
     throw new ApiProblem(await readProblem(response));
   }

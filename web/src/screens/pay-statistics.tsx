@@ -11,10 +11,11 @@ import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { apiFetch } from '../api/api-fetch';
 import { payStatisticsPath } from '../api/pay-statistics-path';
 import { queryKey } from '../api/query-key';
-import { Figure, Muted, PageHeader, Panel, RangeBar } from '../components/document';
+import { CountryStamp, Figure, Muted, PageHeader, Panel, RangeBar } from '../components/document';
 import { QueryState } from '../components/query-state';
 import {
   emptyGroupText,
+  peerGroupName,
   seeEmployeesText,
   smallGroupNotice,
   statisticsHeading,
@@ -87,7 +88,13 @@ export function PayStatistics() {
 function Statistics({ statistics }: { statistics: PayStatisticsResponse }) {
   const { jobTitle, country, headcount, min, median, average, max } = statistics;
   return (
-    <Panel title={statisticsHeading(statistics)}>
+    <Panel
+      title={
+        <>
+          {peerGroupName(statistics)} <CountryStamp country={country} />
+        </>
+      }
+    >
       {headcount === 0 || !min || !median || !average || !max ? (
         <Text>{emptyGroupText(statistics)}</Text>
       ) : (

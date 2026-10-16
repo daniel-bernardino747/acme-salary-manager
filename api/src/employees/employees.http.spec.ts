@@ -337,4 +337,17 @@ describe('DELETE /api/employees/:id', () => {
 
     expect(problemSchema.parse(res.body)).toMatchObject({ title: 'Not Found', status: 404 });
   });
+
+  it('takes the employee off the list, its search included', async () => {
+    const { id } = insertEmployee(t.db, { name: 'Priya Sharma' });
+    const kenji = insertEmployee(t.db, { name: 'Kenji Watanabe' }).id;
+
+    await t.http().delete(`/api/employees/${id}`).expect(204);
+
+    const list = await t.http().get('/api/employees').expect(200);
+    expect(employeeListResponseSchema.parse(list.body)).toMatchObject({ total: 1 });
+    expect(employeeListResponseSchema.parse(list.body).items.map((e) => e.id)).toEqual([kenji]);
+    const search = await t.http().get('/api/employees').query({ q: 'priya' }).expect(200);
+    expect(employeeListResponseSchema.parse(search.body).total).toBe(0);
+  });
 });

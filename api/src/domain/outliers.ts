@@ -1,7 +1,7 @@
 import { exchangeRates, type EmployeeResponse, type Money } from '@acme/contract';
 import { compaRatioHundredths, gapMinor, isAboveThreshold, isBelowThreshold } from './compa-ratio';
-import { isSmallGroup } from './pay-statistics';
 import { usdTotal, type RatesPerUsd, type UsdMoney } from './conversion';
+import { isSmallGroup } from './pay-statistics';
 import { median } from './statistics';
 
 /** Below 0.80 is underpaid, above 1.20 overpaid: the outlier's direction (CONTEXT.md). */
@@ -79,7 +79,8 @@ function peerGroups(members: readonly PeerGroupMember[]): PeerGroupMember[][] {
  * Question 4: the shown employees whose compa-ratio against their whole peer group's median, as
  * shown, is strictly below 0.80 or strictly above 1.20, in groups of 5 or more (ADR 0001,
  * *Outliers*), most extreme first. Asked for a direction, it ranks only that one, so the underpaid
- * are never buried under the overpaid (ADR 0003). The same pass counts the shown employees in small groups, who were not checked.
+ * are never buried under the overpaid (ADR 0003). The same pass counts the shown employees in
+ * small groups, who were not checked.
  */
 export function findOutliers(
   members: readonly PeerGroupMember[],

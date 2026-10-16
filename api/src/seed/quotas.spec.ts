@@ -1,6 +1,7 @@
 import { countries, jobTitles } from '@acme/contract';
 import { describe, expect, it } from 'vitest';
 import { countryTotals, headcountQuotas, smallGroupOverrides } from './quotas';
+import { quotaSnapshot } from './snapshots';
 
 describe('headcountQuotas', () => {
   const quotas = headcountQuotas();
@@ -32,5 +33,11 @@ describe('headcountQuotas', () => {
     );
     expect(others).toHaveLength(quotas.length - 5);
     expect(others.every((q) => q.count >= 5)).toBe(true);
+  });
+
+  it('matches the committed quota snapshot', async () => {
+    await expect(quotaSnapshot(quotas)).toMatchFileSnapshot(
+      '../../../docs/seed/headcount-quotas.md',
+    );
   });
 });

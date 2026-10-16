@@ -304,6 +304,19 @@ describe('PUT /api/employees/:id', () => {
     const stored = await t.http().get(`/api/employees/${kenji.id}`).expect(200);
     expect(employeeResponseSchema.parse(stored.body).name).toBe('Kenji Watanabe');
   });
+
+  it('makes search find the employee by the new name, and no longer by the old one', async () => {
+    const { id } = insertEmployee(t.db, { name: 'Kenji Watanabe' });
+
+    await t.http().put(`/api/employees/${id}`).send(priya).expect(200);
+
+    const search = async (q: string) => {
+      const res = await t.http().get('/api/employees').query({ q }).expect(200);
+      return employeeListResponseSchema.parse(res.body).items.map((employee) => employee.id);
+    };
+    expect(await search('pri sha')).toEqual([id]);
+    expect(await search('kenji')).toEqual([]);
+  });
 });
 
 describe('DELETE /api/employees/:id', () => {

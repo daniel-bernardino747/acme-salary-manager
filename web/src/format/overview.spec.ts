@@ -1,6 +1,6 @@
 import type { Money } from '@acme/contract';
 import { describe, expect, it } from 'vitest';
-import { shareBars, topOutliers } from './overview';
+import { overviewDateLine, shareBars, topOutliers } from './overview';
 
 const usd = (amountMinor: number): Money => ({ amountMinor, currency: 'USD' });
 
@@ -38,5 +38,19 @@ describe('shareBars', () => {
     ]);
 
     expect(bars.map(({ width }) => width)).toEqual([0, 0]);
+  });
+});
+
+describe('overviewDateLine', () => {
+  it("states today's date in the app's locale and the organization's size", () => {
+    expect(overviewDateLine(new Date(2026, 9, 16), 10_000)).toBe(
+      'Friday, October 16, 2026 · 10,000 employees in 7 countries',
+    );
+  });
+
+  it('counts one employee in the singular', () => {
+    expect(overviewDateLine(new Date(2026, 0, 1), 1)).toBe(
+      'Thursday, January 1, 2026 · 1 employee in 7 countries',
+    );
   });
 });

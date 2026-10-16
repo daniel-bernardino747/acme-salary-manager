@@ -1,11 +1,13 @@
-import { exchangeRates, type EmployeeResponse, type Money } from '@acme/contract';
+import {
+  exchangeRates,
+  type EmployeeResponse,
+  type Money,
+  type OutlierDirection,
+} from '@acme/contract';
 import { compaRatioHundredths, gapMinor, isAboveThreshold, isBelowThreshold } from './compa-ratio';
 import { usdTotal, type RatesPerUsd, type UsdMoney } from './conversion';
 import { isSmallGroup } from './pay-statistics';
 import { median } from './statistics';
-
-/** Below 0.80 is underpaid, above 1.20 overpaid: the outlier's direction (CONTEXT.md). */
-export type OutlierDirection = 'below' | 'above';
 
 /**
  * An employee in one of the peer groups the filters touch. Every member counts towards their

@@ -8,11 +8,16 @@ describe('assertRateTable', () => {
   });
 
   it("fails fast when a supported country's currency has no rate", () => {
-    const { GBP: _, ...withoutGbp } = exchangeRates.ratesPerUsd;
+    const withoutGbp = Object.fromEntries(
+      Object.entries(exchangeRates.ratesPerUsd).filter(([currency]) => currency !== 'GBP'),
+    );
     expect(() => assertRateTable(withoutGbp)).toThrow(/GBP/);
   });
 
-  it.each([0, -1, Number.NaN])('fails fast on a rate of %s, which is not greater than 0', (rate) => {
-    expect(() => assertRateTable({ ...exchangeRates.ratesPerUsd, JPY: rate })).toThrow(/JPY/);
-  });
+  it.each([0, -1, Number.NaN])(
+    'fails fast on a rate of %s, which is not greater than 0',
+    (rate) => {
+      expect(() => assertRateTable({ ...exchangeRates.ratesPerUsd, JPY: rate })).toThrow(/JPY/);
+    },
+  );
 });

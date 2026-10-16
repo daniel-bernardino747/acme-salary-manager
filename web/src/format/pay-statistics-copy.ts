@@ -21,3 +21,8 @@ function inCountry(country: CountryCode): string {
 export function statisticsHeading({ jobTitle, country }: PeerGroupNames): string {
   return `${jobTitle} ${inCountry(country)} · ${currencyOf(country)}`;
 }
+
+/** An empty peer group, shown in place of the figures, never as zeros (ADR 0004, *Question 1*). */
+export function emptyGroupText({ jobTitle, country }: PeerGroupNames): string {
+  return `No employees with the title ${jobTitle} ${inCountry(country)}.`;
+}

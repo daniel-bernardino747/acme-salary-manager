@@ -1,8 +1,9 @@
-import { currencyOf, type EmployeeListQuery, type EmployeeResponse } from '@acme/contract';
+import type { EmployeeListQuery, EmployeeResponse } from '@acme/contract';
 import { and, count, eq, getTableColumns, sql } from 'drizzle-orm';
 import type { Db } from './db';
 import { nameMatch } from './name-match';
 import { employees } from './schema';
+import { toEmployee } from './to-employee';
 
 export interface EmployeeList {
   items: EmployeeResponse[];
@@ -37,13 +38,4 @@ export function listEmployees(db: Db, query: EmployeeListQuery): EmployeeList {
   const total =
     (match === null ? counted : counted.innerJoin(employeesFts, ftsRow)).where(where).get()?.n ?? 0;
   return { items: rows.map(toEmployee), total };
-}
-
-/** An employee with the salary as Money: the currency follows from the country (ADR 0002). */
-function toEmployee(row: typeof employees.$inferSelect): EmployeeResponse {
-  const { annualSalaryMinor, ...employee } = row;
-  return {
-    ...employee,
-    annualSalary: { amountMinor: annualSalaryMinor, currency: currencyOf(row.country) },
-  };
 }

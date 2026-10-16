@@ -35,5 +35,12 @@ export const employeeFormSchema = z
       ctx.addIssue({ code: 'custom', path: ['annualSalary'], message: salary.error });
       return z.NEVER;
     }
-    return { ...employee, annualSalaryMinor: salary.amountMinor };
+    const amount = fields.annualSalaryMinor.safeParse(salary.amountMinor);
+    if (!amount.success) {
+      for (const issue of amount.error.issues) {
+        ctx.addIssue({ code: 'custom', path: ['annualSalary'], message: issue.message });
+      }
+      return z.NEVER;
+    }
+    return { ...employee, annualSalaryMinor: amount.data };
   });

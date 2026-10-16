@@ -1,19 +1,10 @@
 import { currencyOf, type CountryCode, type JobTitle } from '@acme/contract';
 import { employeeCount } from './counts';
-import { countryName } from './country-name';
+import { inCountry } from './country-name';
 
 export interface PeerGroupNames {
   jobTitle: JobTitle;
   country: CountryCode;
-}
-
-/** Countries whose English name reads with "the": "in the Netherlands", never "in Netherlands". */
-const takesThe = new Set<CountryCode>(['US', 'GB', 'NL']);
-
-/** "in India", "in the United Kingdom". */
-export function inCountry(country: CountryCode): string {
-  const name = countryName(country);
-  return takesThe.has(country) ? `in the ${name}` : `in ${name}`;
 }
 
 /**

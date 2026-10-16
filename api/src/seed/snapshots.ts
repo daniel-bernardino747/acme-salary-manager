@@ -1,4 +1,6 @@
-import { countries, jobTitles } from '@acme/contract';
+import { countries, currencyOf, exchangeRates, formatMoney, jobTitles } from '@acme/contract';
+import { toUsd } from '../domain/conversion';
+import { baseSalaryMinor } from './base-salaries';
 import { homeDepartment } from './home-departments';
 import type { Quota } from './quotas';
 
@@ -36,6 +38,38 @@ export function quotaSnapshot(quotas: readonly Quota[]): string {
     `Generated from \`headcountQuotas()\` (ADR 0005, *Headcount: exact quotas*). Do not edit: \`${REGENERATE}\` rewrites it, and \`api/src/seed/quotas.spec.ts\` fails when it is stale.`,
     '',
     table(['Job title', 'Department', ...codes, 'Total'], rows),
+    '',
+  ].join('\n');
+}
+
+/** Every base salary, per country, in local currency and in USD at the shipped rates, as Markdown. */
+export function baseSnapshot(): string {
+  const whole = { wholeUnits: true };
+  const sections = countries.map(({ code, name }) => {
+    const currency = currencyOf(code);
+    const rows = jobTitles.map((t) => {
+      const local = { amountMinor: baseSalaryMinor(t, code), currency };
+      return [
+        t,
+        homeDepartment[t],
+        formatMoney(local, 'en', whole),
+        formatMoney(toUsd(local), 'en', whole),
+      ];
+    });
+    return [
+      `## ${name} (${code}, ${currency})`,
+      '',
+      table(['Job title', 'Department', 'Base', 'In USD'], rows),
+    ].join('\n');
+  });
+  return [
+    '# Base salaries',
+    '',
+    `Generated from \`baseSalaryMinor()\` (ADR 0005, *Base salaries*). Do not edit: \`${REGENERATE}\` rewrites it, and \`api/src/seed/base-salaries.spec.ts\` fails when it is stale. Illustrative figures, not market data.`,
+    '',
+    `USD at the ${exchangeRates.source}, as of ${exchangeRates.asOf}, each base converted once and shown in whole dollars.`,
+    '',
+    sections.join('\n\n'),
     '',
   ].join('\n');
 }

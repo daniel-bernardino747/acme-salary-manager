@@ -1,6 +1,8 @@
 import {
+  countrySchema,
   currencyOf,
   employeeRequestSchema,
+  formatMoney,
   parseMoney,
   type CountryCode,
   type EmployeeRequest,
@@ -78,4 +80,21 @@ function addSalaryIssues(ctx: z.RefinementCtx, messages: string[]): void {
   for (const message of messages) {
     ctx.addIssue({ code: 'custom', path: ['annualSalary'], message });
   }
+}
+
+/**
+ * The live preview under the salary field, e.g. "= ₹1,250,000.50 a year" (ADR 0004, *Forms*), or
+ * `null` while there is no country or the salary does not read: its message shows instead.
+ */
+export function salaryPreview(annualSalary: string, country: string): string | null {
+  const code = countrySchema.safeParse(country);
+  if (!code.success) {
+    return null;
+  }
+  const salary = readSalary(annualSalary, code.data);
+  if (!salary.success) {
+    return null;
+  }
+  const money = { amountMinor: salary.amountMinor, currency: currencyOf(code.data) };
+  return `= ${formatMoney(money, 'en')} a year`;
 }

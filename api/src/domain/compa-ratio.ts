@@ -26,6 +26,19 @@ export function isAboveThreshold(salaryMinor: number, medianMinor: number): bool
 }
 
 /**
+ * The gap to 0.80 in minor units: the smallest salary with `100·salary ≥ 80·median`, less the
+ * salary, as `(80·median + 99) div 100 − salary` (ADR 0003, *Money on the wire*). Only an underpaid
+ * salary has one, so it is always at least one minor unit.
+ */
+export function gapMinor(salaryMinor: number, medianMinor: number): number {
+  if (!isBelowThreshold(salaryMinor, medianMinor)) {
+    throw new RangeError(`Only a salary below 0.80 of the median has a gap: ${salaryMinor}.`);
+  }
+  const target = scaled(LOWER_THRESHOLD_HUNDREDTHS, medianMinor) + 99;
+  return (target - (target % 100)) / 100 - salaryMinor;
+}
+
+/**
  * A compa-ratio in hundredths, as the screen shows it: salary ÷ the peer median as shown, already
  * rounded (ADR 0001, *Outliers*). It never crosses a boundary: below 0.80 it rounds down, so 0.7996
  * shows 0.79, never 0.80, and above 1.20 it rounds up, so 1.2004 shows 1.21. Inside 0.80–1.20 it

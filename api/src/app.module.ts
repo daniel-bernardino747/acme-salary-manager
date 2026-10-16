@@ -4,6 +4,8 @@ import { DatabaseModule } from './database.module';
 import { EmployeesController } from './employees/employees.controller';
 import { HealthController } from './health/health.controller';
 import { ProblemFilter } from './http/problem.filter';
+import { PayComparisonController } from './pay-comparison/pay-comparison.controller';
+import { PayComparisonService } from './pay-comparison/pay-comparison.service';
 import { PayStatisticsController } from './pay-statistics/pay-statistics.controller';
 import { PayStatisticsService } from './pay-statistics/pay-statistics.service';
 import { PayrollTotalsController } from './payroll-totals/payroll-totals.controller';
@@ -24,11 +26,13 @@ export class AppModule {
         EmployeesController,
         PayStatisticsController,
         PayrollTotalsController,
+        PayComparisonController,
       ],
       providers: [
         { provide: APP_FILTER, useClass: ProblemFilter },
         PayStatisticsService,
         PayrollTotalsService,
+        PayComparisonService,
       ],
     };
   }

@@ -165,4 +165,28 @@ describe('findOutliers ranking', () => {
       [at140, at065, at075, at0795, at07996].map((m) => m.employee),
     );
   });
+
+  it('compares distances exactly when the cross-multiplied products pass 2⁵³', () => {
+    // m = 400,000,000,000 and m + 1 as medians, each with one salary of 1 minor unit.
+    // The distances are m / (m + 1) and (m − 1) / m. Cross-multiplied: m² against m² − 1, about
+    // 1.6 × 10²³, where neighbouring doubles are 2²⁵ apart, so only BigInt sees the first is larger.
+    const m = 400_000_000_000;
+    const nearer = { jobTitle: 'Accountant', country: 'US', name: 'Amy Adams' } as const;
+    const farther = { jobTitle: 'Recruiter', country: 'US', name: 'Zed Young' } as const;
+    const fartherOutlier = member(1, farther);
+    const nearerOutlier = member(1, nearer);
+    const group = [
+      nearerOutlier,
+      ...[1, 2, 3, 4].map(() => member(m, nearer)),
+      fartherOutlier,
+      ...[1, 2, 3, 4].map(() => member(m + 1, farther)),
+    ];
+
+    const { outliers } = findOutliers(group);
+
+    expect(outliers.map((o) => o.employee)).toEqual([
+      fartherOutlier.employee,
+      nearerOutlier.employee,
+    ]);
+  });
 });

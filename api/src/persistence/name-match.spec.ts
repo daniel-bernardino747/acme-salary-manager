@@ -15,4 +15,9 @@ describe('nameMatch', () => {
     expect(nameMatch('o"connor')).toBe('"o""connor"*');
     expect(nameMatch('"')).toBe('""""*');
   });
+
+  it('is null for an empty or whitespace-only search, which means no search', () => {
+    expect(nameMatch('')).toBeNull();
+    expect(nameMatch(' \t ')).toBeNull();
+  });
 });

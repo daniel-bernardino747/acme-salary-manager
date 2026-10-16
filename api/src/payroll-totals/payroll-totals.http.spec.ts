@@ -1,4 +1,4 @@
-import { exchangeRates, payrollTotalsResponseSchema } from '@acme/contract';
+import { exchangeRates, payrollTotalsResponseSchema, problemSchema } from '@acme/contract';
 import { describe, expect, it } from 'vitest';
 import { insertEmployee } from '../../test/builders';
 import { useTestApp } from '../../test/http';
@@ -41,5 +41,16 @@ describe('GET /api/payroll-totals', () => {
       ),
     ).toBe(true);
     expect(totals.rates).toEqual({ source: exchangeRates.source, asOf: exchangeRates.asOf });
+  });
+
+  it('answers any parameter with a 400 problem, since the totals are never filtered', async () => {
+    const res = await t.http().get('/api/payroll-totals').query({ country: 'IN' }).expect(400);
+
+    expect(res.headers['content-type']).toMatch(/^application\/problem\+json/);
+    expect(problemSchema.parse(res.body)).toMatchObject({
+      title: 'Validation failed',
+      status: 400,
+      detail: 'Query is invalid',
+    });
   });
 });

@@ -4,14 +4,10 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
-/**
- * The domain imports only @acme/contract and its own modules. A file `depth` folders below
- * `domain/` may climb at most `depth` levels, so `../` between domain subfolders stays allowed
- * while any path out of `domain/` is rejected. One block per depth, up to `maxDepth`.
- */
-function domainImportRules(maxDepth) {
-  return Array.from({ length: maxDepth + 1 }, (_, depth) => ({
-    files: [`api/src/domain/${'*/'.repeat(depth)}*.ts`],
+/** The `no-restricted-imports` rule for a domain file that may climb at most `maxClimb` levels. */
+function domainImportRule(files, maxClimb) {
+  return {
+    files,
     ignores: ['**/*.spec.ts'],
     rules: {
       'no-restricted-imports': [
@@ -23,14 +19,30 @@ function domainImportRules(maxDepth) {
               message: 'The domain imports no package except @acme/contract.',
             },
             {
-              regex: `^(\\.\\./){${depth + 1}}`,
+              regex: `^(\\.\\./){${maxClimb + 1}}`,
               message: 'The domain imports only its own modules.',
             },
           ],
         },
       ],
     },
-  }));
+  };
+}
+
+/**
+ * The domain imports only @acme/contract and its own modules. A file `depth` folders below
+ * `domain/` may climb at most `depth` levels, so `../` between domain subfolders stays allowed
+ * while any path out of `domain/` is rejected. One block per depth up to `maxDepth`, then one
+ * catch-all for anything deeper, which may climb at most `maxDepth + 1` levels: that still keeps
+ * every deeper file inside `domain/`, at the cost of rejecting some long climbs within it.
+ */
+function domainImportRules(maxDepth) {
+  return [
+    ...Array.from({ length: maxDepth + 1 }, (_, depth) =>
+      domainImportRule([`api/src/domain/${'*/'.repeat(depth)}*.ts`], depth),
+    ),
+    domainImportRule([`api/src/domain/${'*/'.repeat(maxDepth + 1)}**/*.ts`], maxDepth + 1),
+  ];
 }
 
 export default tseslint.config(

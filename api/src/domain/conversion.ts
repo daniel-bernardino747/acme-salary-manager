@@ -18,7 +18,7 @@ export type UsdMoney = Money & { currency: 'USD' };
 
 /**
  * Converts a local amount to USD cents once: `localMinor · 10^(2 − exp) · 10⁶ / rate`, rounded half
- * up. The product passes 2⁵³ for large totals, so it runs in BigInt, the only place money does,
+ * up. The product passes 2⁵³ for large totals, so it runs in BigInt (as a share of payroll does),
  * and the result is asserted as a safe integer (ADR 0001).
  */
 export function toUsd(

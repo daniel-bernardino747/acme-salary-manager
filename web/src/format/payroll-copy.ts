@@ -1,6 +1,7 @@
-import { formatMoney, type Money, type Rates } from '@acme/contract';
+import type { Money, Rates } from '@acme/contract';
 import { employeeCount } from './counts';
 import { placeDecimal } from './place-decimal';
+import { wholeUnits } from './whole-units';
 
 /**
  * A share of payroll as the domain rounded it, e.g. 421 → "42.1%" (ADR 0004, *Question 2*). No
@@ -18,7 +19,7 @@ export function shareText(sharePermille: number | null, total: Money): string {
 
 /** The landing screen's first line, in whole USD (ADR 0001, *USD totals*; ADR 0004, *Question 2*). */
 export function payrollHeadline({ headcount, usd }: { headcount: number; usd: Money }): string {
-  return `Annual payroll: ${formatMoney(usd, 'en', { wholeUnits: true })} · ${employeeCount(headcount)}`;
+  return `Annual payroll: ${wholeUnits(usd)} · ${employeeCount(headcount)}`;
 }
 
 /**

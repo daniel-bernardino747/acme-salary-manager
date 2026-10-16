@@ -1,4 +1,4 @@
-import { formatMoney, type Money, type PayrollTotalsResponse } from '@acme/contract';
+import type { Money, PayrollTotalsResponse } from '@acme/contract';
 import { Anchor, Button, Group, Skeleton, Stack, Table, Text, Title } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, type LinkProps } from '@tanstack/react-router';
@@ -14,9 +14,7 @@ import {
   payrollHeadline,
   shareText,
 } from '../format/payroll-copy';
-
-/** Payroll totals are shown in whole units, rounded in integers (ADR 0001, *USD totals*). */
-const whole = (money: Money) => formatMoney(money, 'en', { wholeUnits: true });
+import { wholeUnits } from '../format/whole-units';
 
 /** Question 2, the landing screen: payroll per country and per department (ADR 0004, *Question 2*). */
 export function PayrollTotals() {
@@ -126,8 +124,8 @@ function TotalsTable({
                 </Anchor>
               </Table.Td>
               <Table.Td ta="right">{countText(row.headcount)}</Table.Td>
-              {withLocal && <MoneyCell>{row.local && whole(row.local)}</MoneyCell>}
-              <MoneyCell>{whole(row.usd)}</MoneyCell>
+              {withLocal && <MoneyCell>{row.local && wholeUnits(row.local)}</MoneyCell>}
+              <MoneyCell>{wholeUnits(row.usd)}</MoneyCell>
               <Table.Td ta="right">{shareText(row.sharePermille, row.usd)}</Table.Td>
             </Table.Tr>
           ))}

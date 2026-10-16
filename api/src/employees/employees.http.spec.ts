@@ -1,4 +1,4 @@
-import { employeeListResponseSchema } from '@acme/contract';
+import { employeeListResponseSchema, problemSchema } from '@acme/contract';
 import { describe, expect, it } from 'vitest';
 import { insertEmployee } from '../../test/builders';
 import { useTestApp } from '../../test/http';
@@ -84,6 +84,30 @@ describe('GET /api/employees', () => {
       .get('/api/employees')
       .query({ q: ` ${'x'.repeat(100)} ` })
       .expect(200);
+  });
+
+  it.each([
+    ['a page that is not a number', { page: 'two' }, ['page']],
+    ['a page that is not an integer', { page: '2.5' }, ['page']],
+    ['a page below 1', { page: '0' }, ['page']],
+    ['a page size of 0', { pageSize: '0' }, ['pageSize']],
+    ['a page size over 100', { pageSize: '101' }, ['pageSize']],
+    ['an unknown parameter', { contry: 'IN' }, []],
+    ['a country not in the list', { country: 'UK' }, ['country']],
+    ['a department not in the list', { department: 'Legal' }, ['department']],
+    ['a job title not in the list', { jobTitle: 'Software Engineers' }, ['jobTitle']],
+    ['a q over 100 characters once trimmed', { q: 'x'.repeat(101) }, ['q']],
+  ])('answers %s with a 400 problem', async (_, query, path) => {
+    const res = await t.http().get('/api/employees').query(query).expect(400);
+
+    expect(res.headers['content-type']).toMatch(/^application\/problem\+json/);
+    const problem = problemSchema.parse(res.body);
+    expect(problem).toMatchObject({
+      title: 'Validation failed',
+      status: 400,
+      detail: 'Query is invalid',
+    });
+    expect(problem.errors?.map((error) => error.path)).toEqual([path]);
   });
 
   it('answers a page past the end with 200 and no items', async () => {

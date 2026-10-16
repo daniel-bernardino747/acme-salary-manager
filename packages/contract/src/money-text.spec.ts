@@ -75,3 +75,16 @@ describe('formatMoney', () => {
     expect(new Set(shown.map((text) => text.replace(/[\d.,]/g, ''))).size).toBe(shown.length);
   });
 });
+
+describe('formatMoney in whole units', () => {
+  it.each([
+    // $12,500.50 is an exact half dollar.
+    [1_250_050, 'USD', '$12,501'],
+    [1_250_049, 'USD', '$12,500'],
+    [1_250_000, 'USD', '$12,500'],
+    [49, 'USD', '$0'],
+    [1_250_000, 'JPY', '¥1,250,000'],
+  ] as const)('shows %d %s as "%s", rounding half up', (amountMinor, currency, text) => {
+    expect(formatMoney({ amountMinor, currency }, 'en', { wholeUnits: true })).toBe(text);
+  });
+});

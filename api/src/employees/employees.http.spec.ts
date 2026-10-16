@@ -1,8 +1,4 @@
-import {
-  employeeListResponseSchema,
-  employeeResponseSchema,
-  problemSchema,
-} from '@acme/contract';
+import { employeeListResponseSchema, employeeResponseSchema, problemSchema } from '@acme/contract';
 import { describe, expect, it } from 'vitest';
 import { insertEmployee } from '../../test/builders';
 import { useTestApp } from '../../test/http';
@@ -162,4 +158,26 @@ describe('GET /api/employees/:id', () => {
     expect(res.headers['content-type']).toMatch(/^application\/problem\+json/);
     expect(problemSchema.parse(res.body)).toMatchObject({ title: 'Not Found', status: 404 });
   });
+});
+
+describe('the :id of /api/employees/:id', () => {
+  const t = useTestApp();
+
+  it.each(['abc', '0', '-3', '2.5', '1e3', '0x10', '007', '9007199254740993'])(
+    'answers %s with a 400 problem, since an id is a positive integer written plainly',
+    async (id) => {
+      insertEmployee(t.db);
+
+      const res = await t.http().get(`/api/employees/${id}`).expect(400);
+
+      expect(res.headers['content-type']).toMatch(/^application\/problem\+json/);
+      const problem = problemSchema.parse(res.body);
+      expect(problem).toMatchObject({
+        title: 'Validation failed',
+        status: 400,
+        detail: 'Path parameter is invalid',
+      });
+      expect(problem.errors?.map((error) => error.message)).toEqual(['Must be a positive integer']);
+    },
+  );
 });

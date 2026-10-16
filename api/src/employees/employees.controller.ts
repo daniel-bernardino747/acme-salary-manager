@@ -1,4 +1,5 @@
 import {
+  employeeIdSchema,
   employeeListQuerySchema,
   type EmployeeListQuery,
   type EmployeeListResponse,
@@ -24,8 +25,8 @@ export class EmployeesController {
   }
 
   @Get(':id')
-  view(@Param('id') id: string): EmployeeResponse {
-    const employee = findEmployee(this.db, Number(id));
+  view(@Param('id', new ZodValidationPipe(employeeIdSchema)) id: number): EmployeeResponse {
+    const employee = findEmployee(this.db, id);
     if (!employee) throw new NotFoundException(`Employee ${id} does not exist`);
     return employee;
   }

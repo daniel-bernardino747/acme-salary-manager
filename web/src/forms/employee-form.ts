@@ -5,6 +5,7 @@ import {
   formatMoney,
   parseMoney,
   type CountryCode,
+  type CurrencyCode,
   type EmployeeRequest,
 } from '@acme/contract';
 import { z } from 'zod';
@@ -97,4 +98,31 @@ export function salaryPreview(annualSalary: string, country: string): string | n
   }
   const money = { amountMinor: salary.amountMinor, currency: currencyOf(code.data) };
   return `= ${formatMoney(money, 'en')} a year`;
+}
+
+/** A country's currency, or `null` while none is picked. */
+function currencyOfPicked(country: string): CurrencyCode | null {
+  const code = countrySchema.safeParse(country);
+  return code.success ? currencyOf(code.data) : null;
+}
+
+/**
+ * The salary after the country changes (ADR 0004, *Forms*). A salary typed in another currency is
+ * cleared with a message, so 120,000 USD never silently becomes ¥120,000. Within one currency
+ * (Germany and the Netherlands) it stays.
+ */
+export function salaryAfterCountryChange(
+  from: string,
+  to: string,
+  annualSalary: string,
+): { annualSalary: string; message: string | null } {
+  const was = currencyOfPicked(from);
+  const now = currencyOfPicked(to);
+  if (!annualSalary || was === null || was === now) {
+    return { annualSalary, message: null };
+  }
+  return {
+    annualSalary: '',
+    message: `Salary was in ${was}; enter it in ${now ?? 'its currency'}.`,
+  };
 }

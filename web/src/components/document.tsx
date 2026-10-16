@@ -40,8 +40,12 @@ export function PageHeader({ title, question, meta, actions, back }: PageHeaderP
 }
 
 /** "IN · INR", framed: the same mark wherever a country or its currency appears. */
-export function CountryStamp({ country }: { country: CountryCode }) {
-  return <span className={classes.stamp}>{countryStamp(country)}</span>;
+export function CountryStamp({ country, size }: { country: CountryCode; size?: 'lg' }) {
+  return (
+    <span className={classes.stamp} data-size={size}>
+      {countryStamp(country)}
+    </span>
+  );
 }
 
 /** A white document panel on the tinted ground. Panels are never nested. */

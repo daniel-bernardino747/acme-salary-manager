@@ -16,16 +16,18 @@ export function configureApp(app: NestExpressApplication, options: ConfigureOpti
 }
 
 /**
- * Serves the SPA's files, and its `index.html` for any other path outside `/api`, so deep links
+ * Serves the SPA's files, and its `index.html` for any other page path outside `/api`, so deep links
  * open the app while an unknown `/api` route still reaches the JSON 404 (ADR 0003, *Endpoints*).
  */
 function serveWebApp(app: NestExpressApplication, webRoot: string): void {
   const indexHtml = path.join(webRoot, 'index.html');
   app.useStaticAssets(webRoot);
   app.use((req: Request, res: Response, next: NextFunction) => {
-    const isPage = req.method === 'GET' || req.method === 'HEAD';
+    const isRead = req.method === 'GET' || req.method === 'HEAD';
     const isApi = req.path === '/api' || req.path.startsWith('/api/');
-    if (isPage && !isApi) {
+    // A path with an extension asks for a file the static handler didn't find, so it stays a 404.
+    const isFile = path.posix.extname(req.path) !== '';
+    if (isRead && !isApi && !isFile) {
       res.sendFile(indexHtml);
     } else {
       next();

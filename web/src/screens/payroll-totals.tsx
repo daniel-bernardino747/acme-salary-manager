@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { apiFetch } from '../api/api-fetch';
 import { queryKey } from '../api/query-key';
 import { QueryState } from '../components/query-state';
+import { countText } from '../format/counts';
 import {
   highestUsdFirst,
   payrollFootnote,
@@ -16,9 +17,6 @@ import {
 const countryNames = new Map<string, string>(
   countries.map((country) => [country.code, country.name]),
 );
-
-/** Counts in the app's one locale (ADR 0004, *Copy and locale*). */
-const counts = new Intl.NumberFormat('en');
 
 /** Payroll totals are shown in whole units, rounded in integers (ADR 0001, *USD totals*). */
 const whole = (money: Money) => formatMoney(money, 'en', { wholeUnits: true });
@@ -130,7 +128,7 @@ function TotalsTable({
                   {row.name}
                 </Anchor>
               </Table.Td>
-              <Table.Td ta="right">{counts.format(row.headcount)}</Table.Td>
+              <Table.Td ta="right">{countText(row.headcount)}</Table.Td>
               {withLocal && <MoneyCell>{row.local && whole(row.local)}</MoneyCell>}
               <MoneyCell>{whole(row.usd)}</MoneyCell>
               <Table.Td ta="right">{shareText(row.sharePermille, row.usd)}</Table.Td>

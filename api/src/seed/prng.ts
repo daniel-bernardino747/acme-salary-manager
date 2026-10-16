@@ -25,7 +25,22 @@ export function sfc32(seed: readonly [number, number, number, number]): Uint32So
   return next;
 }
 
-/** A whole number from `min` to `max`, both included. */
+const UINT32_RANGE = 0x1_0000_0000;
+
+/**
+ * A whole number from `min` to `max`, both included. Draws at or past the last whole multiple of
+ * the range size are rejected and redrawn, so every value is equally likely (no modulo bias).
+ */
 export function intInRange(next: Uint32Source, min: number, max: number): number {
-  return min + (next() % (max - min + 1));
+  const size = max - min + 1;
+  if (!Number.isSafeInteger(min) || !Number.isSafeInteger(max) || size < 1 || size > UINT32_RANGE) {
+    throw new RangeError(`Cannot draw from ${min} to ${max}.`);
+  }
+  const limit = UINT32_RANGE - (UINT32_RANGE % size);
+  for (;;) {
+    const draw = next();
+    if (draw < limit) {
+      return min + (draw % size);
+    }
+  }
 }

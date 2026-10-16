@@ -93,3 +93,17 @@ test('editing that employee starts from their salary and saves a raise', async (
   await expect(page.getByText(`Saved ${added.name}`, { exact: true })).toBeVisible();
   await expect(page.getByText('₹1,300,000.00 INR', { exact: true })).toBeVisible();
 });
+
+test('deleting that employee, after a confirmation naming them, removes them from the list', async ({
+  page,
+}) => {
+  await openAdded(page);
+  await page.getByRole('button', { name: 'Delete', exact: true }).click();
+
+  const confirmation = page.getByRole('dialog', { name: `Delete ${added.name}?` });
+  await confirmation.getByRole('button', { name: `Delete ${added.name}` }).click();
+
+  await expect(page).toHaveURL(/\/employees(\?|$)/);
+  await page.getByRole('textbox', { name: 'Search' }).fill(added.name);
+  await expect(page.getByText('No employees match these filters.', { exact: true })).toBeVisible();
+});

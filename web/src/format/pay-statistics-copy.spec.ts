@@ -45,6 +45,7 @@ describe('seeEmployeesText', () => {
     [47, 'See these 47 employees'],
     [1_234, 'See these 1,234 employees'],
     [1, 'See this employee'],
+    [0, 'See the employee list for this group'],
   ])('links a group of %i to the list as "%s"', (headcount, text) => {
     expect(seeEmployeesText(headcount)).toBe(text);
   });

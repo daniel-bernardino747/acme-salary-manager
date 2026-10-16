@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { employeeFormSchema, type EmployeeFormValues } from './employee-form';
+import { employeeFormSchema, salaryPreview, type EmployeeFormValues } from './employee-form';
 
 const priya: EmployeeFormValues = {
   name: '  Priya Sharma ',
@@ -80,5 +80,25 @@ describe('employeeFormSchema', () => {
       jobTitle: ['Required'],
       annualSalary: ['Must be greater than 0'],
     });
+  });
+});
+
+describe('salaryPreview', () => {
+  it.each([
+    ['1,250,000.50', 'IN', '= ₹1,250,000.50 a year'],
+    ['1250000.5', 'IN', '= ₹1,250,000.50 a year'],
+    ['7000000', 'JP', '= ¥7,000,000 a year'],
+    ['64,000', 'NL', '= €64,000.00 a year'],
+  ])('shows %s in %s as %s', (annualSalary, country, preview) => {
+    expect(salaryPreview(annualSalary, country)).toBe(preview);
+  });
+
+  it.each([
+    ['nothing typed', '', 'IN'],
+    ['no country', '120,000', ''],
+    ['a salary that does not read', '1.250.000,50', 'IN'],
+    ['a salary out of bounds', '0', 'US'],
+  ])('shows nothing for %s', (_, annualSalary, country) => {
+    expect(salaryPreview(annualSalary, country)).toBeNull();
   });
 });

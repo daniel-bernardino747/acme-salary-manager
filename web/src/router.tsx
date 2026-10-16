@@ -14,6 +14,7 @@ import {
   statisticsSearchSchema,
   stringifySearch,
 } from './routes/search';
+import { EmployeeList } from './screens/employee-list';
 import { NotFound } from './screens/not-found';
 import { Placeholder } from './screens/placeholder';
 
@@ -37,7 +38,7 @@ const employeesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/employees',
   validateSearch: employeesSearchSchema,
-  component: () => <Placeholder title="Employees" />,
+  component: EmployeeList,
 });
 
 const newEmployeeRoute = createRoute({

@@ -16,7 +16,7 @@ describe('employeesPath', () => {
         jobTitle: 'Support Team Lead',
       }),
     ).toBe(
-      "/api/employees?page=1&pageSize=25&q=o%27connor&country=GB&department=Customer+Support&jobTitle=Support+Team+Lead",
+      '/api/employees?page=1&pageSize=25&q=o%27connor&country=GB&department=Customer+Support&jobTitle=Support+Team+Lead',
     );
   });
 

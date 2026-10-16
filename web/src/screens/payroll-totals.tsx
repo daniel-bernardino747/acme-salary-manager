@@ -1,16 +1,21 @@
 import type { CountryCode, Money, PayrollTotalsResponse } from '@acme/contract';
-import { Anchor, Box, Button, Group, Skeleton, Stack, Table, Text } from '@mantine/core';
+import { Anchor, Box, Button, Group, Skeleton, Stack, Table, Text, Title } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, type LinkProps } from '@tanstack/react-router';
 import { payrollTotalsQuery } from '../api/payroll-totals-query';
-import { CountryStamp, Figure, Muted, PageHeader, Panel, ShareBar } from '../components/document';
+import { CountryStamp, Muted, PageHeader, Panel, ShareBar } from '../components/document';
 import { PlusIcon } from '../components/icons';
 import { QueryState } from '../components/query-state';
 import rowStyles from '../components/rows.module.css';
 import { countText, employeeCount } from '../format/counts';
 import { countryName } from '../format/country-name';
 import { shareBars } from '../format/overview';
-import { outliersInCountryText, payrollFootnote, shareText } from '../format/payroll-copy';
+import {
+  outliersInCountryText,
+  payrollFootnote,
+  payrollHeadline,
+  shareText,
+} from '../format/payroll-copy';
 import { wholeUnits } from '../format/whole-units';
 import { pageQuestion } from '../layout/navigation';
 import classes from './payroll-totals.module.css';
@@ -33,15 +38,10 @@ function Payroll({ totals }: { totals: PayrollTotalsResponse }) {
   const { grandTotal } = totals;
   return (
     <Stack gap="lg">
-      <div>
-        <Text size="sm" c="gray.6">
-          Annual payroll
-        </Text>
-        <Group gap="md" align="baseline" wrap="wrap">
-          <Figure>{wholeUnits(grandTotal.usd)}</Figure>
-          <Text fz="lg">{employeeCount(grandTotal.headcount)}</Text>
-        </Group>
-      </div>
+      {/* ADR 0004's headline, set as the page's figure. */}
+      <Title order={2} className={classes.headline}>
+        {payrollHeadline(grandTotal)}
+      </Title>
       {grandTotal.headcount === 0 && (
         <Group gap="sm">
           <Text>No employees yet. Add one to start the payroll.</Text>
@@ -204,6 +204,18 @@ function TotalsRows({ rows }: { rows: TotalsRow[] }) {
               </Text>
             </div>
           </Link>
+          {row.country && (
+            // The phone's way to a country's outliers (ADR 0004, *Question 2*).
+            <Anchor
+              size="sm"
+              className={classes.outliersLink}
+              renderRoot={(props) => (
+                <Link {...props} to="/pay/outliers" search={{ country: row.country }} />
+              )}
+            >
+              {outliersInCountryText(row.country)}
+            </Anchor>
+          )}
         </li>
       ))}
     </ul>

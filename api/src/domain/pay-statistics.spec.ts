@@ -44,4 +44,15 @@ describe('payStatistics', () => {
       smallGroup,
     });
   });
+
+  it('gives an empty group headcount 0 and null figures, never 0, and does not mark it small', () => {
+    expect(payStatistics({ currency: 'INR', salariesMinor: [] })).toEqual({
+      headcount: 0,
+      smallGroup: false,
+      min: null,
+      median: null,
+      average: null,
+      max: null,
+    });
+  });
 });

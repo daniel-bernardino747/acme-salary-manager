@@ -9,6 +9,16 @@ import { countrySchema, currencyOf, departmentSchema, jobTitleSchema } from './r
 export const MAX_ANNUAL_SALARY_MINOR = 900_000_000_000;
 
 /**
+ * An employee's id as it arrives in a path: a positive integer written plainly, with no sign,
+ * leading zero, exponent or hex, so each employee has exactly one URL.
+ */
+export const employeeIdSchema = z
+  .string()
+  .regex(/^[1-9]\d*$/, 'Must be a positive integer')
+  .transform(Number)
+  .refine(Number.isSafeInteger, 'Must be a positive integer');
+
+/**
  * The body of an add (`POST`) or edit (`PUT`). Strict, with no `currency`: it follows from the
  * country.
  */

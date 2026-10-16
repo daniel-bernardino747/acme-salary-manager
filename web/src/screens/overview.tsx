@@ -29,7 +29,7 @@ import { ArrowRightIcon, PlusIcon, SearchIcon } from '../components/icons';
 import { QueryState } from '../components/query-state';
 import { countText, employeeCount } from '../format/counts';
 import { countryName, countryOptions } from '../format/country-name';
-import { costText, smallGroupCountText } from '../format/outliers-copy';
+import { costFootnote, costText, smallGroupCountText } from '../format/outliers-copy';
 import { overviewDateLine, shareBars, topOutliers } from '../format/overview';
 import { payrollFootnote, shareText } from '../format/payroll-copy';
 import { placeDecimal } from '../format/place-decimal';
@@ -39,8 +39,9 @@ import { statisticsSearchSchema } from '../routes/search';
 import classes from './overview.module.css';
 
 /**
- * `/`, the Overview (ADR 0004, *Overview*, as amended by #40): find an employee, what we pay a
- * role, who is paid out of line, and the annual payroll. Each panel loads and fails on its own.
+ * `/`, the Overview (ADR 0004, *Overview*, as amended by #40): find an employee, the annual payroll
+ * (the first figure on screen, ADR 0001), who is paid out of line, and what we pay for a job title
+ * in a country. Each panel loads and fails on its own.
  */
 export function Overview() {
   // The same query as the payroll panel, so the date line costs no request of its own.
@@ -64,10 +65,10 @@ export function Overview() {
         <kbd className={classes.kbd}>Ctrl K</kbd>
       </button>
       <Box className={classes.grid}>
-        <OutOfLine />
+        <AnnualPayroll />
         <Stack gap="lg">
+          <OutOfLine />
           <WhatDoWePay />
-          <AnnualPayroll />
         </Stack>
       </Box>
     </Stack>
@@ -115,6 +116,7 @@ function OutOfLine() {
               Compa-ratio is salary ÷ the median for the same title in the same country.{' '}
               {smallGroupCountText(page.smallGroupHeadcount)}
             </Muted>
+            {page.rates && <Muted size="xs">{costFootnote(page.rates)}</Muted>}
           </Stack>
         )}
       </QueryState>
@@ -221,7 +223,14 @@ function AnnualPayroll() {
         {({ grandTotal, byCountry, rates }) => (
           <Stack gap="md">
             <div>
-              <Figure>{wholeUnits(grandTotal.usd)}</Figure>
+              <Anchor
+                inherit
+                underline="hover"
+                c="inherit"
+                renderRoot={(props) => <Link {...props} to="/pay/payroll" />}
+              >
+                <Figure>{wholeUnits(grandTotal.usd)}</Figure>
+              </Anchor>
               <Text mt={4}>{employeeCount(grandTotal.headcount)}</Text>
             </div>
             {grandTotal.headcount === 0 ? (

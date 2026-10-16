@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
@@ -15,7 +16,13 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(
     AppModule.forRoot({ databasePath: config.databasePath }),
   );
-  configureApp(app, { webRoot: existsSync(webRoot) ? webRoot : undefined });
+  const hasWebApp = existsSync(webRoot);
+  if (!hasWebApp) {
+    new Logger('Bootstrap').warn(
+      `No built web app at ${webRoot}: serving /api only. Run the root build (in dev, Vite serves it).`,
+    );
+  }
+  configureApp(app, { webRoot: hasWebApp ? webRoot : undefined });
   app.enableShutdownHooks();
   await app.listen(config.port);
 }

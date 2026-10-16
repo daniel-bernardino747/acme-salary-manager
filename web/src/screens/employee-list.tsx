@@ -23,12 +23,13 @@ import {
 import { useDebouncedCallback } from '@mantine/hooks';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { apiFetch } from '../api/api-fetch';
 import { employeesPath } from '../api/employees-path';
 import { queryKey } from '../api/query-key';
 import { QueryState } from '../components/query-state';
 import { listRange, pageCount } from '../format/list-range';
+import { lastEmployeesSearch } from '../routes/last-employees-search';
 import { changeEmployeesSearch, type EmployeesSearchChange } from '../routes/search';
 
 /** How long the search box waits after the last keystroke before searching (ADR 0004). */
@@ -48,6 +49,8 @@ export function EmployeeList() {
     queryFn: () => apiFetch<EmployeeListResponse>(employeesPath(search)),
     placeholderData: keepPreviousData,
   });
+  // A delete from the employee view comes back to this page of the list.
+  useEffect(() => lastEmployeesSearch.set(search), [search]);
 
   // What is typed while its search waits to reach the URL; null once it has, or was cancelled.
   const [typed, setTyped] = useState<string | null>(null);

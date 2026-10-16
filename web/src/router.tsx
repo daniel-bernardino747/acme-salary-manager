@@ -15,6 +15,7 @@ import {
   stringifySearch,
 } from './routes/search';
 import { EmployeeList } from './screens/employee-list';
+import { EmployeeView } from './screens/employee-view';
 import { NotFound } from './screens/not-found';
 import { PayComparison } from './screens/pay-comparison';
 import { PayStatistics } from './screens/pay-statistics';
@@ -53,7 +54,7 @@ const newEmployeeRoute = createRoute({
 const employeeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/employees/$id',
-  component: () => <Placeholder title="Employee" />,
+  component: EmployeeView,
 });
 
 const editEmployeeRoute = createRoute({

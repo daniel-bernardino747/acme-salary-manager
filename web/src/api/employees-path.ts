@@ -16,3 +16,8 @@ export function employeesPath(search: EmployeesSearch): string {
   if (search.jobTitle) params.set('jobTitle', search.jobTitle);
   return `/api/employees?${params}`;
 }
+
+/** One employee's API resource: its view, edit and delete (ADR 0003, *Endpoints*). */
+export function employeePath(id: number): string {
+  return `/api/employees/${id}`;
+}

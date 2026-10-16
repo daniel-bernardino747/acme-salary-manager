@@ -210,8 +210,9 @@ USD figures use a fixed exchange rate table shipped with the app, never a live f
 
 ## Known limitations
 
-As recorded in the ADRs:
+As recorded in the requirements and the ADRs:
 
+- **There is no authentication.** Anyone with the URL can read and change every salary. That is acceptable only because the data is illustrative: authentication was a stretch goal and wasn't built, and production would need SSO and role-based access, because salary data is sensitive ([requirements](docs/requirements.md#key-decisions--assumptions)).
 - **Name search is prefix-only:** "ller" doesn't find "Müller". `ß` isn't folded to `ss` ("gross" doesn't find "Groß"), and punctuation inside a name must be typed or replaced by a space ("oconnor" doesn't find "O'Connor", "o'connor" and "connor" do) ([ADR 0002](docs/adr/0002-persistence-and-computation-seams.md#name-search)).
 - **Small groups reveal individual pay.** A peer group of one shows that person's salary as its statistics. That is acceptable while the HR Manager is the only user ([ADR 0001](docs/adr/0001-domain-model-and-money-rules.md#consequences)).
 - **Money is shown and typed in `en` format only:** comma thousands separators and a decimal point ([ADR 0004](docs/adr/0004-ui-structure.md#copy-and-locale)).

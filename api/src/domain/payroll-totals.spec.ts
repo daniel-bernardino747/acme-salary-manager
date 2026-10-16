@@ -125,4 +125,18 @@ describe('payrollTotals', () => {
       none('Finance'),
     ]);
   });
+
+  it('gives the grand total in USD with its headcount, converting each currency subtotal once', () => {
+    // £1.01 + £1.01 = £2.02 converts once to $1.01. Converting each salary would give 51¢ + 51¢.
+    const totals = payrollTotals(
+      [
+        employee('US', 'Engineering', 10_00, 'USD'),
+        employee('GB', 'Sales', 1_01, 'GBP'),
+        employee('GB', 'Finance', 1_01, 'GBP'),
+      ],
+      rates,
+    );
+
+    expect(totals.grandTotal).toEqual({ headcount: 3, usd: money(11_01, 'USD') });
+  });
 });

@@ -33,3 +33,19 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+.headline {
+  font-size: 2rem;
+  letter-spacing: -0.015em;
+}
+
+@media (max-width: 36em) {
+  .headline {
+    font-size: var(--mantine-h2-font-size);
+  }
+}
+
+.outliersLink {
+  display: inline-block;
+  padding: 0 14px 12px;
+}

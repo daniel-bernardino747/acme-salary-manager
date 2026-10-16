@@ -26,9 +26,12 @@ describe('baseSalaryMinor', () => {
     ['Senior Data Scientist', 'BR', 237_600_00],
     // ¥7,000,000 · 0.55^1.15 = ¥7,000,000 · 0.50283 ≈ ¥3,519,777, to the ¥10,000 step: ¥3,520,000.
     ['Customer Support Specialist', 'JP', 3_520_000],
-  ] as const)('is anchor · multiplier ^ spread, to the nearest step, for %s · %s', (title, country, base) => {
-    expect(baseSalaryMinor(title, country)).toBe(base);
-  });
+  ] as const)(
+    'is anchor · multiplier ^ spread, to the nearest step, for %s · %s',
+    (title, country, base) => {
+      expect(baseSalaryMinor(title, country)).toBe(base);
+    },
+  );
 
   it('matches the committed base snapshot, with each base also in USD', async () => {
     await expect(baseSnapshot()).toMatchFileSnapshot('../../../docs/seed/base-salaries.md');

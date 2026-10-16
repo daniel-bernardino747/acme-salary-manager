@@ -28,8 +28,7 @@ describe('headcountQuotas', () => {
     expect(countOf('Sales Manager', 'NL')).toBe(4);
     expect(countOf('Senior Data Scientist', 'NL')).toBe(5);
     const others = quotas.filter(
-      (q) =>
-        !smallGroupOverrides.some((o) => o.jobTitle === q.jobTitle && o.country === q.country),
+      (q) => !smallGroupOverrides.some((o) => o.jobTitle === q.jobTitle && o.country === q.country),
     );
     expect(others).toHaveLength(quotas.length - 5);
     expect(others.every((q) => q.count >= 5)).toBe(true);

@@ -1,4 +1,4 @@
-import type { Problem } from '@acme/contract';
+import { problemSchema, type Problem } from '@acme/contract';
 
 /** An error response from the API, carrying its Problem Details body (ADR 0003). */
 export class ApiProblem extends Error {
@@ -19,10 +19,32 @@ export class ApiProblem extends Error {
 export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const response = await fetch(path, { ...init, headers: { Accept: 'application/json' } });
   if (!response.ok) {
-    throw new ApiProblem((await response.json()) as Problem);
+    throw new ApiProblem(await readProblem(response));
   }
   if (response.status === 204) {
     return undefined as T;
   }
   return (await response.json()) as T;
+}
+
+/**
+ * The Problem Details of an error response. Anything else, such as an HTML 502 while the service
+ * restarts, becomes a generic problem, never a JSON parse error (ADR 0004).
+ */
+async function readProblem(response: Response): Promise<Problem> {
+  const text = await response.text();
+  try {
+    const parsed = problemSchema.safeParse(JSON.parse(text));
+    if (parsed.success) {
+      return parsed.data;
+    }
+  } catch {
+    // Not JSON: fall through to the generic problem.
+  }
+  return {
+    type: 'about:blank',
+    title: 'Request failed',
+    status: response.status,
+    detail: `The server answered ${response.status} with a response the app cannot read.`,
+  };
 }

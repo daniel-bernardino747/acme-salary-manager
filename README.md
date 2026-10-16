@@ -21,6 +21,7 @@ The terms used here (peer group, compa-ratio, gap to 0.80, …) are defined in t
 - [Exchange rates](#exchange-rates)
 - [Known limitations](#known-limitations)
 - [How it was decided and built](#how-it-was-decided-and-built)
+- [How AI was used](#how-ai-was-used)
 
 ## Architecture
 
@@ -241,3 +242,25 @@ What the MVP leaves out on purpose, and why, is in [the requirements](docs/requi
 | The Railway setup | [`.railway/README.md`](.railway/README.md) |
 | The prompts given to the AI tools, phase by phase | [`docs/ai/prompts.md`](docs/ai/prompts.md) |
 | Every AI session, saved as it ran | [`docs/ai/sessions/`](docs/ai/sessions/) |
+
+## How AI was used
+
+Claude Code wrote the code and most of the documents. The decisions, and the checks on what it produced, stayed with the developer.
+
+- **Decisions came before code.** The AI drafted the one-page requirements, and the developer edited and approved them before any code existed. Each architecture area then got its own planning ticket ([#2](https://github.com/daniel-bernardino747/acme-salary-manager/issues/2)–[#8](https://github.com/daniel-bernardino747/acme-salary-manager/issues/8)) and its own session. The AI asked one question at a time, each with a recommendation, and the developer answered. Those answers became the ADRs. Facts that change over time, such as how Railway handles volumes, were researched from current documentation rather than recalled ([#7](https://github.com/daniel-bernardino747/acme-salary-manager/issues/7)).
+- **Every ticket ran on the same rails.** One session per ticket, from the same prompt ([`docs/ai/prompts.md`](docs/ai/prompts.md), Phase 3):
+  - test first at the seams ADR 0006 agreed, one behaviour per `test:` / `feat:` / `refactor:` commit;
+  - a code review on two axes, this repo's standards and the ticket's acceptance criteria, before the PR, with each fix in its own commit;
+  - CI passing before a rebase merge, so the red → green → refactor history survives.
+- **Where the AI got it wrong, and what caught it.**
+  - **The PR rule:** the spec said commits go straight to `main`, so the first two build tickets were committed to the local `main`. The developer caught it while reviewing the session reports. Both tickets were moved to a branch and a PR before reaching GitHub, the spec ([#10](https://github.com/daniel-bernardino747/acme-salary-manager/issues/10)) was corrected, and every later ticket went through a PR.
+  - **Review findings:** the code reviews caught real defects before merge. A missing built file was served as the app instead of a 404 ([#12](https://github.com/daniel-bernardino747/acme-salary-manager/issues/12)). Round half up was implemented four times, against ADR 0002's one implementation per money rule ([#13](https://github.com/daniel-bernardino747/acme-salary-manager/issues/13)). An empty peer group hid two of its three links ([#17](https://github.com/daniel-bernardino747/acme-salary-manager/issues/17)).
+  - **Gap lists:** the developer read each session's report and sent the gaps back as a list to close test-first. For example, a health check whose test still passed with the database call removed.
+  - **Tests that never failed:** a test that passes on its first run proves nothing by itself. For those, the code was broken on purpose to watch the test fail, for example the static assets in [#12](https://github.com/daniel-bernardino747/acme-salary-manager/issues/12) and per-salary conversion in [#18](https://github.com/daniel-bernardino747/acme-salary-manager/issues/18).
+- **Checked rather than trusted.**
+  - **Exchange rates:** fetched once from the ECB. The derived rates were recomputed independently, in Python `Decimal`, and INR by hand.
+  - **Seed:** its golden hash matches on Windows, in CI and in production.
+  - **Deploy:** each deploy was checked with requests against the public URL.
+  - **Performance:** the developer ran the performance run against Railway by hand.
+
+Every prompt is in [`docs/ai/prompts.md`](docs/ai/prompts.md), and every session's transcript is in [`docs/ai/sessions/`](docs/ai/sessions/).

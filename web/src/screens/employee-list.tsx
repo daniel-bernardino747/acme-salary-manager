@@ -216,7 +216,7 @@ function EmployeeTable({ employees }: { employees: EmployeeResponse[] }) {
   );
 }
 
-/** On a phone each employee is one stacked row: name, job title · country, salary. */
+/** On a phone each employee is one stacked row: name and salary, then job title · country (ADR 0004). */
 function EmployeeRows({ employees }: { employees: EmployeeResponse[] }) {
   return (
     <ul className={rowStyles.stacked}>
@@ -228,7 +228,7 @@ function EmployeeRows({ employees }: { employees: EmployeeResponse[] }) {
               <span className={rowStyles.money}>{formatMoney(employee.annualSalary, 'en')}</span>
             </div>
             <div className={rowStyles.rowMeta}>
-              {employee.jobTitle} · {employee.department}{' '}
+              {employee.jobTitle} · {countryName(employee.country)}{' '}
               <CountryStamp country={employee.country} />
             </div>
           </Link>

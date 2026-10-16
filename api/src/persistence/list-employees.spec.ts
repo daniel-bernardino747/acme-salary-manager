@@ -57,11 +57,7 @@ describe('listEmployees', () => {
     const pageIds = (page: number) =>
       listEmployees(db, { page, pageSize: 2 }).items.map((employee) => employee.id);
 
-    expect([pageIds(1), pageIds(2), pageIds(3)]).toEqual([
-      [aarav, ana1],
-      [ana2, ana3],
-      [bruno],
-    ]);
+    expect([pageIds(1), pageIds(2), pageIds(3)]).toEqual([[aarav, ana1], [ana2, ana3], [bruno]]);
     expect(listEmployees(db, { page: 2, pageSize: 2 }).total).toBe(5);
   });
 

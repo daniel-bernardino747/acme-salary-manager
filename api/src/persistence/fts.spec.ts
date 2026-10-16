@@ -1,15 +1,8 @@
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { insertEmployee } from '../../test/builders';
 import { createDb, type Db } from './db';
 import { employees } from './schema';
-
-const employee = {
-  name: 'João Müller',
-  jobTitle: 'Data Analyst',
-  department: 'Data',
-  country: 'BR',
-  annualSalaryMinor: 9_600_000,
-} as const;
 
 /** Ids whose indexed name matches an FTS5 query, through the external-content index only. */
 function matchingIds(db: Db, query: string): number[] {
@@ -28,14 +21,14 @@ describe('name search index', () => {
   });
 
   it('indexes a new employee, folding case and accents', () => {
-    const { id } = db.insert(employees).values(employee).returning().get();
+    const { id } = insertEmployee(db, { name: 'João Müller' });
 
     expect(matchingIds(db, '"muller"*')).toEqual([id]);
     expect(matchingIds(db, '"JOAO"*')).toEqual([id]);
   });
 
   it('replaces the old name when a name is updated', () => {
-    const { id } = db.insert(employees).values(employee).returning().get();
+    const { id } = insertEmployee(db, { name: 'João Müller' });
 
     db.update(employees).set({ name: 'Ana Costa' }).where(eq(employees.id, id)).run();
 
@@ -44,7 +37,7 @@ describe('name search index', () => {
   });
 
   it('drops a deleted employee', () => {
-    const { id } = db.insert(employees).values(employee).returning().get();
+    const { id } = insertEmployee(db, { name: 'João Müller' });
 
     db.delete(employees).where(eq(employees.id, id)).run();
 

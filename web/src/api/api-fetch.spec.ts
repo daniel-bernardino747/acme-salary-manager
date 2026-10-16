@@ -46,4 +46,23 @@ describe('apiFetch', () => {
     expect(error).toBeInstanceOf(ApiProblem);
     expect((error as ApiProblem).problem).toEqual(problem);
   });
+
+  it('turns an error response that is not Problem Details into a generic ApiProblem', async () => {
+    serve(
+      new Response('<html><body>502 Bad Gateway</body></html>', {
+        status: 502,
+        headers: { 'Content-Type': 'text/html' },
+      }),
+    );
+
+    const error = await apiFetch('/api/payroll-totals').catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(ApiProblem);
+    expect((error as ApiProblem).problem).toEqual({
+      type: 'about:blank',
+      title: 'Request failed',
+      status: 502,
+      detail: 'The server answered 502 with a response the app cannot read.',
+    });
+  });
 });

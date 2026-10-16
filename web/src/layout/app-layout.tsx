@@ -63,7 +63,7 @@ export function AppLayout() {
             ml="auto"
             variant="subtle"
             color="cover"
-            size="lg"
+            size={44}
             aria-label="Search"
             onClick={openGlobalSearch}
           >

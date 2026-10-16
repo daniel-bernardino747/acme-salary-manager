@@ -8,8 +8,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "migrate": "node dist/migrate.js",
-    "seed": "node dist/seed/seed.js",
-    "start:prod": "node dist/migrate.js && node dist/seed/seed.js --if-empty && node dist/main.js",
+    "seed": "node dist/seed/main.js",
+    "start:prod": "node dist/migrate.js && node dist/seed/main.js --if-empty && node dist/main.js",
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {

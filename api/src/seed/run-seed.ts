@@ -3,11 +3,21 @@ import type { Db } from '../persistence/db';
 import { countEmployees } from '../persistence/count-employees';
 import { insertEmployees } from '../persistence/insert-employees';
 import { generateEmployees } from './generate-employees';
+import { databaseGoldenHash } from './golden-hash';
 
-/** Validates every generated row like the API does, then inserts them all in one transaction. */
-function seed(db: Db): void {
+const count = new Intl.NumberFormat('en');
+
+/**
+ * Validates every generated row like the API does, then inserts them all in one transaction, and
+ * reports the row count, the database golden hash and the duration.
+ */
+function seed(db: Db, log: (line: string) => void): void {
+  const start = performance.now();
   const rows = generateEmployees().map((g) => employeeRequestSchema.parse(g.employee));
   db.transaction(() => insertEmployees(db, rows));
+  const ms = Math.round(performance.now() - start);
+  log(`Seeded ${count.format(countEmployees(db))} employees in ${ms} ms.`);
+  log(`Database golden hash: ${databaseGoldenHash(db)}`);
 }
 
 /**
@@ -24,6 +34,6 @@ export function runSeed(db: Db, args: readonly string[], log: (line: string) => 
     );
     return 0;
   }
-  seed(db);
+  seed(db, log);
   return 0;
 }

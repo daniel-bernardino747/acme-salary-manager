@@ -182,7 +182,7 @@ As recorded in the ADRs:
 - **Small groups reveal individual pay.** A peer group of one shows that person's salary as its statistics. That is acceptable while the HR Manager is the only user ([ADR 0001](docs/adr/0001-domain-model-and-money-rules.md#consequences)).
 - **Money is shown and typed in `en` format only:** comma thousands separators and a decimal point ([ADR 0004](docs/adr/0004-ui-structure.md#copy-and-locale)).
 - **SQLite on one Railway instance** means no replicas and a brief outage on each deploy. Needing more than one instance is the trigger for moving to Postgres ([ADR 0002](docs/adr/0002-persistence-and-computation-seams.md#consequences)).
-- **The seed figures are illustrative, not market data** ([ADR 0005](docs/adr/0005-deterministic-seed-data.md)).
+- **The seed figures are illustrative, not market data** (see [Seed](#seed), and [ADR 0005](docs/adr/0005-deterministic-seed-data.md)).
 
 What the MVP leaves out on purpose, and why, is in [the requirements](docs/requirements.md#out-of-scope-and-why).
 

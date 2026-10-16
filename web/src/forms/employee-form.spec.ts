@@ -62,4 +62,15 @@ describe('employeeFormSchema', () => {
       annualSalary: ['JPY has no decimals'],
     });
   });
+
+  it("rejects more decimals than the currency takes, and any format but the app's en one", () => {
+    expect(errorsOf({ ...priya, country: 'US', annualSalary: '120,000.505' })).toEqual({
+      annualSalary: ['USD takes at most 2 decimals'],
+    });
+    for (const annualSalary of ['1.250.000,50', '₹1,250,000', '-5', '12,50']) {
+      expect(errorsOf({ ...priya, annualSalary })).toEqual({
+        annualSalary: ['Use digits, comma thousands separators and a decimal point'],
+      });
+    }
+  });
 });

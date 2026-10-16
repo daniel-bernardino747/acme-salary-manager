@@ -17,13 +17,21 @@ export interface PayStatistics {
   max: Money | null;
 }
 
+/** The largest small group: its figures are shown but marked, and it is never checked for outliers. */
+export const SMALL_GROUP_MAX_HEADCOUNT = 4;
+
+/** A small group has 1 to 4 employees. An empty group is not one: it has no figures to mark. */
+export function isSmallGroup(headcount: number): boolean {
+  return headcount >= 1 && headcount <= SMALL_GROUP_MAX_HEADCOUNT;
+}
+
 /** The pay statistics of one peer group, each figure rounded once by the rounding rule. */
 export function payStatistics({ currency, salariesMinor }: PeerGroupSalaries): PayStatistics {
   const money = (amountMinor: number | null): Money | null =>
     amountMinor === null ? null : { amountMinor, currency };
   return {
     headcount: salariesMinor.length,
-    smallGroup: false,
+    smallGroup: isSmallGroup(salariesMinor.length),
     min: money(Math.min(...salariesMinor)),
     median: money(median(salariesMinor)),
     average: money(average(salariesMinor)),

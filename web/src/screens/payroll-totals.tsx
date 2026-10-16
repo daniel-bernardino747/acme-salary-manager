@@ -43,7 +43,7 @@ function Payroll({ totals }: { totals: PayrollTotalsResponse }) {
       <Title order={2}>{payrollHeadline(totals.grandTotal)}</Title>
       {totals.grandTotal.headcount === 0 && (
         <Group gap="sm">
-          <Text>No employees yet. Add one to see what payroll costs.</Text>
+          <Text>No employees yet. Add one to start the payroll.</Text>
           <Button component={Link} to="/employees/new">
             Add employee
           </Button>
@@ -131,8 +131,8 @@ function TotalsTable({
                 </Anchor>
               </Table.Td>
               <Table.Td ta="right">{counts.format(row.headcount)}</Table.Td>
-              {withLocal && <Amount>{row.local && whole(row.local)}</Amount>}
-              <Amount>{whole(row.usd)}</Amount>
+              {withLocal && <MoneyCell>{row.local && whole(row.local)}</MoneyCell>}
+              <MoneyCell>{whole(row.usd)}</MoneyCell>
               <Table.Td ta="right">{shareText(row.sharePermille, row.usd)}</Table.Td>
             </Table.Tr>
           ))}
@@ -142,7 +142,7 @@ function TotalsTable({
   );
 }
 
-function Amount({ children }: { children: ReactNode }) {
+function MoneyCell({ children }: { children: ReactNode }) {
   return (
     <Table.Td ta="right" style={{ whiteSpace: 'nowrap' }}>
       {children}

@@ -1,6 +1,6 @@
 import type { CountryCode } from '@acme/contract';
 import { describe, expect, it } from 'vitest';
-import { comparisonFootnote, highestMedianFirst } from './comparison-copy';
+import { comparisonFootnote, highestMedianFirst, medianBars } from './comparison-copy';
 
 const row = (country: CountryCode, medianMinor: number | null) => ({
   country,
@@ -40,5 +40,20 @@ describe('comparisonFootnote', () => {
         'is converted from the local figure as shown, so it may differ slightly from converting ' +
         'individual salaries. Amounts are nominal, not adjusted for cost of living.',
     );
+  });
+});
+
+describe('medianBars', () => {
+  it('gives one bar per country with employees, in the order given, its median in cents as length', () => {
+    const rows = [
+      { ...row('GB', 120_000_00), smallGroup: false },
+      { ...row('JP', 100_000_01), smallGroup: true },
+      { ...row('NL', null), smallGroup: false },
+    ];
+
+    expect(medianBars(rows)).toEqual([
+      { country: 'United Kingdom', medianUsdMinor: 120_000_00, smallGroup: false },
+      { country: 'Japan', medianUsdMinor: 100_000_01, smallGroup: true },
+    ]);
   });
 });

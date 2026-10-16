@@ -1,5 +1,5 @@
 import type { CountryCode, Department, JobTitle } from '@acme/contract';
-import { and, eq, exists, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/sqlite-core';
 import type { PeerGroupMember } from '../domain/outliers';
 import type { Db } from './db';
@@ -13,15 +13,18 @@ export interface OutlierFilters {
   jobTitle?: JobTitle;
 }
 
-/** A peer of the employee being read, to ask whether their group has anyone in the department. */
-const peer = alias(employees, 'peer');
+/** The employees in the department, to find the peer groups that have anyone in it. */
+const inDepartment = alias(employees, 'in_department');
 
 /**
  * Every member of every peer group the filters touch, for question 4 (ADR 0003, *Outliers*). A
  * country or a job title names whole peer groups. A department narrows who is shown, never the
  * peer group: every member of a group with someone in it is read, so each median covers the whole
- * group. Both use the `(job_title, country)` index. SQL only selects; the domain takes each median
- * and decides who is an outlier.
+ * group. SQL only selects; the domain takes each median and decides who is an outlier.
+ *
+ * The department's groups come from one uncorrelated subquery on the department index, then each
+ * group is read on the `(job_title, country)` index. A correlated `EXISTS` instead searches the
+ * employee's whole group once per employee, which is far slower on the full seed.
  */
 export function peerGroupMembers(
   db: Db,
@@ -29,18 +32,10 @@ export function peerGroupMembers(
 ): PeerGroupMember[] {
   const groupHasDepartment =
     department &&
-    exists(
-      db
-        .select({ one: sql`1` })
-        .from(peer)
-        .where(
-          and(
-            eq(peer.jobTitle, employees.jobTitle),
-            eq(peer.country, employees.country),
-            eq(peer.department, department),
-          ),
-        ),
-    );
+    sql`(${employees.jobTitle}, ${employees.country}) in ${db
+      .select({ jobTitle: inDepartment.jobTitle, country: inDepartment.country })
+      .from(inDepartment)
+      .where(eq(inDepartment.department, department))}`;
   return db
     .select()
     .from(employees)

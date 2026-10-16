@@ -1,4 +1,8 @@
-import { employeeListResponseSchema, problemSchema } from '@acme/contract';
+import {
+  employeeListResponseSchema,
+  employeeResponseSchema,
+  problemSchema,
+} from '@acme/contract';
 import { describe, expect, it } from 'vitest';
 import { insertEmployee } from '../../test/builders';
 import { useTestApp } from '../../test/http';
@@ -120,6 +124,31 @@ describe('GET /api/employees', () => {
       page: 3,
       pageSize: 25,
       total: 1,
+    });
+  });
+});
+
+describe('GET /api/employees/:id', () => {
+  const t = useTestApp();
+
+  it("returns the employee with the salary in its country's currency", async () => {
+    const kenji = insertEmployee(t.db, {
+      name: 'Kenji Watanabe',
+      jobTitle: 'Data Analyst',
+      department: 'Data',
+      country: 'JP',
+      annualSalaryMinor: 7_000_000,
+    });
+
+    const res = await t.http().get(`/api/employees/${kenji.id}`).expect(200);
+
+    expect(employeeResponseSchema.parse(res.body)).toEqual({
+      id: kenji.id,
+      name: 'Kenji Watanabe',
+      jobTitle: 'Data Analyst',
+      department: 'Data',
+      country: 'JP',
+      annualSalary: { amountMinor: 7_000_000, currency: 'JPY' },
     });
   });
 });

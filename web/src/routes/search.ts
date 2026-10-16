@@ -78,7 +78,7 @@ export type OutliersSearch = z.infer<typeof outliersSearchSchema>;
 
 /** A new direction or filter on question 4; `null` is a cleared filter. */
 export interface OutliersSearchChange {
-  direction?: string;
+  direction?: OutliersSearch['direction'];
   country?: string | null;
   department?: string | null;
   jobTitle?: string | null;

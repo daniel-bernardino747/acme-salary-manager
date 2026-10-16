@@ -2,8 +2,8 @@ import { divideRoundHalfUp } from '@acme/contract';
 import { assertSafeInteger } from './rounding';
 
 /** The thresholds in hundredths: strictly below 0.80 or strictly above 1.20 is an outlier. */
-export const LOWER_THRESHOLD_HUNDREDTHS = 80;
-export const UPPER_THRESHOLD_HUNDREDTHS = 120;
+const LOWER_THRESHOLD_HUNDREDTHS = 80;
+const UPPER_THRESHOLD_HUNDREDTHS = 120;
 
 /** `percent · minor units`, asserted as a safe integer, so a cross-multiplication stays exact. */
 function scaled(percent: number, minor: number): number {

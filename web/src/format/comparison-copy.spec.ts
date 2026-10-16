@@ -1,6 +1,6 @@
 import type { CountryCode } from '@acme/contract';
 import { describe, expect, it } from 'vitest';
-import { highestMedianFirst } from './comparison-copy';
+import { comparisonFootnote, highestMedianFirst } from './comparison-copy';
 
 const row = (country: CountryCode, medianMinor: number | null) => ({
   country,
@@ -30,5 +30,15 @@ describe('highestMedianFirst', () => {
       'NL',
     ]);
     expect(rows[0]?.country).toBe('US');
+  });
+});
+
+describe('comparisonFootnote', () => {
+  it('names the rate source and date, and says the amounts are nominal', () => {
+    expect(comparisonFootnote({ source: 'ECB reference rates', asOf: '2026-09-30' })).toBe(
+      'Converted to USD at fixed rates from ECB reference rates, as of 2026-09-30. Each figure ' +
+        'is converted from the local figure as shown, so it may differ slightly from converting ' +
+        'individual salaries. Amounts are nominal, not adjusted for cost of living.',
+    );
   });
 });

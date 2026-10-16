@@ -52,7 +52,7 @@ The script cannot restart Railway. It records the first request to each endpoint
 
 ## A smoke check on a local build
 
-The script also runs against a local production build, as a check that it works, not as a measurement of the deployed app:
+The script also runs against a local production build, as a check that it works, not as a measurement of the deployed app (in a POSIX shell such as Git Bash; in PowerShell, set `$env:DATABASE_PATH` and `$env:PORT` first):
 
 ```sh
 pnpm build

@@ -1,4 +1,4 @@
-import { formatMoney, type Money } from '@acme/contract';
+import { formatMoney, type Money, type Rates } from '@acme/contract';
 import type { OutliersSearch } from '../routes/search';
 import { employeeCount } from './counts';
 
@@ -42,4 +42,12 @@ const nobody: Record<Direction, string> = {
 /** An empty result; the small-group count still shows next to it (ADR 0004, *Question 4*). */
 export function noOutliersText(direction: Direction): string {
   return `${nobody[direction]} for these filters.`;
+}
+
+/** Rendered from the response's `rates`, so it names the table that converted the cost. */
+export function costFootnote({ source, asOf }: Rates): string {
+  return (
+    `The cost is converted to USD at fixed rates from ${source}, as of ${asOf}. ` +
+    "Each currency's gaps are added up first and converted once."
+  );
 }

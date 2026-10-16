@@ -34,6 +34,13 @@ export function runSeed(db: Db, args: readonly string[], log: (line: string) => 
     );
     return 0;
   }
+  const existing = countEmployees(db);
+  if (existing > 0) {
+    log(
+      `Seed refused: the table already has ${count.format(existing)} employees. Run with --reset to replace them.`,
+    );
+    return 1;
+  }
   seed(db, log);
   return 0;
 }

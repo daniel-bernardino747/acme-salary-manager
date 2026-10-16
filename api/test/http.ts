@@ -1,9 +1,10 @@
 import type { INestApplication, ModuleMetadata } from '@nestjs/common';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { afterAll, beforeAll, beforeEach } from 'vitest';
-import { AppModule, type AppOptions } from '../src/app.module';
-import { configureApp } from '../src/configure-app';
+import { AppModule } from '../src/app.module';
+import { configureApp, type ConfigureOptions } from '../src/configure-app';
 import { DB } from '../src/database.module';
 import { clearEmployees } from '../src/persistence/clear-employees';
 import type { Db } from '../src/persistence/db';
@@ -16,16 +17,16 @@ export interface TestApp {
 }
 
 /** Test-only controllers, and the built web app to serve, if the test needs one. */
-export type TestAppOptions = Pick<ModuleMetadata, 'controllers'> & Pick<AppOptions, 'webRoot'>;
+export type TestAppOptions = Pick<ModuleMetadata, 'controllers'> & ConfigureOptions;
 
 /** Boots one app per test file on a fresh `:memory:` database. */
 export async function bootTestApp(options: TestAppOptions = {}): Promise<TestApp> {
   const moduleRef = await Test.createTestingModule({
-    imports: [AppModule.forRoot({ databasePath: ':memory:', webRoot: options.webRoot })],
+    imports: [AppModule.forRoot({ databasePath: ':memory:' })],
     controllers: options.controllers ?? [],
   }).compile();
-  const app = moduleRef.createNestApplication({ logger: false });
-  configureApp(app);
+  const app = moduleRef.createNestApplication<NestExpressApplication>({ logger: false });
+  configureApp(app, { webRoot: options.webRoot });
   await app.init();
   return { app, db: app.get<Db>(DB), http: () => request(app.getHttpServer()) };
 }

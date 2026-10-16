@@ -61,4 +61,15 @@ describe('seed command', () => {
     expect(countEmployees(db)).toBe(10_000);
     expect(databaseGoldenHash(db)).toBe(DATABASE_GOLDEN_HASH);
   });
+
+  it('with --if-empty does nothing on a non-empty table, and exits 0', () => {
+    insertEmployee(db);
+    insertEmployee(db, { name: 'Kenji Watanabe', country: 'JP', annualSalaryMinor: 9_000_000 });
+    const before = employeesById(db);
+
+    expect(seed(['--if-empty'])).toBe(0);
+
+    expect(lines).toEqual(['Seed skipped: the table already has 2 employees.']);
+    expect(employeesById(db)).toEqual(before);
+  });
 });

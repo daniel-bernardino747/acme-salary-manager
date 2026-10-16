@@ -36,6 +36,27 @@ describe('GET /api/employees', () => {
     expect(employeeListResponseSchema.parse(largest.body)).toMatchObject({ pageSize: 100 });
   });
 
+  it('combines the country, department and job title filters with AND', async () => {
+    const match = insertEmployee(t.db, {
+      country: 'GB',
+      department: 'Data',
+      jobTitle: 'Data Analyst',
+    }).id;
+    insertEmployee(t.db, { country: 'US', department: 'Data', jobTitle: 'Data Analyst' });
+    insertEmployee(t.db, { country: 'GB', department: 'Finance', jobTitle: 'Data Analyst' });
+    insertEmployee(t.db, { country: 'GB', department: 'Data', jobTitle: 'Data Scientist' });
+
+    const res = await t
+      .http()
+      .get('/api/employees')
+      .query({ country: 'GB', department: 'Data', jobTitle: 'Data Analyst' })
+      .expect(200);
+
+    const list = employeeListResponseSchema.parse(res.body);
+    expect(list.total).toBe(1);
+    expect(list.items.map((employee) => employee.id)).toEqual([match]);
+  });
+
   it('answers a page past the end with 200 and no items', async () => {
     insertEmployee(t.db);
 

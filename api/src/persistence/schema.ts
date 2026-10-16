@@ -5,7 +5,7 @@ import { check, index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-cor
 export const employees = sqliteTable(
   'employees',
   {
-    id: integer('id').primaryKey(),
+    id: integer('id').primaryKey({ autoIncrement: true }),
     name: text('name').notNull(),
     jobTitle: text('job_title').notNull(),
     department: text('department').notNull(),

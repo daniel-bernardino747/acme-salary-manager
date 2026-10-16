@@ -1,5 +1,5 @@
 CREATE TABLE `employees` (
-	`id` integer PRIMARY KEY NOT NULL,
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`job_title` text NOT NULL,
 	`department` text NOT NULL,

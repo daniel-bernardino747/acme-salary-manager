@@ -7,6 +7,6 @@ export function nameMatch(search: string): string {
   return search
     .trim()
     .split(/\s+/)
-    .map((word) => `"${word}"*`)
+    .map((word) => `"${word.replaceAll('"', '""')}"*`)
     .join(' AND ');
 }

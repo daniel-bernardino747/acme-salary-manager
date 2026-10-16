@@ -41,9 +41,14 @@ export function runSeed(
   log: Log,
   generate: Generate = generateEmployees,
 ): number {
-  const reset = args.includes('--reset');
+  const mode = args.join(' ');
+  if (mode !== '' && mode !== '--if-empty' && mode !== '--reset') {
+    log(`Seed failed: expected no option, --if-empty or --reset, got "${mode}".`);
+    return 1;
+  }
+  const reset = mode === '--reset';
   const existing = countEmployees(db);
-  if (existing > 0 && args.includes('--if-empty')) {
+  if (existing > 0 && mode === '--if-empty') {
     log(`Seed skipped: the table already has ${count.format(existing)} employees.`);
     return 0;
   }

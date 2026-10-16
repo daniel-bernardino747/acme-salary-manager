@@ -315,4 +315,13 @@ describe('DELETE /api/employees/:id', () => {
     expect(res.text).toBe('');
     await t.http().get(`/api/employees/${id}`).expect(404);
   });
+
+  it('answers an id with no employee with a 404 problem', async () => {
+    const removed = insertEmployee(t.db);
+    clearEmployees(t.db);
+
+    const res = await t.http().delete(`/api/employees/${removed.id}`).expect(404);
+
+    expect(problemSchema.parse(res.body)).toMatchObject({ title: 'Not Found', status: 404 });
+  });
 });

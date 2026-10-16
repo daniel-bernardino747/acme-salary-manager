@@ -20,3 +20,13 @@ describe('serverDuration on a header it cannot read', () => {
     },
   );
 });
+
+describe('serverDuration behind a proxy', () => {
+  // A proxy may add its own metrics; fetch joins repeated headers with ", ".
+  it.each([
+    ['edge;dur=3, app;dur=12.5', 12.5],
+    ['app;dur=12.5,cdn-cache;desc=MISS', 12.5],
+  ])('picks the app metric out of %s', (header, expected) => {
+    expect(serverDuration(header)).toBe(expected);
+  });
+});

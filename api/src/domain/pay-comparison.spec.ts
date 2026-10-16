@@ -37,4 +37,24 @@ describe('payComparison', () => {
       max: usd(120_000_01),
     });
   });
+
+  it('converts each local figure as shown, once, so the median and average carry two roundings', () => {
+    // The median of £50,000.00 and £50,000.01 is 5,000,000.5p → £50,000.01 as shown, and so is
+    // the average. At £2 to the dollar that is 2,500,000.5¢ → $25,000.01. Converting the exact
+    // £50,000.005 would round once, to 2,500,000.25¢ → $25,000.00.
+    const rows = payComparison(
+      [salary('GB', 50_000_00, 'GBP'), salary('GB', 50_000_01, 'GBP')],
+      rates,
+    );
+
+    expect(rows.find((row) => row.country === 'GB')).toEqual({
+      country: 'GB',
+      headcount: 2,
+      smallGroup: true,
+      min: usd(25_000_00),
+      median: usd(25_000_01),
+      average: usd(25_000_01),
+      max: usd(25_000_01),
+    });
+  });
 });

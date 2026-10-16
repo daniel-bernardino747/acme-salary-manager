@@ -16,6 +16,7 @@ import {
 } from './routes/search';
 import { EmployeeList } from './screens/employee-list';
 import { NotFound } from './screens/not-found';
+import { PayStatistics } from './screens/pay-statistics';
 import { Placeholder } from './screens/placeholder';
 
 // Every route in ADR 0004, *Routing*. Screens are placeholders until their tickets land.
@@ -63,7 +64,7 @@ const statisticsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/pay/statistics',
   validateSearch: statisticsSearchSchema,
-  component: () => <Placeholder title="Pay statistics" />,
+  component: PayStatistics,
 });
 
 const payrollRoute = createRoute({

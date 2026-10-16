@@ -4,7 +4,6 @@ import {
   employeeRequestSchema,
   formatMoney,
   parseMoney,
-  type CountryCode,
   type CurrencyCode,
   type EmployeeRequest,
   type EmployeeResponse,
@@ -53,21 +52,21 @@ const picked = <T extends z.ZodType<unknown, string>>(list: T) =>
 type SalaryResult = { success: true; amountMinor: number } | { success: false; errors: string[] };
 
 /**
- * The typed salary in minor units of the country's currency: `parseMoney`, then the contract's
+ * The typed salary in minor units of the currency: `parseMoney`, then the contract's
  * own bounds, so the form and the API never disagree on the cap.
  */
-function readSalary(text: string, country: CountryCode): SalaryResult {
+function readSalary(text: string, currency: CurrencyCode): SalaryResult {
   if (!text.trim()) {
     return { success: false, errors: ['Required'] };
   }
-  const salary = parseMoney(text, currencyOf(country));
+  const salary = parseMoney(text, currency);
   if (!salary.success) {
     return { success: false, errors: [salary.error] };
   }
-  const amount = fields.annualSalaryMinor.safeParse(salary.amountMinor);
-  return amount.success
-    ? { success: true, amountMinor: amount.data }
-    : { success: false, errors: amount.error.issues.map((issue) => issue.message) };
+  const salaryMinor = fields.annualSalaryMinor.safeParse(salary.amountMinor);
+  return salaryMinor.success
+    ? { success: true, amountMinor: salaryMinor.data }
+    : { success: false, errors: salaryMinor.error.issues.map((issue) => issue.message) };
 }
 
 /**
@@ -85,7 +84,7 @@ export const employeeFormSchema = z
   })
   .superRefine(
     ({ annualSalary, country }, ctx) => {
-      const salary = readSalary(annualSalary, country);
+      const salary = readSalary(annualSalary, currencyOf(country));
       if (!salary.success) {
         addSalaryIssues(ctx, salary.errors);
       }
@@ -94,7 +93,7 @@ export const employeeFormSchema = z
   )
   .transform(({ annualSalary, ...employee }, ctx): EmployeeRequest => {
     // Reached only once every field is valid, so the salary reads; it is checked again, not trusted.
-    const salary = readSalary(annualSalary, employee.country);
+    const salary = readSalary(annualSalary, currencyOf(employee.country));
     if (!salary.success) {
       addSalaryIssues(ctx, salary.errors);
       return z.NEVER;
@@ -113,16 +112,12 @@ function addSalaryIssues(ctx: z.RefinementCtx, messages: string[]): void {
  * `null` while there is no country or the salary does not read: its message shows instead.
  */
 export function salaryPreview(annualSalary: string, country: string): string | null {
-  const code = countrySchema.safeParse(country);
-  if (!code.success) {
+  const currency = currencyOfPicked(country);
+  const salary = currency === null ? null : readSalary(annualSalary, currency);
+  if (currency === null || !salary?.success) {
     return null;
   }
-  const salary = readSalary(annualSalary, code.data);
-  if (!salary.success) {
-    return null;
-  }
-  const money = { amountMinor: salary.amountMinor, currency: currencyOf(code.data) };
-  return `= ${formatMoney(money, 'en')} a year`;
+  return `= ${formatMoney({ amountMinor: salary.amountMinor, currency }, 'en')} a year`;
 }
 
 /** A country's currency, or `null` while none is picked. */

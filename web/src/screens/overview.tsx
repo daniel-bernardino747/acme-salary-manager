@@ -1,4 +1,4 @@
-import { countries, jobTitles, type Outlier, type PayrollTotalsResponse } from '@acme/contract';
+import { jobTitles, type Outlier } from '@acme/contract';
 import {
   Anchor,
   Box,
@@ -14,9 +14,8 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
-import { apiFetch } from '../api/api-fetch';
 import { outliersQuery, overpaidSearch, underpaidSearch } from '../api/outliers-query';
-import { queryKey } from '../api/query-key';
+import { payrollTotalsQuery } from '../api/payroll-totals-query';
 import {
   CountryStamp,
   DirectionBadge,
@@ -29,7 +28,7 @@ import {
 import { ArrowRightIcon, PlusIcon, SearchIcon } from '../components/icons';
 import { QueryState } from '../components/query-state';
 import { countText, employeeCount } from '../format/counts';
-import { countryName } from '../format/country-name';
+import { countryName, countryOptions } from '../format/country-name';
 import { costText, smallGroupCountText } from '../format/outliers-copy';
 import { overviewDateLine, shareBars, topOutliers } from '../format/overview';
 import { payrollFootnote, shareText } from '../format/payroll-copy';
@@ -39,23 +38,25 @@ import { openGlobalSearch } from '../layout/global-search';
 import { statisticsSearchSchema } from '../routes/search';
 import classes from './overview.module.css';
 
-const countryOptions = countries.map((country) => ({ value: country.code, label: country.name }));
-
 /**
  * `/`, the Overview (ADR 0004, *Overview*, as amended by #40): find an employee, what we pay a
  * role, who is paid out of line, and the annual payroll. Each panel loads and fails on its own.
  */
 export function Overview() {
   // The same query as the payroll panel, so the date line costs no request of its own.
-  const payroll = useQuery({
-    queryKey: queryKey('payroll-totals'),
-    queryFn: () => apiFetch<PayrollTotalsResponse>('/api/payroll-totals'),
-  });
+  const payroll = useQuery(payrollTotalsQuery());
   return (
     <Stack gap="lg">
       <PageHeader
         title="Overview"
-        meta={payroll.data && overviewDateLine(new Date(), payroll.data.grandTotal.headcount)}
+        meta={
+          payroll.data &&
+          overviewDateLine(
+            new Date(),
+            payroll.data.grandTotal.headcount,
+            payroll.data.byCountry.filter((row) => row.headcount > 0).length,
+          )
+        }
       />
       <button type="button" className={classes.find} onClick={openGlobalSearch}>
         <SearchIcon size={22} />
@@ -213,10 +214,7 @@ function WhatDoWePay() {
 }
 
 function AnnualPayroll() {
-  const query = useQuery({
-    queryKey: queryKey('payroll-totals'),
-    queryFn: () => apiFetch<PayrollTotalsResponse>('/api/payroll-totals'),
-  });
+  const query = useQuery(payrollTotalsQuery());
   return (
     <Panel title="Annual payroll">
       <QueryState query={query} skeleton={<PayrollSkeleton />}>

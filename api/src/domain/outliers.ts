@@ -33,6 +33,8 @@ export interface OutlierFindings {
   outliers: Outlier[];
   /** Shown employees whose peer group has fewer than 5, so they were not checked (ADR 0003). */
   smallGroupHeadcount: number;
+  /** The cost to reach 0.80 over the underpaid outliers found, every page included. */
+  costToReachThreshold: UsdMoney;
 }
 
 /** An employee's direction against their peer median, or `null` inside 0.80–1.20. */
@@ -82,11 +84,12 @@ function peerGroups(members: readonly PeerGroupMember[]): PeerGroupMember[][] {
  * shown, is strictly below 0.80 or strictly above 1.20, in groups of 5 or more (ADR 0001,
  * *Outliers*), most extreme first. Asked for a direction, it ranks only that one, so the underpaid
  * are never buried under the overpaid (ADR 0003). The same pass counts the shown employees in
- * small groups, who were not checked.
+ * small groups, who were not checked, and costs bringing the underpaid found to 0.80.
  */
 export function findOutliers(
   members: readonly PeerGroupMember[],
   only?: OutlierDirection,
+  ratesPerUsd: RatesPerUsd = exchangeRates.ratesPerUsd,
 ): OutlierFindings {
   const outliers: Outlier[] = [];
   let smallGroupHeadcount = 0;
@@ -112,7 +115,11 @@ export function findOutliers(
       }
     }
   }
-  return { outliers: outliers.sort(mostExtremeFirst), smallGroupHeadcount };
+  return {
+    outliers: outliers.sort(mostExtremeFirst),
+    smallGroupHeadcount,
+    costToReachThreshold: costToReachThreshold(outliers, ratesPerUsd),
+  };
 }
 
 /**

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { insertEmployee } from '../../test/builders';
+import { anEmployee, insertEmployee } from '../../test/builders';
 import { countEmployees } from '../persistence/count-employees';
 import { createDb, type Db } from '../persistence/db';
 import { employeesById } from '../persistence/employees-by-id';
@@ -101,5 +101,14 @@ describe('seed command', () => {
     expect(employeesById(db)).toEqual(before);
     db.$client.exec('DROP TRIGGER fail_halfway');
     expect(insertEmployee(db).id).toBe(3);
+  });
+
+  it("validates every row with the contract's employee schema before inserting any", () => {
+    const rows = [anEmployee(), anEmployee({ name: ' ' }), anEmployee()];
+    const generate = () => rows.map((employee) => ({ employee, plant: null }));
+
+    expect(() => runSeed(db, [], (line) => lines.push(line), generate)).toThrow(/Required/);
+
+    expect(countEmployees(db)).toBe(0);
   });
 });

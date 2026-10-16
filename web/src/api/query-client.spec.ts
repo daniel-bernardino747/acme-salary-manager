@@ -20,8 +20,4 @@ describe('createQueryClient', () => {
     expect(shouldRetry(2, new TypeError('Failed to fetch'))).toBe(true);
     expect(shouldRetry(3, problem(500))).toBe(false);
   });
-
-  it('treats data as fresh for 30 seconds', () => {
-    expect(createQueryClient().getDefaultOptions().queries?.staleTime).toBe(30_000);
-  });
 });

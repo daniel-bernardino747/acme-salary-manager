@@ -1,4 +1,4 @@
-import { exchangeRates } from '@acme/contract';
+import { countries, exchangeRates } from '@acme/contract';
 import {
   ActionIcon,
   AppShell,
@@ -15,6 +15,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 import { outliersQuery, underpaidSearch } from '../api/outliers-query';
 import { PlusIcon, SearchIcon } from '../components/icons';
+import { countText } from '../format/counts';
 import { GlobalSearch, openGlobalSearch } from './global-search';
 import { activeNavItem, navItems, type NavItem } from './navigation';
 import classes from './shell.module.css';
@@ -89,7 +90,7 @@ export function AppLayout() {
         <Stack gap={2} h="100%">
           <Box component={Link} to="/" className={classes.brand} visibleFrom="sm">
             ACME Salary Manager
-            <span className={classes.brandLine}>HR · 7 countries</span>
+            <span className={classes.brandLine}>HR · {countries.length} countries</span>
           </Box>
           <Box h={18} visibleFrom="sm" />
           {navItems
@@ -117,7 +118,7 @@ export function AppLayout() {
             Add employee
           </Button>
           <Text className={classes.rates}>
-            Rates as of {exchangeRates.asOf}, from ECB reference rates
+            Rates as of {exchangeRates.asOf}, from {exchangeRates.source}
           </Text>
         </Stack>
       </AppShell.Navbar>
@@ -153,7 +154,7 @@ function UnderpaidCount() {
   }
   return (
     <span className={classes.count}>
-      {data.total.toLocaleString('en')}
+      {countText(data.total)}
       <VisuallyHidden> underpaid</VisuallyHidden>
     </span>
   );

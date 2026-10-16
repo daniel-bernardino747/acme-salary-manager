@@ -1,4 +1,4 @@
-import { outliersResponseSchema } from '@acme/contract';
+import { exchangeRates, outliersResponseSchema } from '@acme/contract';
 import { describe, expect, it } from 'vitest';
 import { insertEmployee } from '../../test/builders';
 import { useTestApp } from '../../test/http';
@@ -34,4 +34,30 @@ describe('GET /api/outliers', () => {
       direction: 'below',
     });
   });
+
+  it('answers direction=below with the cost to reach 0.80 in USD and the rates that converted it', async () => {
+    // $7,000.00 is $1,000.00 short of 0.80 · $10,000.00, all in USD, so no conversion arithmetic.
+    insertGroupWithOneUnderpaid();
+
+    const res = await t.http().get('/api/outliers').query({ direction: 'below' }).expect(200);
+
+    const page = outliersResponseSchema.parse(res.body);
+    expect(page.costToReachThreshold).toEqual({ usd: { amountMinor: 1_000_00, currency: 'USD' } });
+    expect(page.rates).toEqual({ source: exchangeRates.source, asOf: exchangeRates.asOf });
+  });
+
+  it.each([
+    ['direction=above', { direction: 'above' }],
+    ['no direction', {}],
+  ])(
+    'answers %s with no cost and no rates: only an underpaid list states one',
+    async (_, query) => {
+      insertGroupWithOneUnderpaid();
+
+      const res = await t.http().get('/api/outliers').query(query).expect(200);
+
+      expect(outliersResponseSchema.parse(res.body)).not.toHaveProperty('costToReachThreshold');
+      expect(res.body).not.toHaveProperty('rates');
+    },
+  );
 });

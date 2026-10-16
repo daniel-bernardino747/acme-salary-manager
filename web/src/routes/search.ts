@@ -12,3 +12,10 @@ const jobTitle = jobTitleSchema.optional().catch(undefined);
 
 export const employeesSearchSchema = z.object({ page, q, country, department, jobTitle });
 export type EmployeesSearch = z.infer<typeof employeesSearchSchema>;
+
+/** `all` omits the API's `direction` parameter (ADR 0004, *Question 4*). */
+export const outlierDirections = ['below', 'above', 'all'] as const;
+const direction = z.enum(outlierDirections).default('below').catch('below');
+
+export const outliersSearchSchema = z.object({ page, direction, country, department, jobTitle });
+export type OutliersSearch = z.infer<typeof outliersSearchSchema>;

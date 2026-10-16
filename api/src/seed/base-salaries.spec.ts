@@ -1,6 +1,7 @@
 import { countries, jobTitles } from '@acme/contract';
 import { describe, expect, it } from 'vitest';
 import { baseSalaryMinor, salaryStepMinor } from './base-salaries';
+import { baseSnapshot } from './snapshots';
 
 describe('baseSalaryMinor', () => {
   it('is the anchor for a Software Engineer II, and a whole number of salary steps everywhere', () => {
@@ -27,5 +28,9 @@ describe('baseSalaryMinor', () => {
     ['Customer Support Specialist', 'JP', 3_520_000],
   ] as const)('is anchor · multiplier ^ spread, to the nearest step, for %s · %s', (title, country, base) => {
     expect(baseSalaryMinor(title, country)).toBe(base);
+  });
+
+  it('matches the committed base snapshot, with each base also in USD', async () => {
+    await expect(baseSnapshot()).toMatchFileSnapshot('../../../docs/seed/base-salaries.md');
   });
 });

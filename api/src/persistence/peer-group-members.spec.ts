@@ -63,4 +63,21 @@ describe('peerGroupMembers', () => {
       [inData.id, true],
     ]);
   });
+
+  it('reads every member of each peer group with someone in a department, showing only those in it', () => {
+    const touched = { jobTitle: 'Data Scientist', country: 'BR' } as const;
+    const inData = insertEmployee(db, { ...touched, department: 'Data' });
+    const inSales = insertEmployee(db, { ...touched, department: 'Sales' });
+    // Nobody in this group is in Data, so it is not read at all.
+    insertEmployee(db, { jobTitle: 'Data Scientist', country: 'IN', department: 'Engineering' });
+
+    const members = peerGroupMembers(db, { department: 'Data' });
+
+    expect(
+      members.map((m) => [m.employee.id, m.shown]).toSorted(([a], [b]) => Number(a) - Number(b)),
+    ).toEqual([
+      [inData.id, true],
+      [inSales.id, false],
+    ]);
+  });
 });

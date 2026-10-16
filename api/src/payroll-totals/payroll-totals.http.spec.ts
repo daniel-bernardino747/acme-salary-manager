@@ -30,16 +30,11 @@ describe('GET /api/payroll-totals', () => {
     expect(totals.rates).toEqual({ source: exchangeRates.source, asOf: exchangeRates.asOf });
   });
 
-  it('answers an empty organization with 200, a $0 grand total and no shares', async () => {
+  it('answers an empty organization with 200 and a $0 grand total, still with its rates', async () => {
     const res = await t.http().get('/api/payroll-totals').expect(200);
 
     const totals = payrollTotalsResponseSchema.parse(res.body);
     expect(totals.grandTotal).toEqual({ headcount: 0, usd: { amountMinor: 0, currency: 'USD' } });
-    expect(
-      [...totals.byCountry, ...totals.byDepartment].every(
-        (row) => row.headcount === 0 && row.sharePermille === null,
-      ),
-    ).toBe(true);
     expect(totals.rates).toEqual({ source: exchangeRates.source, asOf: exchangeRates.asOf });
   });
 

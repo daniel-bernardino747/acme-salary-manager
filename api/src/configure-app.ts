@@ -1,6 +1,7 @@
 import path from 'node:path';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { NextFunction, Request, Response } from 'express';
+import { serverTiming } from './http/server-timing';
 
 export interface ConfigureOptions {
   /** The built web app's folder. Omitted, the app serves only `/api`. */
@@ -12,6 +13,8 @@ const API_PREFIX = 'api';
 
 /** App-wide setup shared by `main.ts` and the HTTP tests. */
 export function configureApp(app: NestExpressApplication, options: ConfigureOptions = {}): void {
+  // First, before any other middleware, so the clock starts as the request arrives (ADR 0006).
+  app.use(serverTiming);
   app.setGlobalPrefix(API_PREFIX);
   if (options.webRoot) {
     serveWebApp(app, options.webRoot);

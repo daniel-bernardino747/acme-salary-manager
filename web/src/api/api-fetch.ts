@@ -42,13 +42,19 @@ export async function apiFetch<T>(path: string, request: ApiRequest = {}): Promi
 }
 
 /**
+ * The client's reading of Problem Details. The contract's schema is strict so the API's own tests
+ * catch a leaked field; here an extra RFC 9457 member such as `instance` is dropped, not fatal.
+ */
+const readableProblemSchema = problemSchema.strip();
+
+/**
  * The Problem Details of an error response. Anything else, such as an HTML 502 while the service
  * restarts, becomes a generic problem, never a JSON parse error (ADR 0004).
  */
 async function readProblem(response: Response): Promise<Problem> {
   const text = await response.text();
   try {
-    const parsed = problemSchema.safeParse(JSON.parse(text));
+    const parsed = readableProblemSchema.safeParse(JSON.parse(text));
     if (parsed.success) {
       return parsed.data;
     }

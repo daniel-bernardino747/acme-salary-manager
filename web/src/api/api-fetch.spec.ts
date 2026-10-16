@@ -3,7 +3,7 @@ import { ApiProblem, apiFetch } from './api-fetch';
 
 /** Answers every request with `response`, as the network would, and records the requests. */
 function serve(response: Response) {
-  const fetch = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) => response);
+  const fetch = vi.fn<typeof globalThis.fetch>(async () => response);
   vi.stubGlobal('fetch', fetch);
   return fetch;
 }

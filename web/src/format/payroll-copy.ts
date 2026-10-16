@@ -1,5 +1,6 @@
-import type { Money, Rates } from '@acme/contract';
+import type { CountryCode, Money, Rates } from '@acme/contract';
 import { employeeCount } from './counts';
+import { inCountry } from './pay-statistics-copy';
 import { placeDecimal } from './place-decimal';
 import { wholeUnits } from './whole-units';
 
@@ -39,4 +40,9 @@ export function payrollFootnote({ source, asOf }: Rates): string {
     `USD amounts converted at fixed rates from ${source}, as of ${asOf}. Each total is rounded on ` +
     'its own, so the parts may not add up exactly to the total, or to 100%.'
   );
+}
+
+/** A country row's link to its outliers, e.g. "Outliers in the Netherlands" (ADR 0004, *Question 2*). */
+export function outliersInCountryText(country: CountryCode): string {
+  return `Outliers ${inCountry(country)}`;
 }

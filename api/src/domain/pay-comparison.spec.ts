@@ -2,8 +2,13 @@ import { countries, exchangeRates, type CountryCode, type CurrencyCode } from '@
 import { describe, expect, it } from 'vitest';
 import { payComparison, type CountrySalary } from './pay-comparison';
 
-// Round rates keep the hand arithmetic readable: £2 and ¥150 to the dollar.
-const rates = { ...exchangeRates.ratesPerUsd, GBP: 2_000_000, JPY: 150_000_000 };
+// Round rates keep the hand arithmetic readable: £2, ₹100 and ¥150 to the dollar.
+const rates = {
+  ...exchangeRates.ratesPerUsd,
+  GBP: 2_000_000,
+  INR: 100_000_000,
+  JPY: 150_000_000,
+};
 
 const usd = (amountMinor: number) => ({ amountMinor, currency: 'USD' });
 
@@ -69,6 +74,31 @@ describe('payComparison', () => {
       median: null,
       average: null,
       max: null,
+    });
+  });
+
+  it('marks a country of 1 to 4 employees as a small group, its figures still shown in USD', () => {
+    // ₹2,000,000.00 to ₹3,500,000.00 at ₹100 to the dollar: $20,000.00 to $35,000.00. The median
+    // (₹2,500,000.00 + ₹3,000,000.00) / 2 and the average ₹11,000,000.00 / 4 are both
+    // ₹2,750,000.00 → $27,500.00.
+    const rows = payComparison(
+      [
+        salary('IN', 2_000_000_00, 'INR'),
+        salary('IN', 3_500_000_00, 'INR'),
+        salary('IN', 2_500_000_00, 'INR'),
+        salary('IN', 3_000_000_00, 'INR'),
+      ],
+      rates,
+    );
+
+    expect(rows.find((row) => row.country === 'IN')).toEqual({
+      country: 'IN',
+      headcount: 4,
+      smallGroup: true,
+      min: usd(20_000_00),
+      median: usd(27_500_00),
+      average: usd(27_500_00),
+      max: usd(35_000_00),
     });
   });
 });

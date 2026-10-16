@@ -102,6 +102,8 @@ Headcount is not sampled. A pure function turns the weights into an exact intege
   4. Shuffle the group, so sorted positions do not leak into ids.
 
   Each anchored group has one or two employees on exactly the base salary, which reads as a standard offer.
+
+  *Amended during the seed (#15):* steps 1 and 2 do not hold as written. Setting the sorted middle to the base moves the median whenever values below the middle sit above the base (draws 1.02, 1.04, 1.06, 1.08, 1.10 × base give a median of 1.04 × base once the middle is set to 1.00). The draw is now split by side instead. With `k = floor((n − 1) / 2)`, k salaries are drawn in `[ceil(0.88·base/step), base/step − 1]` steps and k in `[base/step + 1, floor(1.12·base/step)]`, and the one or two remaining are the base exactly. The median is then the base by construction, exactly one or two employees sit on it, and steps 3 and 4 are unchanged: plants replace the lowest or highest draw, then the group is shuffled.
 - **Groups under 5 draw freely** in the same range, and their values must be distinct (on a collision, the seed redraws from the same stream). They are never checked for outliers, so neither anchoring nor the bound applies. Anchoring would also give the two Staff Software Engineers in the Netherlands identical salaries and lose the even-sized median the plant exists for.
 - **The bound:** every employee who is not planted lands within 0.85–1.15 of their group's final median. The draw range of 0.88–1.12 sits inside it with a margin.
 
@@ -116,7 +118,7 @@ Headcount is not sampled. A pure function turns the weights into an exact intege
 
 - **sfc32, implemented in the repo** in `api/src/seed/prng.ts`. It uses only 32-bit integer operations (`Math.imul`, `>>>`), so it is bit-identical on every engine and OS. The seed lives in `api/src/seed/` (`prng.ts`, `generate-employees.ts`, `names.ts`), outside `domain/`, which holds only pay rules.
 - **No `Math.random` in seed code,** enforced by an ESLint `no-restricted-properties` rule scoped to `api/src/seed/`.
-- **Integer-only draws.** A salary is a whole number of steps drawn in `[ceil(0.88·base/step), floor(1.12·base/step)]`. Ranges use rejection sampling, so there is no modulo bias.
+- **Integer-only draws.** A salary is a whole number of steps drawn in `[ceil(0.88·base/step), floor(1.12·base/step)]` (split at the base for anchored groups, see *Salaries within a group*). Ranges use rejection sampling, so there is no modulo bias.
 - **One stream per cell,** seeded from a hash of (fixed seed, job title, country), plus a separate stream for names. Changing one cell's count or one plant changes only that cell's rows, and changing a name list never moves a salary.
 - **A fixed order:** countries and titles in reference-list order, and rows inserted in that order.
 

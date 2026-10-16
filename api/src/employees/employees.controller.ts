@@ -4,7 +4,7 @@ import {
   type EmployeeListResponse,
   type EmployeeResponse,
 } from '@acme/contract';
-import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
+import { Controller, Get, Inject, NotFoundException, Param, Query } from '@nestjs/common';
 import { DB } from '../database.module';
 import { ZodValidationPipe } from '../http/zod-validation.pipe';
 import type { Db } from '../persistence/db';
@@ -24,7 +24,9 @@ export class EmployeesController {
   }
 
   @Get(':id')
-  view(@Param('id') id: string): EmployeeResponse | undefined {
-    return findEmployee(this.db, Number(id));
+  view(@Param('id') id: string): EmployeeResponse {
+    const employee = findEmployee(this.db, Number(id));
+    if (!employee) throw new NotFoundException(`Employee ${id} does not exist`);
+    return employee;
   }
 }

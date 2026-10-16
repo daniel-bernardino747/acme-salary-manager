@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { ESLint } from 'eslint';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 // ADR 0002 "Module seams", as amended by ADR 0003: domain → contract only; persistence → domain;
 // Nest modules → both.
@@ -15,6 +15,10 @@ async function restrictedImports(file: string, specifier: string): Promise<numbe
 }
 
 describe('layer imports', () => {
+  // The first lint loads the whole config, which can pass a test's 5 s budget under a full parallel
+  // run. Paying it once here keeps each case timing only its own lint.
+  beforeAll(() => restrictedImports('domain/money.ts', '@acme/contract'), 30_000);
+
   it.each([
     ['domain/money.ts', '../persistence/db'],
     ['domain/money.ts', '../health/health.controller'],

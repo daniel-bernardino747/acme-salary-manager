@@ -57,4 +57,18 @@ describe('payComparison', () => {
       max: usd(25_000_01),
     });
   });
+
+  it('gives a country with no employees of the title headcount 0 and null figures, never 0', () => {
+    const rows = payComparison([salary('US', 100_000_00, 'USD')], rates);
+
+    expect(rows.find((row) => row.country === 'NL')).toEqual({
+      country: 'NL',
+      headcount: 0,
+      smallGroup: false,
+      min: null,
+      median: null,
+      average: null,
+      max: null,
+    });
+  });
 });

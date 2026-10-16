@@ -1,4 +1,4 @@
-import { formatMoney, type EmployeeResponse, type PayStatisticsResponse } from '@acme/contract';
+import { formatMoney, type EmployeeResponse } from '@acme/contract';
 import { Alert, Anchor, Box, Button, Group, Modal, Skeleton, Stack, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -8,7 +8,7 @@ import { apiFetch } from '../api/api-fetch';
 import { employeePath } from '../api/employees-path';
 import { employeesQuery } from '../api/employees-query';
 import { errorText } from '../api/error-text';
-import { payStatisticsPath } from '../api/pay-statistics-path';
+import { payStatisticsQuery } from '../api/pay-statistics-query';
 import { queryKey } from '../api/query-key';
 import { useEmployee } from '../api/use-employee';
 import { CountryStamp, Figure, Muted, PageHeader, Panel, RangeBar } from '../components/document';
@@ -132,10 +132,7 @@ function MetaLink({ search, children }: { search: EmployeesSearch; children: Rea
 function Peers({ employee }: { employee: EmployeeResponse }) {
   const { jobTitle, country } = employee;
   const search = { jobTitle, country };
-  const query = useQuery({
-    queryKey: queryKey('pay-statistics', search),
-    queryFn: () => apiFetch<PayStatisticsResponse>(payStatisticsPath(search) ?? ''),
-  });
+  const query = useQuery(payStatisticsQuery(search));
   return (
     <Panel title="Peers">
       <Text size="sm" c="gray.7">

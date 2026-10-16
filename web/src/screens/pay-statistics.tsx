@@ -1,16 +1,8 @@
-import {
-  countries,
-  formatMoney,
-  jobTitles,
-  type Money,
-  type PayStatisticsResponse,
-} from '@acme/contract';
+import { formatMoney, jobTitles, type Money, type PayStatisticsResponse } from '@acme/contract';
 import { Alert, Anchor, Group, Select, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
-import { apiFetch } from '../api/api-fetch';
-import { payStatisticsPath } from '../api/pay-statistics-path';
-import { queryKey } from '../api/query-key';
+import { payStatisticsQuery } from '../api/pay-statistics-query';
 import { CountryStamp, Figure, Muted, PageHeader, Panel, RangeBar } from '../components/document';
 import { QueryState } from '../components/query-state';
 import {
@@ -23,8 +15,7 @@ import {
 import { pageQuestion } from '../layout/navigation';
 import { statisticsSearchSchema } from '../routes/search';
 import classes from './pay-statistics.module.css';
-
-const countryOptions = countries.map((country) => ({ value: country.code, label: country.name }));
+import { countryOptions } from '../format/country-name';
 
 /** Counts in the app's one locale (ADR 0004, *Copy and locale*). */
 const counts = new Intl.NumberFormat('en');
@@ -33,13 +24,7 @@ const counts = new Intl.NumberFormat('en');
 export function PayStatistics() {
   const search = useSearch({ from: '/pay/statistics' });
   const navigate = useNavigate({ from: '/pay/statistics' });
-  const path = payStatisticsPath(search);
-  const query = useQuery({
-    queryKey: queryKey('pay-statistics', search),
-    // Disabled until both are picked, so `path` is set whenever this runs.
-    queryFn: () => apiFetch<PayStatisticsResponse>(path ?? ''),
-    enabled: path !== null,
-  });
+  const query = useQuery(payStatisticsQuery(search));
   // Each pick pushes a history entry, so Back returns to the previous question.
   // A cleared select's null falls back to unset through the URL's lenient schema.
   const pick = (change: { jobTitle?: string | null; country?: string | null }) =>

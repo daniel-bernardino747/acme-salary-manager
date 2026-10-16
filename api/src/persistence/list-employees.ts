@@ -1,24 +1,8 @@
-import {
-  currencyOf,
-  type CountryCode,
-  type Department,
-  type EmployeeResponse,
-  type JobTitle,
-} from '@acme/contract';
+import { currencyOf, type EmployeeListQuery, type EmployeeResponse } from '@acme/contract';
 import { and, count, eq, getTableColumns, sql } from 'drizzle-orm';
 import type { Db } from './db';
 import { nameMatch } from './name-match';
 import { employees } from './schema';
-
-export interface EmployeeListQuery {
-  page: number;
-  pageSize: number;
-  /** A name search: the prefix of each word (ADR 0002, *Name search*). */
-  q?: string;
-  country?: CountryCode;
-  department?: Department;
-  jobTitle?: JobTitle;
-}
 
 export interface EmployeeList {
   items: EmployeeResponse[];

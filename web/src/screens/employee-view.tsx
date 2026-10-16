@@ -257,7 +257,7 @@ function DeleteEmployee({ employee, opened, onClose }: DeleteEmployeeProps) {
           given to anyone else.
         </Text>
         {remove.isError && (
-          <Alert color="red" title="Could not delete">
+          <Alert color="red.8" title="Could not delete">
             {errorText(remove.error)}
           </Alert>
         )}

@@ -214,7 +214,7 @@ function EmployeeForm({ initialValues, submitLabel, send }: EmployeeFormProps) {
           </Stack>
         </Panel>
         {formError && (
-          <Alert color="red" title="Could not save">
+          <Alert color="red.8" title="Could not save">
             {formError}
           </Alert>
         )}

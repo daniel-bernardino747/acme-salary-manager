@@ -2,7 +2,7 @@ import type { INestApplication, ModuleMetadata } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { afterAll, beforeAll, beforeEach } from 'vitest';
-import { AppModule } from '../src/app.module';
+import { AppModule, type AppOptions } from '../src/app.module';
 import { configureApp } from '../src/configure-app';
 import { DB } from '../src/database.module';
 import { clearEmployees } from '../src/persistence/clear-employees';
@@ -15,13 +15,14 @@ export interface TestApp {
   http: () => ReturnType<typeof request>;
 }
 
-/** Boots one app per test file on a fresh `:memory:` database, plus any test-only controllers. */
-export async function bootTestApp(
-  extra: Pick<ModuleMetadata, 'controllers'> = {},
-): Promise<TestApp> {
+/** Test-only controllers, and the built web app to serve, if the test needs one. */
+export type TestAppOptions = Pick<ModuleMetadata, 'controllers'> & Pick<AppOptions, 'webRoot'>;
+
+/** Boots one app per test file on a fresh `:memory:` database. */
+export async function bootTestApp(options: TestAppOptions = {}): Promise<TestApp> {
   const moduleRef = await Test.createTestingModule({
-    imports: [AppModule.forRoot({ databasePath: ':memory:' })],
-    controllers: extra.controllers ?? [],
+    imports: [AppModule.forRoot({ databasePath: ':memory:', webRoot: options.webRoot })],
+    controllers: options.controllers ?? [],
   }).compile();
   const app = moduleRef.createNestApplication({ logger: false });
   configureApp(app);
@@ -33,10 +34,10 @@ export async function bootTestApp(
  * Registers the per-file lifecycle (ADR 0006): one app booted before all tests, an empty employees
  * table before each, and the app closed after all. Read the returned object inside tests only.
  */
-export function useTestApp(extra: Pick<ModuleMetadata, 'controllers'> = {}): TestApp {
+export function useTestApp(options: TestAppOptions = {}): TestApp {
   const t = {} as TestApp;
   beforeAll(async () => {
-    Object.assign(t, await bootTestApp(extra));
+    Object.assign(t, await bootTestApp(options));
   });
   beforeEach(() => clearEmployees(t.db));
   afterAll(() => t.app.close());

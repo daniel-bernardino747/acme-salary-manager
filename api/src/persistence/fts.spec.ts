@@ -1,18 +1,9 @@
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { insertEmployee } from '../../test/builders';
+import { matchingIds } from '../../test/fts';
 import { createDb, type Db } from './db';
 import { employees } from './schema';
-
-/** Ids whose indexed name matches an FTS5 query, through the external-content index only. */
-function matchingIds(db: Db, query: string): number[] {
-  return db.$client
-    .prepare<[string], { id: number }>(
-      'SELECT rowid AS id FROM employees_fts WHERE employees_fts MATCH ? ORDER BY rowid',
-    )
-    .all(query)
-    .map((row) => row.id);
-}
 
 describe('name search index', () => {
   let db: Db;

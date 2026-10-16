@@ -4,7 +4,7 @@ import { countries, jobTitles, type JobTitle } from '@acme/contract';
 const MIN_EMPLOYEE_QUERY = 2;
 
 /** How many employees the overlay lists; "See all" opens the rest in the list. */
-const EMPLOYEE_RESULTS = 8;
+export const EMPLOYEE_RESULTS = 8;
 
 /** How many job titles the overlay lists. */
 const JOB_TITLE_RESULTS = 4;
@@ -23,7 +23,8 @@ export function employeeSearchPath(query: string): string {
   return `/api/employees?${params}`;
 }
 
-const matches = (text: string, query: string) =>
+/** Whether `text` contains the query, ignoring case and surrounding spaces. */
+export const matches = (text: string, query: string) =>
   text.toLocaleLowerCase('en').includes(query.trim().toLocaleLowerCase('en'));
 
 /** Job titles containing the query, in the reference order, from the contract with no request. */

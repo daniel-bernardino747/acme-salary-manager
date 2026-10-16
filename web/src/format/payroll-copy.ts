@@ -1,5 +1,4 @@
 import type { CountryCode, Money, Rates } from '@acme/contract';
-import { employeeCount } from './counts';
 import { inCountry } from './pay-statistics-copy';
 import { placeDecimal } from './place-decimal';
 import { wholeUnits } from './whole-units';
@@ -16,11 +15,6 @@ export function shareText(sharePermille: number | null, total: Money): string {
     return '<0.1%';
   }
   return `${placeDecimal(sharePermille, 1)}%`;
-}
-
-/** The landing screen's first line, in whole USD (ADR 0001, *USD totals*; ADR 0004, *Question 2*). */
-export function payrollHeadline({ headcount, usd }: { headcount: number; usd: Money }): string {
-  return `Annual payroll: ${wholeUnits(usd)} · ${employeeCount(headcount)}`;
 }
 
 /**

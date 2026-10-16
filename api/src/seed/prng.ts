@@ -61,3 +61,13 @@ export function streamFor(...keys: readonly string[]): Uint32Source {
     digest.readUInt32BE(12),
   ]);
 }
+
+/** A Fisher–Yates shuffle of a copy of `items`, drawing from `next`. */
+export function shuffle<T>(next: Uint32Source, items: readonly T[]): T[] {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = intInRange(next, 0, i);
+    [result[i], result[j]] = [result[j] as T, result[i] as T];
+  }
+  return result;
+}

@@ -3,6 +3,7 @@ import {
   emptyGroupText,
   seeEmployeesText,
   smallGroupNotice,
+  peerGroupName,
   statisticsHeading,
 } from './pay-statistics-copy';
 
@@ -49,4 +50,16 @@ describe('seeEmployeesText', () => {
   ])('links a group of %i to the list as "%s"', (headcount, text) => {
     expect(seeEmployeesText(headcount)).toBe(text);
   });
+});
+
+describe('peerGroupName', () => {
+  it.each([
+    ['Software Engineer II', 'IN', 'Software Engineer II in India'],
+    ['Senior Data Scientist', 'NL', 'Senior Data Scientist in the Netherlands'],
+  ] as const)(
+    'names %s in %s without the currency, which its stamp shows',
+    (jobTitle, country, name) => {
+      expect(peerGroupName({ jobTitle, country })).toBe(name);
+    },
+  );
 });

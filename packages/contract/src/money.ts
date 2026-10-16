@@ -9,3 +9,6 @@ export const moneySchema = z.strictObject({
   currency: currencySchema,
 });
 export type Money = z.infer<typeof moneySchema>;
+
+/** Money in US cents, as every USD figure crosses the wire; whole dollars are display only (ADR 0001). */
+export const usdMoneySchema = moneySchema.extend({ currency: z.literal('USD') });

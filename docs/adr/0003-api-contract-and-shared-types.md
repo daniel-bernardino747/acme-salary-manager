@@ -82,6 +82,7 @@ Everything is under `/api`. The SPA fallback excludes `/api`, so an unknown `/ap
 
   `errors[].path` is the Zod issue path, so the UI attaches each message to its form field without a mapping table.
 - **Statuses:** 400 for any request that fails its schema, query or body. 404 for an unknown employee or an unknown `/api` route. 500 is a generic problem body with no stack trace or SQL in it, and the detail is logged on the server.
+  *Amended during the web shell (#12):* a deliberate 5xx `HttpException` (e.g. `ServiceUnavailableException`) keeps its status, with the same generic body: its title is the status text and its detail never carries the exception's own message, which is logged like any 5xx. Any other error is a 500.
 - **Responses are not parsed at runtime.** Services are typed through `z.infer`, and the HTTP tests parse every response with its response schema.
 
 **Employee request body:** `{ name, jobTitle, department, country, annualSalaryMinor }`. The schema is strict and has no `currency` field (it follows from country), so a request that sends one is rejected.

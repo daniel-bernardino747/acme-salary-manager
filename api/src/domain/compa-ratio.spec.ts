@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { compaRatioHundredths } from './compa-ratio';
+import { compaRatioHundredths, gapMinor } from './compa-ratio';
 
 describe('compaRatioHundredths', () => {
   it.each([
@@ -33,5 +33,19 @@ describe('compaRatioHundredths', () => {
     ['1.30', 13_000_00, 10_000_00, 130],
   ])('rounds a compa-ratio of %s up when it is above 1.20', (_, salary, median, hundredths) => {
     expect(compaRatioHundredths(salary, median)).toBe(hundredths);
+  });
+});
+
+describe('gapMinor', () => {
+  it.each([
+    // 80 · $10,000.00 divides exactly by 100: $8,000.00 is the smallest salary at 0.80, so
+    // $7,996.00 is $4.00 short.
+    ['divides exactly by 100', 7_996_00, 10_000_00, 4_00],
+    // 80 · $10,000.01 / 100 = $8,000.008, so the smallest salary at or above 0.80 is $8,000.01.
+    ['leaves a remainder, rounding the target up', 7_999_99, 10_000_01, 2],
+    // ¥5,000,000 · 0.80 = ¥4,000,000, and JPY's minor unit is one yen.
+    ['is in yen', 3_999_999, 5_000_000, 1],
+  ])('gives the raise that reaches 0.80 when 80 · median %s', (_, salary, median, gap) => {
+    expect(gapMinor(salary, median)).toBe(gap);
   });
 });

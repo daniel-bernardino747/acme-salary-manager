@@ -27,4 +27,26 @@ describe('employeeProblem', () => {
       formError: null,
     });
   });
+
+  const notFound: Problem = {
+    type: 'about:blank',
+    title: 'Not Found',
+    status: 404,
+    detail: 'Employee 7 does not exist',
+  };
+  const serverError: Problem = {
+    type: 'about:blank',
+    title: 'Internal Server Error',
+    status: 500,
+    detail: 'An unexpected error occurred',
+  };
+  const noDetail: Problem = { type: 'about:blank', title: 'Bad Gateway', status: 502 };
+
+  it.each([
+    ['an unknown employee', notFound, 'Employee 7 does not exist'],
+    ['a server error', serverError, 'An unexpected error occurred'],
+    ['a problem with no detail', noDetail, 'Bad Gateway'],
+  ])('shows %s, which has no errors, as a form-level alert', (_, problem, alert) => {
+    expect(employeeProblem(problem)).toEqual({ fieldErrors: {}, formError: alert });
+  });
 });

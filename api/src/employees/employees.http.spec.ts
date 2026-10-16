@@ -205,3 +205,42 @@ describe('POST /api/employees', () => {
     expect(employeeResponseSchema.parse(stored.body)).toEqual(created);
   });
 });
+
+describe('POST /api/employees with an invalid body', () => {
+  it.each([
+    ['a currency, which follows from the country', { ...priya, currency: 'INR' }, []],
+    ['a missing field', { ...priya, annualSalaryMinor: undefined }, ['annualSalaryMinor']],
+    ['a salary of 0', { ...priya, annualSalaryMinor: 0 }, ['annualSalaryMinor']],
+    [
+      'a salary above the cap',
+      { ...priya, annualSalaryMinor: 900_000_000_001 },
+      ['annualSalaryMinor'],
+    ],
+    ['a country not in the list', { ...priya, country: 'UK' }, ['country']],
+    ['a department not in the list', { ...priya, department: 'Legal' }, ['department']],
+    ['a job title not in the list', { ...priya, jobTitle: 'CEO' }, ['jobTitle']],
+  ])('is a 400 problem naming the path of %s, and adds nobody', async (_, body, path) => {
+    const res = await t.http().post('/api/employees').send(body).expect(400);
+
+    expect(res.headers['content-type']).toMatch(/^application\/problem\+json/);
+    const problem = problemSchema.parse(res.body);
+    expect(problem).toMatchObject({
+      title: 'Validation failed',
+      status: 400,
+      detail: 'Request body is invalid',
+    });
+    expect(problem.errors?.map((error) => error.path)).toEqual([path]);
+    const list = await t.http().get('/api/employees').expect(200);
+    expect(employeeListResponseSchema.parse(list.body).total).toBe(0);
+  });
+
+  it('names the unknown currency field in its message', async () => {
+    const res = await t
+      .http()
+      .post('/api/employees')
+      .send({ ...priya, currency: 'INR' })
+      .expect(400);
+
+    expect(problemSchema.parse(res.body).errors?.[0]?.message).toContain('currency');
+  });
+});

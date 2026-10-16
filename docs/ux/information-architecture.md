@@ -2,7 +2,7 @@
 
 The app has one user, the HR Manager. Today it is organized around its four pay questions, each written out as a sentence in the sidebar, and it opens on a payroll table. This document reorganizes it around the jobs that user does most often (see `hr-manager-research.md`). It uses only the existing endpoints and keeps every route in ADR 0004.
 
-**Status:** proposal, waiting for approval. No UI code depends on it yet.
+**Status:** approved on 2026-10-16, with the decisions recorded at the end of this document.
 
 ## Principles
 
@@ -49,14 +49,14 @@ Not on home, on purpose: department totals (payroll screen), the cross-country c
 |---|---|---|---|
 | — | **Overview** | `/` | — |
 | — | **Employees** | `/employees` | — |
-| Pay | **Pay ranges** | `/pay/statistics` | What do we pay for a job title in a country? |
+| Pay | **Pay by role** | `/pay/statistics` | What do we pay for a job title in a country? |
 | Pay | **Outliers** | `/pay/outliers` | Who is paid out of line with their peers? |
 | Pay | **Payroll** | `/pay/payroll` | What is our payroll total, by country and department? |
 | Pay | **Across countries** | `/pay/comparison` | How does pay for a job title compare across countries? |
 
 - The group heading is **Pay**, not "Pay questions": the labels are places, not questions.
-- **Order** follows the research ranking (`hr-manager-research.md`, section 3): Employees serves jobs 1–3, Pay ranges job 4, Outliers jobs 5 and 7, Payroll job 6, Across countries job 8.
-- **"Pay ranges"** is what HR people call min to max for a role. The page keeps the glossary's term, *pay statistics*, in its heading and copy.
+- **Order** follows the research ranking (`hr-manager-research.md`, section 3): Employees serves jobs 1–3, Pay by role job 4, Outliers jobs 5 and 7, Payroll job 6, Across countries job 8.
+- **"Pay by role"** is the nav label for question 1. The page title stays **Pay statistics**, the glossary's term, with the question as its subtitle. "Pay ranges" was rejected: in HR it means policy bands, and pay grades are out of scope (`docs/requirements.md`).
 - **Outliers** shows the underpaid count as a badge in the nav (from the cached underpaid query), so the to-do count is visible from every screen.
 
 ### One click from anywhere
@@ -92,7 +92,7 @@ Existing links stay. New ones are in **bold**.
 | Overview | **overpaid count** | **`/pay/outliers?direction=above`** |
 | Overview | **job title and country picker** | **`/pay/statistics?jobTitle=…&country=…`** |
 | Employee list | a row | `/employees/$id` |
-| Employee list | **with both job title and country filtered: "Pay ranges for this group"** | **`/pay/statistics?jobTitle=…&country=…`** |
+| Employee list | **with both job title and country filtered: "Pay statistics for this group"** | **`/pay/statistics?jobTitle=…&country=…`** |
 | Employee view | "Compare with peers" | `/pay/statistics?jobTitle=…&country=…` |
 | Employee view | **the peer median in the new Peers panel** | **`/pay/statistics?jobTitle=…&country=…`** |
 | Employee view | **"See the 47 peers"** | **`/employees?jobTitle=…&country=…`** |
@@ -112,7 +112,7 @@ Existing links stay. New ones are in **bold**.
 |---|---|---|---|
 | Landing screen | `/` redirects to the payroll tables | `/` is the Overview | Research: jobs 1–5 come daily or weekly; the payroll tables serve job 6, monthly to quarterly. The grand total, ADR 0001's "first number", moves onto the Overview, so it is still the first number seen. |
 | Sidebar labels | four questions as sentences | short labels; each question becomes its page's subtitle | Scanning six words beats reading four sentences, and the questions are still on screen where they're answered. |
-| Nav order | Employees, then the questions in requirements order | Overview, Employees, Pay ranges, Outliers, Payroll, Across countries | Frequency × urgency (research ranking). |
+| Nav order | Employees, then the questions in requirements order | Overview, Employees, Pay by role, Outliers, Payroll, Across countries | Frequency × urgency (research ranking). |
 | Search | only inside the Employees screen | global, in the header, from every screen | The most frequent job took two clicks and a page load. |
 | Add employee | only on the Employees screen | also in the header | Adding a hire is frequent and shouldn't depend on where you are. |
 | Payroll screen | the landing page | a Pay page; its headline is also on the Overview | Its tables are for budget and finance questions, which come weekly or monthly, not daily. |
@@ -140,7 +140,7 @@ DESKTOP
 │ Employees    │  <question as subtitle>                                                │
 │              │                                                                         │
 │ PAY          │  …                                                                      │
-│ Pay ranges   │                                                                         │
+│ Pay by role  │                                                                         │
 │ Outliers (14)│                                                                         │
 │ Payroll      │                                                                         │
 │ Across ctries│                                                                         │
@@ -156,7 +156,7 @@ PHONE
 ├──────────────────────────────┤        │ Overview             │
 │ <Page title>                 │        │ Employees            │
 │ <subtitle>                   │        │ PAY                  │
-│ …                            │        │ Pay ranges           │
+│ …                            │        │ Pay by role          │
 └──────────────────────────────┘        │ Outliers        (14) │
                                         │ Payroll              │
                                         │ Across countries     │
@@ -175,7 +175,7 @@ PHONE
 │   Aarav Shah      Data Analyst · IN           │
 │   See all employees matching “sha”  →         │
 │ JOB TITLES                                    │
-│   Marketing Specialist → Pay ranges           │
+│   Marketing Specialist → Pay statistics       │
 │ ACTIONS                                       │
 │   + Add employee                              │
 │   Underpaid employees (14)                    │
@@ -194,7 +194,7 @@ DESKTOP
 │ ┌──── Paid out of line ─────────────────────┐ ┌──── What do we pay? ─────────┐ │
 │ │ 14 underpaid                               │ │ [Job title       ▾]           │ │
 │ │ $80,898 a year to bring them to 0.80       │ │ [Country         ▾]           │ │
-│ │                                            │ │ [See pay ranges →]            │ │
+│ │                                            │ │ [See pay statistics →]        │ │
 │ │ Natália Azevedo  SWE I · Brazil      0.62  │ └──────────────────────────────┘ │
 │ │ Rohan Shah       CS Spec · India     0.64  │ ┌──── Annual payroll ──────────┐ │
 │ │ Diego Castro     QA Eng · Brazil     0.66  │ │ $669,197,391                  │ │
@@ -244,7 +244,7 @@ DESKTOP
 │ Aarav Agarwal      Customer Support Spec     Cust Support India  ₹762,400.00   │
 │ …                                                                              │
 │ 1–25 of 10,000                                           ‹ 1 2 3 … 400 ›       │
-│ (when title + country are filtered:) Pay ranges for SWE II in India →          │
+│ (when title + country are filtered:) Pay statistics for SWE II in India →      │
 └───────────────────────────────────────────────────────────────────────────────┘
 
 PHONE
@@ -272,7 +272,7 @@ DESKTOP
 │ Customer Support Specialist · Customer Support · India   (each a link)         │
 │                                                                                │
 │ Annual salary                         Peers: Customer Support Specialist, India │
-│ ₹762,400.00 INR                       Median ₹803,100.00  (→ pay ranges)        │
+│ ₹762,400.00 INR                       Median ₹803,100.00  (→ pay statistics)    │
 │                                       ├──────●───────┼──────────┤               │
 │                                       min ₹…   this   median    max ₹…          │
 │                                       423 employees · See the 423 peers →       │
@@ -306,12 +306,12 @@ DESKTOP                                         PHONE
 Behaviour unchanged (ADR 0004, Forms). Only layout and grouping change.
 ```
 
-### Pay ranges (`/pay/statistics`)
+### Pay statistics (`/pay/statistics`, nav label "Pay by role")
 
 ```text
 DESKTOP
 ┌───────────────────────────────────────────────────────────────────────────────┐
-│ Pay ranges                                                                     │
+│ Pay statistics                                                                 │
 │ What do we pay for a job title in a country?                                   │
 │ [Job title: Software Engineer II ▾] [Country: India ▾]                         │
 │                                                                                │
@@ -374,7 +374,7 @@ DESKTOP
 │ How does pay for a job title compare across countries?                         │
 │ [Job title: Software Engineer II ▾]                                            │
 │ Median salary of Software Engineer II, in USD                                  │
-│ United States  ████████████████████████████  $130,000   (bars link to Pay ranges)│
+│ United States  ████████████████████████████  $130,000   (bars link to Pay stats)│
 │ United Kingdom ███████████████              $…                                  │
 │ …                                       ■ 5 or more  ■ fewer than 5            │
 │ Country  Headcount  Min  Median  Average  Max   (table as today)               │
@@ -392,7 +392,6 @@ DESKTOP
 │ Payroll                                                                        │
 │ What is our payroll total, by country and department?                          │
 │ Annual payroll  $669,197,391   ·   10,000 employees                            │
-│ [By country | By department]  (tabs, both one click)                           │
 │ Country        Headcount   Local total      USD total     Share                │
 │ United States      2,800   $346,783,800   $346,783,800   ███████ 51.8%  ⋯      │
 │ …                                                                              │
@@ -401,7 +400,7 @@ DESKTOP
 PHONE: rows: country + share, then USD total large, local total and headcount small.
 ```
 
-Question: tabs or both tables stacked? Proposal: **both tables stacked as today on desktop** (they fit), tabs only on phone. Listed as an open choice below.
+Both tables are stacked, countries first, on desktop and on phone. No tabs.
 
 ### Not found
 
@@ -420,11 +419,13 @@ There is no page at this address.
   - **Prefilling "Add employee" from a filtered list** (research, inference) would need search params on `/employees/new`. Left as a follow-up.
 - **Follow-ups (need the API):** a compa-ratio and outlier flag on the employee resource; a reference-count endpoint so nav badges don't need a full outliers request; "recently edited" on the Overview (needs history, out of scope).
 
-## Open choices for the reviewer
+## Decisions (2026-10-16)
 
-1. **Payroll on phone:** tabs (By country / By department) or both stacked.
-2. **Label for question 1:** "Pay ranges" (HR wording) or "Pay statistics" (the glossary term).
-3. **Outliers badge in the nav:** the underpaid count on every screen costs one cached request per 30 s.
+1. **The Overview is `/`**, with amendment 4.
+2. **Question 1's nav label is "Pay by role"**; its page title stays "Pay statistics", with the question as its subtitle. Not "Pay ranges": in HR that means policy bands, and pay grades are out of scope.
+3. **The underpaid count shows as a badge on Outliers in the nav**, sharing the Overview's query.
+4. **Payroll on a phone:** both tables stacked, countries first. No tabs.
+5. **The compa-ratio on the employee page** becomes its own ticket after this work ships. It needs a field from the API, which is out of scope for this redesign.
 
 ## ADR 0004 amendments this implies
 
@@ -434,10 +435,10 @@ Applied as one `docs(adr):` commit before any code, in ADR 0004's style: the rep
 2. **Libraries.** Add: **`@mantine/spotlight`** for the global search overlay. No other new dependency.
 3. **Data fetching, debounce.** ~~The search box keeps local state, and the debounce lives in exactly that one place.~~ → There are two search boxes, the list's and the global search. Each keeps local state and debounces in one place, through one shared 300 ms constant. Only the list's writes `q` to the URL.
 4. **Routing table, `/`.** ~~redirects to `/pay/payroll`: the app opens on the grand total, the first number the HR Manager asks for (ADR 0001)~~ → **Overview**: the grand total (still the first number on screen, ADR 0001), the underpaid count, cost and top five, the overpaid count, a pay-ranges picker and employee search. No search params.
-5. **Routing, navigation bullet.** ~~Navigation is a Mantine `AppShell` sidebar: "Employees", then a "Pay questions" group listing the four, each labelled as the question it answers.~~ → Navigation is a Mantine `AppShell` sidebar: Overview, Employees, then a **Pay** group: Pay ranges, Outliers, Payroll, Across countries. Each pay page shows its question as a subtitle under its title. Outliers carries the underpaid count, from the same cached query as the Overview. The header has global search (`Ctrl`/`⌘`+`K`, `/`) and "Add employee" on every screen.
+5. **Routing, navigation bullet.** ~~Navigation is a Mantine `AppShell` sidebar: "Employees", then a "Pay questions" group listing the four, each labelled as the question it answers.~~ → Navigation is a Mantine `AppShell` sidebar: Overview, Employees, then a **Pay** group: Pay by role (the pay statistics page), Outliers, Payroll, Across countries. Each pay page keeps its title (Pay statistics, Outliers, Payroll, Across countries) and shows its question as a subtitle under it. Outliers carries the underpaid count, from the same cached query as the Overview. The header has global search (`Ctrl`/`⌘`+`K`, `/`) and "Add employee" on every screen.
 6. **New section, Global search.** As in *Global search* above: employees from `GET /api/employees?q=&page=1&pageSize=8` (at least 2 characters), job titles and countries from `@acme/contract`, four actions, and "See all employees matching …" → `/employees?q=…`.
 7. **New section, Overview (`/`).** The figures table and the empty and error states: each panel has its own `QueryState`, so a failed outliers request never hides the payroll total. An empty organization shows `$0`, "No employees yet" and Add employee, as the payroll screen does today.
-8. **Employee list.** Add: on a phone each row is stacked (name; job title · country; salary). With both job title and country filtered, a "Pay ranges for this group" link → `/pay/statistics`.
+8. **Employee list.** Add: on a phone each row is stacked (name; job title · country; salary). With both job title and country filtered, a "Pay statistics for this group" link → `/pay/statistics`.
 9. **Employee view.** ~~The view page does not show a compa-ratio. "Compare with peers" answers that one click away.~~ → The view adds a **Peers** panel from `GET /api/pay-statistics` for the employee's job title and country: the peer median (linking to pay statistics), the headcount (linking to the filtered list), and a min-to-max range with the employee's salary marked. A small group shows its notice instead of the range. The view still shows no compa-ratio; that needs a field on the employee resource (follow-up). Job title, department and country link to the filtered list.
 10. **Question 1.** Add: the median leads, larger than the other figures; min to max is drawn as a range with the average marked. All five figures stay as text with exact minor units.
 11. **Question 2.** ~~(`/pay/payroll`, the landing screen)~~ → (`/pay/payroll`). Add: a country row also offers "Outliers in this country" → `/pay/outliers?country=…`. On a phone each row is stacked.

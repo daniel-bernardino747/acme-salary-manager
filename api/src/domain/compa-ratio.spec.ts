@@ -23,4 +23,15 @@ describe('compaRatioHundredths', () => {
   ])('rounds a compa-ratio of %s down when it is below 0.80', (_, salary, median, hundredths) => {
     expect(compaRatioHundredths(salary, median)).toBe(hundredths);
   });
+
+  it.each([
+    // 12,004 / 10,000 = 1.2004 would round half up to 1.20, the boundary it is flagged for crossing.
+    ['1.2004', 12_004_00, 10_000_00, 121],
+    // Exactly 1.20 is not above it, so it stays 1.20.
+    ['1.20', 12_000_00, 10_000_00, 120],
+    // A whole hundredth above stays where it is: 13,000 / 10,000 = 1.30.
+    ['1.30', 13_000_00, 10_000_00, 130],
+  ])('rounds a compa-ratio of %s up when it is above 1.20', (_, salary, median, hundredths) => {
+    expect(compaRatioHundredths(salary, median)).toBe(hundredths);
+  });
 });

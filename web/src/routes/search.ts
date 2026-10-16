@@ -95,6 +95,27 @@ export function changeOutliersSearch(
   return outliersSearchSchema.parse({ ...search, ...change, page: 1 });
 }
 
+/**
+ * The employee list on question 4's filters, from its first page: "See all employees with these
+ * filters" (ADR 0004, *Question 4*, as amended by #40). The direction has no meaning there.
+ */
+export function employeesSearchFromOutliers({
+  country,
+  department,
+  jobTitle,
+}: OutliersSearch): EmployeesSearch {
+  return employeesSearchSchema.parse({ page: 1, country, department, jobTitle });
+}
+
+/** How many of the three filters are set, for the phone's "Filters" button. */
+export function activeFilterCount(filters: {
+  country?: string;
+  department?: string;
+  jobTitle?: string;
+}): number {
+  return [filters.country, filters.department, filters.jobTitle].filter(Boolean).length;
+}
+
 /** Question 1 picks both with no defaults: nothing is fetched until both are set. */
 export const statisticsSearchSchema = z.object({ jobTitle, country });
 export type StatisticsSearch = z.infer<typeof statisticsSearchSchema>;

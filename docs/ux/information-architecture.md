@@ -185,6 +185,8 @@ Phone: the same overlay, full screen.
 
 ### Overview (`/`)
 
+*Amended on 2026-10-16 to follow ADR 0004:* the grand total is the first number on screen, so **Annual payroll** is the first panel (top-left), followed by **Paid out of line**, then **What do we pay?**. The wireframe below shows the layout before this change.
+
 ```text
 DESKTOP
 ┌───────────────────────────────────────────────────────────────────────────────┐

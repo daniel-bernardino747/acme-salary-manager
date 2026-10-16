@@ -189,4 +189,25 @@ describe('findOutliers ranking', () => {
       nearerOutlier.employee,
     ]);
   });
+
+  it('orders equal distances by name, then id, as the list orders employees', () => {
+    // Median $10,000.00 (the mean of two middle 10,000s): 0.70 and 1.30 are both 0.30 away.
+    const firstAna = member(13_000_00, { name: 'Ana Lima' });
+    const secondAna = member(7_000_00, { name: 'Ana Lima' });
+    const bea = member(7_000_00, { name: 'Bea Costa' });
+    const group = [
+      bea,
+      secondAna,
+      member(10_000_00),
+      firstAna,
+      member(10_000_00),
+      member(10_000_00),
+    ];
+
+    const { outliers } = findOutliers(group);
+
+    expect(outliers.map((o) => o.employee)).toEqual(
+      [firstAna, secondAna, bea].map((m) => m.employee),
+    );
+  });
 });

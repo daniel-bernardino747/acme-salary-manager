@@ -5,17 +5,19 @@ import {
   type EmployeeRequest,
   type EmployeeResponse,
 } from '@acme/contract';
-import { Alert, Button, Group, Select, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Alert, Anchor, Button, Group, Select, Stack, Text, TextInput } from '@mantine/core';
 import { schemaResolver, useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useCanGoBack, useNavigate, useParams, useRouter } from '@tanstack/react-router';
+import { Link, useCanGoBack, useNavigate, useParams, useRouter } from '@tanstack/react-router';
 import { useState } from 'react';
 import { apiFetch, ApiProblem } from '../api/api-fetch';
 import { employeePath } from '../api/employees-path';
 import { errorText } from '../api/error-text';
 import { useEmployee } from '../api/use-employee';
+import { PageHeader, Panel } from '../components/document';
 import { EmployeeNotFound } from '../components/employee-not-found';
+import { ChevronLeftIcon } from '../components/icons';
 import { QueryState } from '../components/query-state';
 import {
   currencyOfPicked,
@@ -27,14 +29,15 @@ import {
   type EmployeeFormValues,
 } from '../forms/employee-form';
 import { employeeProblem } from '../forms/employee-problem';
+import classes from './employee-form-pages.module.css';
 
 const countryOptions = countries.map((country) => ({ value: country.code, label: country.name }));
 
 /** `/employees/new` (ADR 0004, *Forms: add and edit*). */
 export function AddEmployee() {
   return (
-    <Stack gap="md">
-      <Title order={2}>Add employee</Title>
+    <Stack gap={0}>
+      <PageHeader title="Add employee" back={<BackLink />} />
       <EmployeeForm
         initialValues={emptyEmployeeForm}
         submitLabel="Add employee"
@@ -54,8 +57,8 @@ export function EditEmployee() {
   return (
     <QueryState query={query}>
       {(employee) => (
-        <Stack gap="md">
-          <Title order={2}>Edit {employee.name}</Title>
+        <Stack gap={0}>
+          <PageHeader title={`Edit ${employee.name}`} back={<BackLink />} />
           <EmployeeForm
             key={employee.id}
             initialValues={employeeFormValues(employee)}
@@ -151,75 +154,104 @@ function EmployeeForm({ initialValues, submitLabel, send }: EmployeeFormProps) {
         save.mutate(body);
       })}
     >
-      <Stack gap="md" maw={520}>
-        <TextInput
-          label="Name"
-          required
-          maxLength={100}
-          key={form.key('name')}
-          {...form.getInputProps('name')}
-        />
-        <Select
-          label="Job title"
-          placeholder="Pick a job title"
-          required
-          searchable
-          data={jobTitles}
-          {...select('jobTitle')}
-        />
-        <Select
-          label="Department"
-          placeholder="Pick a department"
-          required
-          data={departments}
-          {...select('department')}
-        />
-        <Select
-          label="Country"
-          placeholder="Pick a country"
-          required
-          data={countryOptions}
-          {...form.getInputProps('country')}
-          value={country || null}
-          onChange={changeCountry}
-        />
-        <TextInput
-          label="Annual salary"
-          required
-          inputMode="decimal"
-          autoComplete="off"
-          disabled={currency === null}
-          placeholder={currency === null ? undefined : 'e.g. 1,250,000.50'}
-          description={currency === null ? 'Pick a country first.' : undefined}
-          rightSection={
-            currency && (
-              <Text size="sm" c="dimmed">
-                {currency}
+      <Stack gap="lg" maw={640}>
+        <Panel title="Person">
+          <Stack gap="md">
+            <TextInput
+              label="Name"
+              required
+              maxLength={100}
+              key={form.key('name')}
+              {...form.getInputProps('name')}
+            />
+            <Select
+              label="Job title"
+              placeholder="Pick a job title"
+              required
+              searchable
+              data={jobTitles}
+              {...select('jobTitle')}
+            />
+            <Select
+              label="Department"
+              placeholder="Pick a department"
+              required
+              data={departments}
+              {...select('department')}
+            />
+            <Select
+              label="Country"
+              placeholder="Pick a country"
+              required
+              data={countryOptions}
+              {...form.getInputProps('country')}
+              value={country || null}
+              onChange={changeCountry}
+            />
+          </Stack>
+        </Panel>
+        <Panel title="Pay">
+          <Stack gap="xs">
+            <TextInput
+              label="Annual salary"
+              required
+              inputMode="decimal"
+              autoComplete="off"
+              disabled={currency === null}
+              placeholder={currency === null ? undefined : 'e.g. 1,250,000.50'}
+              description={
+                currency === null
+                  ? 'Pick a country first.'
+                  : 'Annual gross base pay, digits with optional commas and a decimal point.'
+              }
+              rightSection={currency && <span className={classes.currency}>{currency}</span>}
+              rightSectionWidth={64}
+              {...form.getInputProps('annualSalary')}
+            />
+            {preview && (
+              <Text size="sm" fw={600} c="visa.7" aria-live="polite">
+                {preview}
               </Text>
-            )
-          }
-          rightSectionWidth={56}
-          {...form.getInputProps('annualSalary')}
-        />
-        {preview && (
-          <Text size="sm" c="dimmed" mt={-8} aria-live="polite">
-            {preview}
-          </Text>
-        )}
+            )}
+          </Stack>
+        </Panel>
         {formError && (
           <Alert color="red" title="Could not save">
             {formError}
           </Alert>
         )}
         <Group gap="sm">
-          <Button type="submit" loading={save.isPending}>
+          <Button type="submit" size="md" loading={save.isPending}>
             {submitLabel}
           </Button>
-          <Button variant="default" onClick={cancel} disabled={save.isPending}>
+          <Button variant="default" size="md" onClick={cancel} disabled={save.isPending}>
             Cancel
           </Button>
         </Group>
       </Stack>
     </form>
+  );
+}
+
+/** Back to wherever the form was opened from, as Cancel does. */
+function BackLink() {
+  const router = useRouter();
+  const canGoBack = useCanGoBack();
+  return (
+    <Anchor
+      size="sm"
+      mb="xs"
+      className={classes.back}
+      renderRoot={(props) =>
+        canGoBack ? (
+          <button {...props} type="button" onClick={() => router.history.back()} />
+        ) : (
+          <Link {...props} to="/employees" />
+        )
+      }
+    >
+      <ChevronLeftIcon size={16} />
+      Back
+    </Anchor>
   );
 }

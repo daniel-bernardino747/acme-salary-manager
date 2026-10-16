@@ -22,4 +22,26 @@ describe('payStatistics', () => {
       max: inr(9_000_000),
     });
   });
+
+  it('marks a single-employee group as small, every figure being their salary', () => {
+    expect(payStatistics({ currency: 'INR', salariesMinor: [4_200_000] })).toEqual({
+      headcount: 1,
+      smallGroup: true,
+      min: inr(4_200_000),
+      median: inr(4_200_000),
+      average: inr(4_200_000),
+      max: inr(4_200_000),
+    });
+  });
+
+  it.each([
+    [4, true],
+    [5, false],
+  ])('marks a group of %i as small: %s', (headcount, smallGroup) => {
+    const salariesMinor = Array.from({ length: headcount }, (_, i) => 100 * (i + 1));
+    expect(payStatistics({ currency: 'INR', salariesMinor })).toMatchObject({
+      headcount,
+      smallGroup,
+    });
+  });
 });

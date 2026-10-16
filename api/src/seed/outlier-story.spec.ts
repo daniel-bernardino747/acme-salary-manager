@@ -1,7 +1,8 @@
 import { currencyOf } from '@acme/contract';
 import { describe, expect, it } from 'vitest';
+import { plantedCostToReachThreshold } from '../../test/seed-story';
 import { compaRatioHundredths } from '../domain/compa-ratio';
-import { findOutliers, type PeerGroupMember } from '../domain/outliers';
+import { costToReachThreshold, findOutliers, type PeerGroupMember } from '../domain/outliers';
 import { median } from '../domain/statistics';
 import { inCell } from './cell';
 import { generateEmployees } from './generate-employees';
@@ -55,5 +56,11 @@ describe('the outlier story on the full seed', () => {
         plant.ratioHundredths,
       );
     }
+  });
+
+  it('costs the sum of the planted underpaid gaps to bring everyone underpaid to 0.80', () => {
+    const { outliers } = findOutliers(everyone, 'below');
+
+    expect(costToReachThreshold(outliers)).toEqual(plantedCostToReachThreshold());
   });
 });

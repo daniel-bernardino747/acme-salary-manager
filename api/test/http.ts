@@ -41,6 +41,7 @@ export function useTestApp(options: TestAppOptions = {}): TestApp {
     Object.assign(t, await bootTestApp(options));
   });
   beforeEach(() => clearEmployees(t.db));
-  afterAll(() => t.app.close());
+  // If the boot failed there is no app; closing it must not bury the boot error under a TypeError.
+  afterAll(() => t.app?.close());
   return t;
 }

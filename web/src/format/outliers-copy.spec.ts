@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { costText, noOutliersText, outliersHeadline, uncheckedText } from './outliers-copy';
+import {
+  costFootnote,
+  costText,
+  noOutliersText,
+  outliersHeadline,
+  uncheckedText,
+} from './outliers-copy';
 
 describe('outliersHeadline', () => {
   it.each([
@@ -41,5 +47,14 @@ describe('noOutliersText', () => {
     ['all', 'No employees paid out of line for these filters.'],
   ] as const)('says nobody matched in direction %s', (direction, text) => {
     expect(noOutliersText(direction)).toBe(text);
+  });
+});
+
+describe('costFootnote', () => {
+  it('names the rate source and date, and says each currency is converted once', () => {
+    expect(costFootnote({ source: 'ECB reference rates', asOf: '2026-09-30' })).toBe(
+      'The cost is converted to USD at fixed rates from ECB reference rates, as of 2026-09-30. ' +
+        "Each currency's gaps are added up first and converted once.",
+    );
   });
 });

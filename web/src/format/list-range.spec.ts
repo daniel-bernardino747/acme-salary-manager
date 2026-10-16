@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { listRange } from './list-range';
+import { listRange, pageCount } from './list-range';
 
 describe('listRange', () => {
   it.each([
@@ -9,5 +9,17 @@ describe('listRange', () => {
     [1, 25, 1, '1–1 of 1'],
   ])('shows page %i, at %i a page, of %i employees as "%s"', (page, pageSize, total, text) => {
     expect(listRange({ page, pageSize, total })).toBe(text);
+  });
+});
+
+describe('pageCount', () => {
+  it.each([
+    [9_812, 25, 393],
+    [50, 25, 2],
+    [51, 25, 3],
+    [1, 25, 1],
+    [0, 25, 0],
+  ])('splits %i employees at %i a page into %i pages', (total, pageSize, pages) => {
+    expect(pageCount({ pageSize, total })).toBe(pages);
   });
 });

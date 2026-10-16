@@ -45,6 +45,11 @@ export function anchoredSalaries(next: Uint32Source, group: AnchoredGroup): numb
   if (underpaid.length > half || overpaid.length > half) {
     throw new RangeError(`A group of ${size} has room for ${half} plants on each side.`);
   }
+  const lowestDraw = low * stepMinor;
+  const highestDraw = high * stepMinor;
+  if (underpaid.some((s) => s >= lowestDraw) || overpaid.some((s) => s <= highestDraw)) {
+    throw new RangeError('A planted salary must sit outside the draw range, or ranks would move.');
+  }
   const ascending = (a: number, b: number) => a - b;
   const below = Array.from({ length: half }, () => intInRange(next, low, baseSteps - 1));
   const above = Array.from({ length: half }, () => intInRange(next, baseSteps + 1, high));

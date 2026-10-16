@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  changeEmployeesSearch,
   comparisonSearchSchema,
   employeesSearchSchema,
   outliersSearchSchema,
@@ -115,5 +116,32 @@ describe('comparisonSearchSchema', () => {
   it('keeps a picked title and drops an unknown one', () => {
     expect(parse('?jobTitle=Recruiter')).toEqual({ jobTitle: 'Recruiter' });
     expect(parse('?jobTitle=recruiter')).toEqual({});
+  });
+});
+
+describe('changeEmployeesSearch', () => {
+  const current = { page: 4, q: 'pri', country: 'IN', department: 'Data' } as const;
+
+  it('applies a new search or filter and goes back to the first page', () => {
+    expect(changeEmployeesSearch(current, { q: 'pri sha' })).toEqual({
+      page: 1,
+      q: 'pri sha',
+      country: 'IN',
+      department: 'Data',
+    });
+    expect(changeEmployeesSearch(current, { jobTitle: 'Data Scientist' })).toEqual({
+      page: 1,
+      q: 'pri',
+      country: 'IN',
+      department: 'Data',
+      jobTitle: 'Data Scientist',
+    });
+  });
+
+  it('unsets a cleared filter and a blank search, so they leave the URL', () => {
+    expect(changeEmployeesSearch(current, { country: null, q: '   ' })).toEqual({
+      page: 1,
+      department: 'Data',
+    });
   });
 });

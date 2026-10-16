@@ -46,4 +46,21 @@ describe('peerGroupMembers', () => {
       },
     ]);
   });
+
+  it('reads only the peer groups a country and a job title name, every member shown', () => {
+    const named = { jobTitle: 'Data Scientist', country: 'BR' } as const;
+    const inSales = insertEmployee(db, { ...named, department: 'Sales' });
+    const inData = insertEmployee(db, { ...named, department: 'Data' });
+    insertEmployee(db, { jobTitle: 'Data Scientist', country: 'IN' });
+    insertEmployee(db, { jobTitle: 'Data Analyst', country: 'BR' });
+
+    const members = peerGroupMembers(db, named);
+
+    expect(
+      members.map((m) => [m.employee.id, m.shown]).toSorted(([a], [b]) => Number(a) - Number(b)),
+    ).toEqual([
+      [inSales.id, true],
+      [inData.id, true],
+    ]);
+  });
 });

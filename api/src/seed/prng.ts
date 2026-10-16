@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 /** A stream of unsigned 32-bit integers. */
 export type Uint32Source = () => number;
 
@@ -43,4 +45,19 @@ export function intInRange(next: Uint32Source, min: number, max: number): number
       return min + (draw % size);
     }
   }
+}
+
+/**
+ * An sfc32 stream seeded from the SHA-256 of `keys`, e.g. (fixed seed, job title, country) for one
+ * cell (ADR 0005, *Determinism*). The keys are hashed as a JSON array, so ("ab", "c") and ("a", "bc")
+ * seed different streams.
+ */
+export function streamFor(...keys: readonly string[]): Uint32Source {
+  const digest = createHash('sha256').update(JSON.stringify(keys)).digest();
+  return sfc32([
+    digest.readUInt32BE(0),
+    digest.readUInt32BE(4),
+    digest.readUInt32BE(8),
+    digest.readUInt32BE(12),
+  ]);
 }

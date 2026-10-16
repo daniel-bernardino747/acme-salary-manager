@@ -72,4 +72,16 @@ describe('seed command', () => {
     expect(lines).toEqual(['Seed skipped: the table already has 2 employees.']);
     expect(employeesById(db)).toEqual(before);
   });
+
+  it('with --reset replaces a seeded and edited table, giving the same database golden hash as a fresh seed', () => {
+    seed([]);
+    insertEmployee(db);
+    lines = [];
+
+    expect(seed(['--reset'])).toBe(0);
+
+    expect(countEmployees(db)).toBe(10_000);
+    expect(databaseGoldenHash(db)).toBe(DATABASE_GOLDEN_HASH);
+    expect(lines[1]).toBe(`Database golden hash: ${DATABASE_GOLDEN_HASH}`);
+  });
 });

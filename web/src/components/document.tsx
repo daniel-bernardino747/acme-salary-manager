@@ -89,7 +89,12 @@ export function Muted({ children, size = 'sm' }: { children: ReactNode; size?: '
 /** "Below" or "Above": the outlier's direction, always in words as well as colour. */
 export function DirectionBadge({ direction }: { direction: OutlierDirection }) {
   return (
-    <Badge color={direction === 'below' ? 'under' : 'over'} variant="light" radius="xs">
+    <Badge
+      color={direction === 'below' ? 'under' : 'over'}
+      variant="light"
+      radius="xs"
+      style={{ flexShrink: 0, overflow: 'visible' }}
+    >
       {direction === 'below' ? 'Below' : 'Above'}
     </Badge>
   );

@@ -1,14 +1,22 @@
-import { Anchor, Stack, Text, Title } from '@mantine/core';
+import { Button, Group, Text } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
+import { PageHeader } from '../components/document';
+import { SearchIcon } from '../components/icons';
+import { openGlobalSearch } from '../layout/global-search';
 
 export function NotFound() {
   return (
-    <Stack gap="xs">
-      <Title order={2}>Page not found</Title>
+    <>
+      <PageHeader title="Page not found" />
       <Text>There is no page at this address.</Text>
-      <Anchor component={Link} to="/pay/payroll">
-        Go to the annual payroll
-      </Anchor>
-    </Stack>
+      <Group gap="sm" mt="lg">
+        <Button component={Link} to="/">
+          Go to the overview
+        </Button>
+        <Button variant="default" leftSection={<SearchIcon size={16} />} onClick={openGlobalSearch}>
+          Search employees
+        </Button>
+      </Group>
+    </>
   );
 }

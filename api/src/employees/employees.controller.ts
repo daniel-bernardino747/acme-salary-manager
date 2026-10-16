@@ -10,7 +10,9 @@ import {
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Inject,
   NotFoundException,
   Param,
@@ -24,6 +26,7 @@ import { DB } from '../database.module';
 import { ZodValidationPipe } from '../http/zod-validation.pipe';
 import { createEmployee } from '../persistence/create-employee';
 import type { Db } from '../persistence/db';
+import { deleteEmployee } from '../persistence/delete-employee';
 import { findEmployee } from '../persistence/find-employee';
 import { replaceEmployee } from '../persistence/replace-employee';
 import { listEmployees } from '../persistence/list-employees';
@@ -65,5 +68,11 @@ export class EmployeesController {
     const employee = replaceEmployee(this.db, id, body);
     if (!employee) throw new NotFoundException(`Employee ${id} does not exist`);
     return employee;
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  remove(@Param('id') id: string): void {
+    deleteEmployee(this.db, Number(id));
   }
 }

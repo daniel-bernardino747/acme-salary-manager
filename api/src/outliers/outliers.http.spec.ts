@@ -60,4 +60,25 @@ describe('GET /api/outliers', () => {
       expect(res.body).not.toHaveProperty('rates');
     },
   );
+
+  it('answers with one page of the ranking, while the total and the cost cover every page', async () => {
+    // Median $10,000.00: 0.70 ranks before 0.75. Their gaps are $1,000.00 and $500.00.
+    const group = { jobTitle: 'Product Manager', country: 'US' } as const;
+    insertEmployee(t.db, { ...group, annualSalaryMinor: 7_000_00 });
+    const second = insertEmployee(t.db, { ...group, annualSalaryMinor: 7_500_00 });
+    for (const salary of [10_000_00, 10_000_00, 11_000_00]) {
+      insertEmployee(t.db, { ...group, annualSalaryMinor: salary });
+    }
+
+    const res = await t
+      .http()
+      .get('/api/outliers')
+      .query({ direction: 'below', page: 2, pageSize: 1 })
+      .expect(200);
+
+    const page = outliersResponseSchema.parse(res.body);
+    expect(page).toMatchObject({ page: 2, pageSize: 1, total: 2 });
+    expect(page.items.map((o) => o.employee.id)).toEqual([second.id]);
+    expect(page.costToReachThreshold?.usd).toEqual({ amountMinor: 1_500_00, currency: 'USD' });
+  });
 });

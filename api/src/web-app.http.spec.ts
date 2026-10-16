@@ -16,6 +16,12 @@ describe('serving the web app', () => {
     expect(res.text).toContain('data-fixture="web-app"');
   });
 
+  it('answers a missing file, such as a stale hashed asset, with a 404 and not the app', async () => {
+    const res = await t.http().get('/assets/index-0ld.js').expect(404);
+
+    expect(res.text).not.toContain('data-fixture="web-app"');
+  });
+
   it('still answers an unknown /api route with a JSON 404 problem', async () => {
     const res = await t.http().get('/api/no-such-route').expect(404);
 

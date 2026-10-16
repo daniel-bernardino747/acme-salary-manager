@@ -59,6 +59,13 @@ export function salaryStepMinor(country: CountryCode): number {
   return currency === 'JPY' ? 10_000 : 100 * 10 ** currencies[currency].exponent;
 }
 
+/**
+ * Per-cell base overrides, in minor units. Empty: it exists for a cell that looks wrong in the base
+ * snapshot (ADR 0005).
+ */
+const baseOverrides: readonly { jobTitle: JobTitle; country: CountryCode; baseMinor: number }[] =
+  [];
+
 const minorPerMajor = (country: CountryCode) => 10 ** currencies[currencyOf(country)].exponent;
 
 /**
@@ -68,6 +75,10 @@ const minorPerMajor = (country: CountryCode) => 10 ** currencies[currencyOf(coun
  * the data (ADR 0005).
  */
 export function baseSalaryMinor(jobTitle: JobTitle, country: CountryCode): number {
+  const override = baseOverrides.find((o) => o.jobTitle === jobTitle && o.country === country);
+  if (override) {
+    return override.baseMinor;
+  }
   const stepMinor = salaryStepMinor(country);
   const anchorSteps = (anchorMajor[country] * minorPerMajor(country)) / stepMinor;
   const steps = Math.round(anchorSteps * Math.pow(multiplier[jobTitle], spread[country]));

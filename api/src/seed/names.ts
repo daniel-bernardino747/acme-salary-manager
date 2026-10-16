@@ -1,13 +1,13 @@
 import type { CountryCode } from '@acme/contract';
 
+// Compact blocks, not one name per line.
+// prettier-ignore
 /**
  * The seed's name lists (ADR 0005, *Names*): Latin script, one "Given Family" order everywhere,
  * Japanese names romanized and Indian names from several regions. Accented names (João, Müller)
  * exercise accent folding, and apostrophe and hyphen names (O'Connor, Anna-Lena) the tokenizer's
  * word splitting. There is no `ß`: the search tokenizer does not fold it to `ss` (ADR 0002).
  */
-// Compact blocks, not one name per line.
-// prettier-ignore
 export const namesByCountry: Record<
   CountryCode,
   { given: readonly string[]; family: readonly string[] }

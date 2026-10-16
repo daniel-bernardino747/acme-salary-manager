@@ -1,5 +1,5 @@
 import { problemSchema } from '@acme/contract';
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Controller, Get, Inject, ServiceUnavailableException } from '@nestjs/common';
 import { describe, expect, it } from 'vitest';
 import { useTestApp } from '../../test/http';
 import { DB } from '../database.module';
@@ -12,6 +12,11 @@ class FailingController {
   @Get('sql')
   badSql(): unknown {
     return this.db.$client.prepare('SELECT secret_column FROM missing_table').all();
+  }
+
+  @Get('unavailable')
+  unavailable(): never {
+    throw new ServiceUnavailableException('Database file /data/secret.db is locked');
   }
 }
 
@@ -40,5 +45,18 @@ describe('problem responses', () => {
       detail: 'An unexpected error occurred',
     });
     expect(res.text).not.toMatch(/missing_table|secret_column|SELECT|SqliteError|\bat /);
+  });
+
+  it('keeps the status of a deliberate 5xx but not its message', async () => {
+    const res = await t.http().get('/api/test-failures/unavailable').expect(503);
+
+    expect(res.headers['content-type']).toMatch(/^application\/problem\+json/);
+    expect(problemSchema.parse(res.body)).toEqual({
+      type: 'about:blank',
+      title: 'Service Unavailable',
+      status: 503,
+      detail: 'An unexpected error occurred',
+    });
+    expect(res.text).not.toMatch(/secret|locked/);
   });
 });

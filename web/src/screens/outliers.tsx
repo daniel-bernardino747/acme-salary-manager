@@ -1,18 +1,10 @@
-import {
-  countries,
-  departments,
-  formatMoney,
-  jobTitles,
-  type Outlier,
-  type OutliersResponse,
-} from '@acme/contract';
+import { formatMoney, type Outlier } from '@acme/contract';
 import {
   Anchor,
-  Badge,
+  Box,
   Group,
   Pagination,
   SegmentedControl,
-  Select,
   Skeleton,
   Stack,
   Table,
@@ -21,12 +13,14 @@ import {
 } from '@mantine/core';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
-import type { ReactNode } from 'react';
-import { apiFetch } from '../api/api-fetch';
-import { outliersPath } from '../api/outliers-path';
-import { queryKey } from '../api/query-key';
+import { outliersQuery } from '../api/outliers-query';
+import { CountryStamp, DirectionBadge, Muted, PageHeader, Panel } from '../components/document';
+import { FilterBar } from '../components/filter-bar';
+import { ArrowRightIcon } from '../components/icons';
 import { QueryState } from '../components/query-state';
+import records from '../components/records.module.css';
 import { countText } from '../format/counts';
+import { countryName } from '../format/country-name';
 import { listRange, pageCount } from '../format/list-range';
 import {
   costFootnote,
@@ -36,16 +30,14 @@ import {
   smallGroupCountText,
 } from '../format/outliers-copy';
 import { placeDecimal } from '../format/place-decimal';
+import { pageQuestion } from '../layout/navigation';
 import {
   changeOutliersSearch,
+  employeesSearchFromOutliers,
   type OutliersSearch,
   type OutliersSearchChange,
 } from '../routes/search';
-
-const countryOptions = countries.map((country) => ({ value: country.code, label: country.name }));
-const countryNames = new Map<string, string>(
-  countries.map((country) => [country.code, country.name]),
-);
+import classes from './outliers.module.css';
 
 const directionOptions: { value: OutliersSearch['direction']; label: string }[] = [
   { value: 'below', label: 'Underpaid' },
@@ -57,94 +49,83 @@ const directionOptions: { value: OutliersSearch['direction']; label: string }[] 
 export function Outliers() {
   const search = useSearch({ from: '/pay/outliers' });
   const navigate = useNavigate({ from: '/pay/outliers' });
-  const query = useQuery({
-    queryKey: queryKey('outliers', search),
-    queryFn: () => apiFetch<OutliersResponse>(outliersPath(search)),
-    placeholderData: keepPreviousData,
-  });
+  const query = useQuery({ ...outliersQuery(search), placeholderData: keepPreviousData });
   // A direction or a filter pushes a history entry and goes back to the first page.
   const change = (next: OutliersSearchChange) =>
     void navigate({ search: (prev) => changeOutliersSearch(prev, next) });
 
   return (
-    <Stack gap="md">
-      <Title order={2}>Paid out of line</Title>
-      <Stack gap={4}>
-        <Text size="sm">
-          Compa-ratio is salary ÷ the median salary for the same title in the same country. Below
-          0.80 or above 1.20 is flagged. Groups with fewer than 5 employees aren&apos;t checked:
-          their median isn&apos;t meaningful.
-        </Text>
-        {query.data && (
-          <Text size="sm" c="dimmed">
-            {smallGroupCountText(query.data.smallGroupHeadcount)}
-          </Text>
-        )}
-      </Stack>
-      <SegmentedControl<OutliersSearch['direction']>
-        data={directionOptions}
-        value={search.direction}
-        onChange={(direction) => change({ direction })}
-        w="fit-content"
-      />
-      <Stack gap={4}>
-        <Group align="flex-end" gap="sm">
-          <Select
-            label="Country"
-            placeholder="Any country"
-            data={countryOptions}
-            value={search.country ?? null}
-            onChange={(country) => change({ country })}
-            clearable
-            w={180}
+    <Stack gap="lg">
+      <PageHeader title="Outliers" question={pageQuestion('/pay/outliers')} />
+      <Stack gap="xs">
+        <Group gap="md" align="flex-end" wrap="wrap">
+          <SegmentedControl<OutliersSearch['direction']>
+            data={directionOptions}
+            value={search.direction}
+            onChange={(direction) => change({ direction })}
+            color={
+              search.direction === 'above'
+                ? 'over'
+                : search.direction === 'below'
+                  ? 'under'
+                  : 'cover'
+            }
+            className={classes.direction}
           />
-          <Select
-            label="Department"
-            placeholder="Any department"
-            data={departments}
-            value={search.department ?? null}
-            onChange={(department) => change({ department })}
-            clearable
-            w={190}
-          />
-          <Select
-            label="Job title"
-            placeholder="Any job title"
-            data={jobTitles}
-            value={search.jobTitle ?? null}
-            onChange={(jobTitle) => change({ jobTitle })}
-            clearable
-            searchable
-            w={260}
-          />
+          <FilterBar filters={search} onChange={change} />
         </Group>
-        <Text size="xs" c="dimmed">
+        <Muted size="xs">
           Filters choose which employees are shown. Each median always covers everyone with the same
           title in the same country.
-        </Text>
+        </Muted>
       </Stack>
       <QueryState query={query} skeleton={<OutliersSkeleton />}>
         {(page) => (
-          <Stack gap="sm">
-            <Stack gap={4}>
-              <Title order={3}>{outliersHeadline(page.total, search.direction)}</Title>
-              {page.costToReachThreshold && <Text>{costText(page.costToReachThreshold.usd)}</Text>}
-            </Stack>
-            {page.total === 0 ? (
-              <Text py="xl" ta="center">
-                {noOutliersText(search.direction)}
+          <Stack gap="md">
+            <div>
+              <Title order={2} className={classes.headline}>
+                {outliersHeadline(page.total, search.direction)}
+              </Title>
+              {page.costToReachThreshold && (
+                <Text fz="lg" mt={4}>
+                  {costText(page.costToReachThreshold.usd)}
+                </Text>
+              )}
+            </div>
+            <Box className={classes.method}>
+              <Text size="sm">
+                Compa-ratio is salary ÷ the median salary for the same title in the same country.
+                Below 0.80 or above 1.20 is flagged. Groups with fewer than 5 employees aren&apos;t
+                checked: their median isn&apos;t meaningful.
               </Text>
+              <Text size="sm" c="gray.6">
+                {smallGroupCountText(page.smallGroupHeadcount)}
+              </Text>
+            </Box>
+            {page.total === 0 ? (
+              <Panel component="div">
+                <Text ta="center" py="lg" fw={600}>
+                  {noOutliersText(search.direction)}
+                </Text>
+              </Panel>
             ) : (
               <>
                 {page.items.length > 0 ? (
-                  <OutliersTable outliers={page.items} />
+                  <>
+                    <Box visibleFrom="sm">
+                      <OutliersTable outliers={page.items} />
+                    </Box>
+                    <Box hiddenFrom="sm">
+                      <OutlierRecords outliers={page.items} />
+                    </Box>
+                  </>
                 ) : (
                   <Text py="xl" ta="center">
                     Page {page.page} is past the end of the list.
                   </Text>
                 )}
-                <Group justify="space-between">
-                  <Text size="sm" c="dimmed">
+                <Group justify="space-between" gap="sm">
+                  <Text size="sm" c="gray.6">
                     {page.items.length > 0 && listRange(page)}
                   </Text>
                   {/* The URL's page, so it moves on click while keepPreviousData shows the old one. */}
@@ -158,11 +139,17 @@ export function Outliers() {
                 </Group>
               </>
             )}
-            {page.rates && (
-              <Text size="sm" c="dimmed">
-                {costFootnote(page.rates)}
-              </Text>
-            )}
+            <Anchor
+              renderRoot={(props) => (
+                <Link {...props} to="/employees" search={employeesSearchFromOutliers(search)} />
+              )}
+            >
+              <Group gap={6} component="span">
+                See all employees with these filters
+                <ArrowRightIcon size={16} />
+              </Group>
+            </Anchor>
+            {page.rates && <Muted size="xs">{costFootnote(page.rates)}</Muted>}
           </Stack>
         )}
       </QueryState>
@@ -172,19 +159,17 @@ export function Outliers() {
 
 function OutliersTable({ outliers }: { outliers: Outlier[] }) {
   return (
-    <Table.ScrollContainer minWidth={1080}>
-      <Table highlightOnHover>
+    <div className={records.tableWrap}>
+      <Table className={records.table}>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>Name</Table.Th>
-            <Table.Th>Job title</Table.Th>
-            <Table.Th>Country</Table.Th>
+            <Table.Th>Employee</Table.Th>
             <Table.Th>Department</Table.Th>
-            <Table.Th ta="right">Salary</Table.Th>
-            <Table.Th ta="right">Peer median</Table.Th>
-            <Table.Th ta="right">Compa-ratio</Table.Th>
-            <Table.Th ta="right">Gap to 0.80</Table.Th>
-            <Table.Th ta="right">Peers</Table.Th>
+            <Table.Th className={records.money}>Salary</Table.Th>
+            <Table.Th className={records.money}>Peer median</Table.Th>
+            <Table.Th className={records.money}>Compa-ratio</Table.Th>
+            <Table.Th className={records.money}>Gap to 0.80</Table.Th>
+            <Table.Th className={records.money}>Peers</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -196,18 +181,22 @@ function OutliersTable({ outliers }: { outliers: Outlier[] }) {
               <Table.Tr key={employee.id}>
                 <Table.Td>
                   <Anchor
+                    fw={600}
                     renderRoot={(props) => (
                       <Link {...props} to="/employees/$id" params={{ id: String(employee.id) }} />
                     )}
                   >
                     {employee.name}
                   </Anchor>
+                  <Text size="sm" c="gray.6">
+                    {jobTitle} · {countryName(country)} <CountryStamp country={country} />
+                  </Text>
                 </Table.Td>
-                <Table.Td>{jobTitle}</Table.Td>
-                <Table.Td>{countryNames.get(country)}</Table.Td>
                 <Table.Td>{employee.department}</Table.Td>
-                <MoneyCell>{formatMoney(employee.annualSalary, 'en')}</MoneyCell>
-                <MoneyCell>
+                <Table.Td className={records.money}>
+                  {formatMoney(employee.annualSalary, 'en')}
+                </Table.Td>
+                <Table.Td className={records.money}>
                   {/* The same median as question 1 for this group, digit for digit. */}
                   <Anchor
                     renderRoot={(props) => (
@@ -216,37 +205,80 @@ function OutliersTable({ outliers }: { outliers: Outlier[] }) {
                   >
                     {formatMoney(outlier.peerMedian, 'en')}
                   </Anchor>
-                </MoneyCell>
-                <Table.Td ta="right" style={{ whiteSpace: 'nowrap' }}>
+                </Table.Td>
+                <Table.Td className={records.money}>
                   <Group gap="xs" justify="flex-end" wrap="nowrap">
-                    {placeDecimal(outlier.compaRatioHundredths, 2)}
-                    <Badge
-                      color={outlier.direction === 'below' ? 'orange' : 'grape'}
-                      variant="light"
-                    >
-                      {outlier.direction === 'below' ? 'Below' : 'Above'}
-                    </Badge>
+                    <Text fw={700} span>
+                      {placeDecimal(outlier.compaRatioHundredths, 2)}
+                    </Text>
+                    <DirectionBadge direction={outlier.direction} />
                   </Group>
                 </Table.Td>
-                <MoneyCell>
+                <Table.Td className={records.money}>
                   {outlier.gapMinor !== null &&
                     formatMoney({ amountMinor: outlier.gapMinor, currency }, 'en')}
-                </MoneyCell>
-                <Table.Td ta="right">{countText(outlier.peerHeadcount)}</Table.Td>
+                </Table.Td>
+                <Table.Td className={records.money}>{countText(outlier.peerHeadcount)}</Table.Td>
               </Table.Tr>
             );
           })}
         </Table.Tbody>
       </Table>
-    </Table.ScrollContainer>
+    </div>
   );
 }
 
-function MoneyCell({ children }: { children: ReactNode }) {
+/**
+ * On a phone each outlier stacks: name and compa-ratio, job title · country, salary against the
+ * peer median, and the gap.
+ */
+function OutlierRecords({ outliers }: { outliers: Outlier[] }) {
   return (
-    <Table.Td ta="right" style={{ whiteSpace: 'nowrap' }}>
-      {children}
-    </Table.Td>
+    <ul className={records.records}>
+      {outliers.map((outlier) => {
+        const { employee } = outlier;
+        const currency = employee.annualSalary.currency;
+        return (
+          <li key={employee.id}>
+            <Link
+              className={records.record}
+              to="/employees/$id"
+              params={{ id: String(employee.id) }}
+            >
+              <div className={records.recordTop}>
+                <span className={records.recordName}>{employee.name}</span>
+                <Group gap={6} wrap="nowrap">
+                  <Text fw={700} span>
+                    {placeDecimal(outlier.compaRatioHundredths, 2)}
+                  </Text>
+                  <DirectionBadge direction={outlier.direction} />
+                </Group>
+              </div>
+              <div className={records.recordMeta}>
+                {employee.jobTitle} · {countryName(employee.country)}{' '}
+                <CountryStamp country={employee.country} />
+              </div>
+              <div className={records.recordFigures}>
+                <span>
+                  {formatMoney(employee.annualSalary, 'en')}{' '}
+                  <Text span c="gray.6" size="sm">
+                    of median {formatMoney(outlier.peerMedian, 'en')}
+                  </Text>
+                </span>
+                {outlier.gapMinor !== null && (
+                  <span>
+                    <Text span c="gray.6" size="sm">
+                      Gap{' '}
+                    </Text>
+                    {formatMoney({ amountMinor: outlier.gapMinor, currency }, 'en')}
+                  </span>
+                )}
+              </div>
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
@@ -254,14 +286,11 @@ function OutliersSkeleton() {
   return (
     <Stack gap="sm" aria-busy="true" aria-label="Loading">
       <Skeleton height={28} width="55%" />
-      <Skeleton height={16} width="40%" />
-      {Array.from({ length: 10 }, (_, row) => (
-        <Skeleton key={row} height={28} />
+      <Skeleton height={20} width="40%" />
+      <Skeleton height={56} />
+      {Array.from({ length: 8 }, (_, row) => (
+        <Skeleton key={row} height={48} />
       ))}
-      <Group justify="space-between">
-        <Skeleton height={16} width={140} />
-        <Skeleton height={28} width={240} />
-      </Group>
     </Stack>
   );
 }

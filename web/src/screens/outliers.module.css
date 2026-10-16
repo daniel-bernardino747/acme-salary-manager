@@ -1,0 +1,24 @@
+.direction {
+  flex: none;
+}
+
+@media (max-width: 48em) {
+  .direction {
+    width: 100%;
+  }
+}
+
+.headline {
+  font-size: var(--mantine-h2-font-size);
+}
+
+/* How outliers are flagged: below the answer, on the tint, never above it. */
+.method {
+  display: grid;
+  gap: 4px;
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+  border: 1px solid var(--acme-hairline);
+  border-radius: var(--mantine-radius-sm);
+  background: color-mix(in srgb, var(--mantine-color-gray-1) 60%, white);
+  max-width: 78ch;
+}

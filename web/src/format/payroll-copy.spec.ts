@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { highestUsdFirst, payrollFootnote, payrollHeadline, shareText } from './payroll-copy';
+import {
+  highestUsdFirst,
+  outliersInCountryText,
+  payrollFootnote,
+  payrollHeadline,
+  shareText,
+} from './payroll-copy';
 
 const usd = (amountMinor: number) => ({ amountMinor, currency: 'USD' as const });
 
@@ -52,5 +58,16 @@ describe('payrollFootnote', () => {
         'Each total is rounded on its own, so the parts may not add up exactly to the total, ' +
         'or to 100%.',
     );
+  });
+});
+
+describe('outliersInCountryText', () => {
+  it.each([
+    ['IN', 'Outliers in India'],
+    ['US', 'Outliers in the United States'],
+    ['GB', 'Outliers in the United Kingdom'],
+    ['NL', 'Outliers in the Netherlands'],
+  ] as const)("names %s's outliers link as the sentence reads", (country, text) => {
+    expect(outliersInCountryText(country)).toBe(text);
   });
 });

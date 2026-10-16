@@ -196,3 +196,56 @@ This is input, not the ticket list. You decide what becomes a ticket, what's a d
 ````
 
 Next sessions, one ticket each: `/wayfinder <map URL>`. When the map is clear: `/to-spec`, `/to-tickets`, then `/implement` per ticket.
+
+## Phase 2 — Spec and tickets
+
+Run in two messages in the same session, so `/to-tickets` works from the spec already in context: `/to-spec` with the prompt below, then `/to-tickets` once the spec is published.
+
+````markdown
+The planning map for ACME Salary Manager is complete: every ticket is closed and every decision is recorded. This session turns it into one spec and a set of build tickets. Write no application code.
+
+## Read first, in this order
+
+1. `docs/requirements.md` — the approved scope.
+2. `CONTEXT.md` — the glossary. Use its terms everywhere (Peer group, Compa-ratio, Outlier, Small group, Payroll total…).
+3. `docs/adr/0001` to `0006` — the decisions. They are final; don't reopen any of them.
+4. The Wayfinder map issue (label `wayfinder:map`) and its closed tickets with their resolution comments: `gh issue view <n> --comments`.
+5. `docs/agents/issue-tracker.md` — how to publish.
+
+## The spec (`/to-spec`)
+
+- **One spec for the whole MVP** in `docs/requirements.md`: managing employees plus the four pay questions, the seed, the deploy, the e2e smoke test and the performance run.
+- **Authentication is out of scope** for this spec. It's the stretch goal and gets its own spec later if there's time.
+- **Seams are already agreed** (ADR 0002 and 0006): domain fixtures, repositories on `:memory:`, HTTP on `:memory:`, pure web functions, and one Playwright smoke test. Confirm them in one message; don't propose new ones.
+- **Implementation Decisions cite ADRs, not copies.** Write "money rules per ADR 0001", not the rules restated. The spec says *what* gets built; the ADRs say *how*. Nothing in the spec may contradict an ADR. If you find a gap or a conflict between ADRs, stop and ask me.
+- **User stories** are from the HR Manager's point of view, plus a few from the reviewer's (run the seed, run the tests, read the performance results). Be thorough, but no story without a requirement or ADR behind it.
+- **Spine.** There's no spine issue yet. Create one, in English: title "ACME Salary Manager MVP", label `spine`, with this checklist and the first two items ticked: Requirements (`docs/requirements.md`), Planning map (link the map issue and `docs/adr/`), Spec & tickets, Build, Deploy, Performance run, Demo video. The spec body starts with `Part of #<spine>`. No handoff PR: the spec and tickets live on the tracker, not in files.
+
+## The tickets (`/to-tickets`, next message)
+
+Vertical tracer bullets, each sized for **one `/implement` session** (one fresh context window, test-first, red → green → refactor commits). Target **10–13 tickets**. My expected shape — challenge it if the ADRs say otherwise:
+
+1. **Walking skeleton, deployed.** pnpm workspaces, `@acme/contract`, Nest boots importing it, Drizzle migration on `:memory:` and on file, `/api/health`, Nest serving the built SPA with the `/api` 404 fallback, lint rules for layer imports, CI on ubuntu, and **deployed to Railway** with the volume and the `migrate → seed --if-empty → start` command (the seed step can be a no-op stub until ticket 2). It includes all of ADR 0002's first-slice checks. Deploying first takes away the biggest risk while the app is still trivial.
+2. **Seed** (ADR 0005): reference lists, quotas and snapshot, bases and snapshot, median anchoring, planted outliers and boundary plants, names, the three modes, golden hashes, the seed tests. It needs the money domain from ADR 0001 that the seed relies on (rates, conversion, rounding); build that domain here, test-first.
+3. **Employee list**: pagination, filters, FTS search with the fixture table, list screen.
+4. **View, add, edit, remove an employee**: `parseMoney`/`formatMoney`, Problem Details mapped to form fields, the delete flow.
+5–8. **One ticket per pay question** (Q1 statistics, Q2 payroll totals, Q3 comparison, Q4 outliers), each through domain → repository → endpoint → screen. Q4 includes the seed-level assertions that need it (flagged set = planted set, cost headline).
+9. **E2E smoke test** (ADR 0006).
+10. **Performance**: Server-Timing middleware, `pnpm perf`, the results file and the hand-written `docs/performance.md`. The actual run against Railway is mine to do.
+11. **README and artifact index**: setup, commands, endpoints, seed modes, known limitations, links to requirements, ADRs, AI prompts and sessions.
+
+Not tickets: the visual polish pass (I'll run it myself with `/impeccable`, constrained to Mantine `createTheme`), the demo video, and auth.
+
+**Blocking edges**: only real gates. 3 and 4 need 1; 5–8 need 1 and the parts of 2's domain they use, not each other; 9 needs 4 and 8; 10 needs 1 and the endpoints it times. Whatever has no blocker should show up as available.
+
+Every ticket's acceptance criteria are checkable: the tests that must exist at which seam, the screen behaviour, and which ADR sections it implements. No file paths, no code.
+
+## Rules
+
+- Quiz me on the breakdown before publishing (granularity, edges, merges/splits). Lead with your recommendation.
+- Publish blockers first, as sub-issues of the spine, using native dependencies and the `ready-for-agent` label.
+- **Commits:** end the session with `chore(ai): session logs` (`docs/ai/`) and push. Nothing else should change in the repo.
+- Stop after publishing. Implement nothing.
+````
+
+Then one `/implement #<ticket>` session per ticket, in frontier order.

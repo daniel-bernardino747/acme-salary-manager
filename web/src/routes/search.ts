@@ -33,6 +33,26 @@ const jobTitle = jobTitleSchema.optional().catch(undefined);
 export const employeesSearchSchema = z.object({ page, q, country, department, jobTitle });
 export type EmployeesSearch = z.infer<typeof employeesSearchSchema>;
 
+/** A new search or filter from the list's toolbar; `null` is a cleared filter. */
+export interface EmployeesSearchChange {
+  q?: string;
+  country?: string | null;
+  department?: string | null;
+  jobTitle?: string | null;
+}
+
+/**
+ * The list's search after a toolbar change: back on the first page, so it never lands past the end
+ * (ADR 0004, *Routing*). A blank search or a cleared filter is unset, so it leaves the URL.
+ */
+export function changeEmployeesSearch(
+  search: EmployeesSearch,
+  change: EmployeesSearchChange,
+): EmployeesSearch {
+  const next = employeesSearchSchema.parse({ ...search, ...change, page: 1 });
+  return next.q?.trim() ? next : { ...next, q: undefined };
+}
+
 /** `all` omits the API's `direction` parameter (ADR 0004, *Question 4*). */
 export const outlierDirections = ['below', 'above', 'all'] as const;
 const direction = z.enum(outlierDirections).default('below').catch('below');

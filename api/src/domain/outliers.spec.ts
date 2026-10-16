@@ -210,4 +210,22 @@ describe('findOutliers ranking', () => {
       [firstAna, secondAna, bea].map((m) => m.employee),
     );
   });
+
+  it.each([
+    ['below', ['0.75', '0.79']],
+    ['above', ['1.50', '1.30']],
+  ] as const)('ranks only the %s outliers when asked for that direction', (direction, expected) => {
+    // Median $10,000.00. Mixed, 1.50 (0.50 away) would come first and bury the underpaid.
+    const salaries = { '0.75': 7_500_00, '0.79': 7_900_00, '1.30': 13_000_00, '1.50': 15_000_00 };
+    const outliersBy = Object.fromEntries(
+      Object.entries(salaries).map(([ratio, salary]) => [ratio, member(salary)]),
+    );
+    const group = [...Object.values(outliersBy), ...[1, 2, 3].map(() => member(10_000_00))];
+
+    const { outliers } = findOutliers(group, direction);
+
+    expect(outliers.map((o) => o.employee)).toEqual(
+      expected.map((ratio) => outliersBy[ratio]?.employee),
+    );
+  });
 });

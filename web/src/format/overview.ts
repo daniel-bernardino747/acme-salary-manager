@@ -1,5 +1,5 @@
-import { countries, type Money } from '@acme/contract';
-import { employeeCount } from './counts';
+import type { Money } from '@acme/contract';
+import { countText, employeeCount } from './counts';
 import { highestUsdFirst } from './payroll-copy';
 
 /** How many underpaid employees the Overview names. */
@@ -29,14 +29,18 @@ export function shareBars<T extends { usd: Money; sharePermille: number | null }
   }));
 }
 
-const today = new Intl.DateTimeFormat('en-US', {
+const dateFormat = new Intl.DateTimeFormat('en', {
   weekday: 'long',
   year: 'numeric',
   month: 'long',
   day: 'numeric',
 });
 
-/** The Overview's date line, e.g. "Friday, October 16, 2026 · 10,000 employees in 7 countries". */
-export function overviewDateLine(date: Date, headcount: number): string {
-  return `${today.format(date)} · ${employeeCount(headcount)} in ${countries.length} countries`;
+/**
+ * The Overview's date line, e.g. "Friday, October 16, 2026 · 10,000 employees in 7 countries",
+ * counting only the countries that have employees.
+ */
+export function overviewDateLine(date: Date, headcount: number, countryCount: number): string {
+  const places = countryCount === 1 ? '1 country' : `${countText(countryCount)} countries`;
+  return `${dateFormat.format(date)} · ${employeeCount(headcount)} in ${places}`;
 }

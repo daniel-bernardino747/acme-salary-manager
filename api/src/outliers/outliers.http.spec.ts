@@ -1,4 +1,4 @@
-import { exchangeRates, outliersResponseSchema } from '@acme/contract';
+import { exchangeRates, outliersResponseSchema, problemSchema } from '@acme/contract';
 import { describe, expect, it } from 'vitest';
 import { insertEmployee } from '../../test/builders';
 import { useTestApp } from '../../test/http';
@@ -98,5 +98,27 @@ describe('GET /api/outliers', () => {
       [overpaid.id, 'above', null],
       [underpaid.id, 'below', 1_000_00],
     ]);
+  });
+
+  it.each([
+    ['an unknown direction', { direction: 'all' }, ['direction']],
+    ['a country not in the list', { country: 'UK' }, ['country']],
+    ['a department not in the list', { department: 'Legal' }, ['department']],
+    ['a job title not in the list', { jobTitle: 'Product Managers' }, ['jobTitle']],
+    ['a page below 1', { page: 0 }, ['page']],
+    ['a page size above 100', { pageSize: 101 }, ['pageSize']],
+    ['a name search, which outliers do not take', { q: 'priya' }, []],
+    ['an unknown parameter', { contry: 'IN' }, []],
+  ])('answers %s with a 400 problem', async (_, query, path) => {
+    const res = await t.http().get('/api/outliers').query(query).expect(400);
+
+    expect(res.headers['content-type']).toMatch(/^application\/problem\+json/);
+    const problem = problemSchema.parse(res.body);
+    expect(problem).toMatchObject({
+      title: 'Validation failed',
+      status: 400,
+      detail: 'Query is invalid',
+    });
+    expect(problem.errors?.map((error) => error.path)).toEqual([path]);
   });
 });

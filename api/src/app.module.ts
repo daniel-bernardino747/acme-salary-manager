@@ -6,6 +6,8 @@ import { HealthController } from './health/health.controller';
 import { ProblemFilter } from './http/problem.filter';
 import { PayStatisticsController } from './pay-statistics/pay-statistics.controller';
 import { PayStatisticsService } from './pay-statistics/pay-statistics.service';
+import { PayrollTotalsController } from './payroll-totals/payroll-totals.controller';
+import { PayrollTotalsService } from './payroll-totals/payroll-totals.service';
 
 export interface AppOptions {
   databasePath: string;
@@ -17,8 +19,17 @@ export class AppModule {
     return {
       module: AppModule,
       imports: [DatabaseModule.forRoot(options.databasePath)],
-      controllers: [HealthController, EmployeesController, PayStatisticsController],
-      providers: [{ provide: APP_FILTER, useClass: ProblemFilter }, PayStatisticsService],
+      controllers: [
+        HealthController,
+        EmployeesController,
+        PayStatisticsController,
+        PayrollTotalsController,
+      ],
+      providers: [
+        { provide: APP_FILTER, useClass: ProblemFilter },
+        PayStatisticsService,
+        PayrollTotalsService,
+      ],
     };
   }
 }

@@ -13,12 +13,18 @@ const USD_EXPONENT = BigInt(currencies.USD.exponent);
 
 export type RatesPerUsd = Readonly<Record<CurrencyCode, number>>;
 
+/** Money in US cents, as every conversion gives it. */
+export type UsdMoney = Money & { currency: 'USD' };
+
 /**
  * Converts a local amount to USD cents once: `localMinor · 10^(2 − exp) · 10⁶ / rate`, rounded half
  * up. The product passes 2⁵³ for large totals, so it runs in BigInt, the only place money does,
  * and the result is asserted as a safe integer (ADR 0001).
  */
-export function toUsd(money: Money, ratesPerUsd: RatesPerUsd = exchangeRates.ratesPerUsd): Money {
+export function toUsd(
+  money: Money,
+  ratesPerUsd: RatesPerUsd = exchangeRates.ratesPerUsd,
+): UsdMoney {
   assertSafeInteger(money.amountMinor, 'The amount to convert');
   if (money.amountMinor < 0) {
     throw new RangeError(`Cannot convert a negative amount: ${money.amountMinor}.`);

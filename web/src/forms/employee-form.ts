@@ -7,6 +7,7 @@ import {
   type CountryCode,
   type CurrencyCode,
   type EmployeeRequest,
+  type EmployeeResponse,
 } from '@acme/contract';
 import { z } from 'zod';
 
@@ -17,6 +18,30 @@ export interface EmployeeFormValues {
   department: string;
   country: string;
   annualSalary: string;
+}
+
+/** The add form starts empty, with no country, so the salary field starts disabled. */
+export const emptyEmployeeForm: EmployeeFormValues = {
+  name: '',
+  jobTitle: '',
+  department: '',
+  country: '',
+  annualSalary: '',
+};
+
+/**
+ * The edit form's starting values. The salary is `formatMoney`'s plain input, with no grouping or
+ * symbol: the UI never converts money any other way (ADR 0004, *Forms*).
+ */
+export function employeeFormValues(employee: EmployeeResponse): EmployeeFormValues {
+  const { name, jobTitle, department, country, annualSalary } = employee;
+  return {
+    name,
+    jobTitle,
+    department,
+    country,
+    annualSalary: formatMoney(annualSalary, 'en', { plainInput: true }),
+  };
 }
 
 const fields = employeeRequestSchema.shape;

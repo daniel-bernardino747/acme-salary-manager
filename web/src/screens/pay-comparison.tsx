@@ -1,29 +1,22 @@
 import { BarChart } from '@mantine/charts';
 import { countries, jobTitles, type JobTitle, type PayComparisonResponse } from '@acme/contract';
-import {
-  Anchor,
-  Badge,
-  ColorSwatch,
-  Group,
-  Select,
-  Skeleton,
-  Stack,
-  Table,
-  Text,
-  Title,
-} from '@mantine/core';
+import { Anchor, Badge, Box, Group, Select, Skeleton, Stack, Table, Text } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
 import { apiFetch } from '../api/api-fetch';
 import { payComparisonPath } from '../api/pay-comparison-path';
 import { queryKey } from '../api/query-key';
+import { CountryStamp, Muted, PageHeader, Panel } from '../components/document';
 import { QueryState } from '../components/query-state';
+import records from '../components/records.module.css';
 import { comparisonFootnote, highestMedianFirst, medianBars } from '../format/comparison-copy';
-import { countText } from '../format/counts';
+import { countText, employeeCount } from '../format/counts';
 import { countryName } from '../format/country-name';
 import { wholeUnits } from '../format/whole-units';
+import { pageQuestion } from '../layout/navigation';
 import { comparisonSearchSchema } from '../routes/search';
+import classes from './pay-comparison.module.css';
 
 /**
  * The comparison is in whole USD: its figures carry two roundings and a fixed rate, so cents would
@@ -33,7 +26,7 @@ import { comparisonSearchSchema } from '../routes/search';
 const wholeUsd = (amountMinor: number) => wholeUnits({ amountMinor, currency: 'USD' });
 
 /** Small groups are drawn muted, so one person's pay does not read as a national median. */
-const barColor = { fiveOrMore: 'blue.6', smallGroup: 'gray.4' } as const;
+const barColor = { fiveOrMore: 'visa.6', smallGroup: 'url(#small-group-hatch)' } as const;
 
 /** The chart grows with its bars, and its skeleton holds the room for every country. */
 const chartHeight = (bars: number) => bars * 44 + 40;
@@ -56,8 +49,8 @@ export function PayComparison() {
   });
 
   return (
-    <Stack gap="md">
-      <Title order={2}>Pay across countries</Title>
+    <Stack gap="lg">
+      <PageHeader title="Across countries" question={pageQuestion('/pay/comparison')} />
       <Select
         label="Job title"
         placeholder="Pick a job title"
@@ -69,12 +62,16 @@ export function PayComparison() {
         }
         searchable
         clearable
-        w={280}
+        w={{ base: '100%', xs: 300 }}
       />
       <QueryState
         query={query}
         skeleton={<ComparisonSkeleton />}
-        idle={<Text c="dimmed">Pick a job title to compare its pay across countries.</Text>}
+        idle={
+          <Panel component="div">
+            <Text c="gray.7">Pick a job title to compare its pay across countries.</Text>
+          </Panel>
+        }
       >
         {(comparison) => <Comparison comparison={comparison} />}
       </QueryState>
@@ -83,17 +80,20 @@ export function PayComparison() {
 }
 
 function Comparison({ comparison }: { comparison: PayComparisonResponse }) {
+  const navigate = useNavigate();
+  const { jobTitle } = comparison;
   // The chart and the table share one ranking, so they pair row for row.
   const rows = highestMedianFirst(comparison.rows);
   const bars = medianBars(rows);
+  const codeOf = new Map(rows.map((row) => [countryName(row.country), row.country]));
   return (
     <Stack gap="lg">
-      <Stack gap="xs">
-        <Title order={3}>Median salary of {comparison.jobTitle}, in USD</Title>
+      <Panel title={`Median salary of ${jobTitle}, in USD`}>
         {bars.length === 0 ? (
-          <Text>No employees with the title {comparison.jobTitle} in any country.</Text>
+          <Text>No employees with the title {jobTitle} in any country.</Text>
         ) : (
-          <>
+          <Stack gap="sm">
+            <HatchPattern />
             <BarChart
               h={chartHeight(bars.length)}
               data={bars.map((bar) => ({
@@ -106,26 +106,66 @@ function Comparison({ comparison }: { comparison: PayComparisonResponse }) {
               valueFormatter={wholeUsd}
               yAxisProps={{ width: 120 }}
               gridAxis="x"
+              barProps={{
+                radius: 2,
+                cursor: 'pointer',
+                // A bar opens the same pay statistics as its table row (ADR 0004, *Question 3*).
+                onClick: (bar: unknown) => {
+                  const name = (bar as { payload?: { country?: string } }).payload?.country;
+                  const country = name ? codeOf.get(name) : undefined;
+                  if (country) {
+                    void navigate({ to: '/pay/statistics', search: { jobTitle, country } });
+                  }
+                },
+              }}
             />
             <Group gap="lg">
-              <LegendEntry color={barColor.fiveOrMore}>5 or more employees</LegendEntry>
-              <LegendEntry color={barColor.smallGroup}>fewer than 5 employees</LegendEntry>
+              <LegendEntry kind="full">5 or more employees</LegendEntry>
+              <LegendEntry kind="small">fewer than 5 employees</LegendEntry>
             </Group>
-          </>
+          </Stack>
         )}
-      </Stack>
-      <ComparisonTable jobTitle={comparison.jobTitle} rows={rows} />
-      <Text size="sm" c="dimmed">
-        {comparisonFootnote(comparison.rates)}
-      </Text>
+      </Panel>
+      <Panel title="By country">
+        <Box visibleFrom="sm">
+          <ComparisonTable jobTitle={jobTitle} rows={rows} />
+        </Box>
+        <Box hiddenFrom="sm">
+          <ComparisonRecords jobTitle={jobTitle} rows={rows} />
+        </Box>
+      </Panel>
+      <Muted size="xs">{comparisonFootnote(comparison.rates)}</Muted>
     </Stack>
   );
 }
 
-function LegendEntry({ color, children }: { color: string; children: ReactNode }) {
+/**
+ * The hatch a small group's bar is filled with, so it never reads as a national median by colour
+ * alone. An inline SVG pattern, referenced by id from the chart's bars.
+ */
+function HatchPattern() {
+  return (
+    <svg width="0" height="0" aria-hidden="true" focusable="false" style={{ position: 'absolute' }}>
+      <defs>
+        <pattern
+          id="small-group-hatch"
+          width="6"
+          height="6"
+          patternUnits="userSpaceOnUse"
+          patternTransform="rotate(45)"
+        >
+          <rect width="6" height="6" fill="var(--mantine-color-gray-1)" />
+          <rect width="3" height="6" fill="var(--mantine-color-gray-4)" />
+        </pattern>
+      </defs>
+    </svg>
+  );
+}
+
+function LegendEntry({ kind, children }: { kind: 'full' | 'small'; children: ReactNode }) {
   return (
     <Group gap={6}>
-      <ColorSwatch color={`var(--mantine-color-${color.replace('.', '-')})`} size={12} />
+      <span className={classes.swatch} data-kind={kind} aria-hidden="true" />
       <Text size="sm">{children}</Text>
     </Group>
   );
@@ -134,66 +174,103 @@ function LegendEntry({ color, children }: { color: string; children: ReactNode }
 function ComparisonTable({ jobTitle, rows }: { jobTitle: JobTitle; rows: ComparisonRow[] }) {
   const navigate = useNavigate();
   return (
-    <Table.ScrollContainer minWidth={720}>
-      <Table highlightOnHover>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>Country</Table.Th>
-            <Table.Th ta="right">Headcount</Table.Th>
-            <Table.Th ta="right">Min</Table.Th>
-            <Table.Th ta="right">Median</Table.Th>
-            <Table.Th ta="right">Average</Table.Th>
-            <Table.Th ta="right">Max</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {rows.map((row) => {
-            // Each row opens that group's pay statistics, with its exact local figures.
-            const statistics = {
-              to: '/pay/statistics',
-              search: { jobTitle, country: row.country },
-            } as const;
-            return (
-              <Table.Tr
-                key={row.country}
-                onClick={() => void navigate(statistics)}
-                style={{ cursor: 'pointer' }}
-              >
-                <Table.Td>
-                  <Anchor
-                    renderRoot={(props) => <Link {...props} {...statistics} />}
-                    onClick={(event) => event.stopPropagation()}
+    <Table className={records.table} horizontalSpacing="sm">
+      <Table.Thead>
+        <Table.Tr>
+          <Table.Th>Country</Table.Th>
+          <Table.Th className={records.money}>Headcount</Table.Th>
+          <Table.Th className={records.money}>Min</Table.Th>
+          <Table.Th className={records.money}>Median</Table.Th>
+          <Table.Th className={records.money}>Average</Table.Th>
+          <Table.Th className={records.money}>Max</Table.Th>
+        </Table.Tr>
+      </Table.Thead>
+      <Table.Tbody>
+        {rows.map((row) => {
+          // Each row opens that group's pay statistics, with its exact local figures.
+          const statistics = {
+            to: '/pay/statistics',
+            search: { jobTitle, country: row.country },
+          } as const;
+          return (
+            <Table.Tr key={row.country} data-link onClick={() => void navigate(statistics)}>
+              <Table.Td style={{ whiteSpace: 'nowrap' }}>
+                <Anchor
+                  fw={600}
+                  renderRoot={(props) => <Link {...props} {...statistics} />}
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  {countryName(row.country)}
+                </Anchor>{' '}
+                <CountryStamp country={row.country} />
+              </Table.Td>
+              <Table.Td className={records.money}>
+                <Group gap="xs" justify="flex-end" wrap="nowrap">
+                  {row.smallGroup && (
+                    <Badge color="gray" variant="light">
+                      Small group
+                    </Badge>
+                  )}
+                  {countText(row.headcount)}
+                </Group>
+              </Table.Td>
+              {row.headcount === 0 ? (
+                <Table.Td colSpan={4} ta="right" c="gray.6">
+                  No employees
+                </Table.Td>
+              ) : (
+                figures.map((figure) => (
+                  <Table.Td
+                    key={figure}
+                    className={records.money}
+                    fw={figure === 'median' ? 700 : undefined}
                   >
-                    {countryName(row.country)}
-                  </Anchor>
-                </Table.Td>
-                <Table.Td ta="right">
-                  <Group gap="xs" justify="flex-end" wrap="nowrap">
-                    {row.smallGroup && (
-                      <Badge color="gray" variant="light">
-                        Small group
-                      </Badge>
-                    )}
-                    {countText(row.headcount)}
-                  </Group>
-                </Table.Td>
-                {row.headcount === 0 ? (
-                  <Table.Td colSpan={4} ta="right" c="dimmed">
-                    No employees
+                    {row[figure] && wholeUnits(row[figure])}
                   </Table.Td>
-                ) : (
-                  figures.map((figure) => (
-                    <Table.Td key={figure} ta="right" style={{ whiteSpace: 'nowrap' }}>
-                      {row[figure] && wholeUnits(row[figure])}
-                    </Table.Td>
-                  ))
-                )}
-              </Table.Tr>
-            );
-          })}
-        </Table.Tbody>
-      </Table>
-    </Table.ScrollContainer>
+                ))
+              )}
+            </Table.Tr>
+          );
+        })}
+      </Table.Tbody>
+    </Table>
+  );
+}
+
+/** On a phone each country stacks: name and headcount, the median, then min to max. */
+function ComparisonRecords({ jobTitle, rows }: { jobTitle: JobTitle; rows: ComparisonRow[] }) {
+  return (
+    <ul className={classes.records}>
+      {rows.map((row) => (
+        <li key={row.country}>
+          <Link
+            className={records.record}
+            to="/pay/statistics"
+            search={{ jobTitle, country: row.country }}
+          >
+            <div className={records.recordTop}>
+              <span className={records.recordName}>
+                {countryName(row.country)} <CountryStamp country={row.country} />
+              </span>
+              <span className={records.recordMeta}>
+                {row.smallGroup ? 'Small group · ' : ''}
+                {employeeCount(row.headcount)}
+              </span>
+            </div>
+            {row.headcount === 0 || !row.median || !row.min || !row.max ? (
+              <div className={records.recordMeta}>No employees</div>
+            ) : (
+              <div className={records.recordFigures}>
+                <Text fw={700}>Median {wholeUnits(row.median)}</Text>
+                <Text size="sm" c="gray.6">
+                  {wholeUnits(row.min)} to {wholeUnits(row.max)}
+                </Text>
+              </div>
+            )}
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }
 

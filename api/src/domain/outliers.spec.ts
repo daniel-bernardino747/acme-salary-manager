@@ -104,7 +104,7 @@ describe('findOutliers', () => {
     const pair = { jobTitle: 'Accountant', country: 'US' } as const;
     const single = { jobTitle: 'Recruiter', country: 'US' } as const;
     const group = [
-      // A group of 2 with one member shown, and a group of 1: 2 shown employees left unchecked.
+      // A group of 2 with one member shown, and a group of 1: 2 shown employees in small groups.
       member(60_000_00, pair),
       member(70_000_00, { ...pair, department: 'People' }, false),
       member(50_000_00, single),

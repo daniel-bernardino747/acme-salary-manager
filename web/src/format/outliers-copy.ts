@@ -27,7 +27,7 @@ export function costText(usd: Money): string {
  * How many matching employees sit in small groups and so weren't checked, so an empty result is
  * never ambiguous between "nobody is out of line" and "nobody could be checked" (ADR 0004).
  */
-export function uncheckedText(smallGroupHeadcount: number): string {
+export function smallGroupCountText(smallGroupHeadcount: number): string {
   return smallGroupHeadcount === 1
     ? "1 employee in a small group wasn't checked."
     : `${employeeCount(smallGroupHeadcount)} in small groups weren't checked.`;

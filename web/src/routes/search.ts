@@ -19,3 +19,11 @@ const direction = z.enum(outlierDirections).default('below').catch('below');
 
 export const outliersSearchSchema = z.object({ page, direction, country, department, jobTitle });
 export type OutliersSearch = z.infer<typeof outliersSearchSchema>;
+
+/** Question 1 picks both with no defaults: nothing is fetched until both are set. */
+export const statisticsSearchSchema = z.object({ jobTitle, country });
+export type StatisticsSearch = z.infer<typeof statisticsSearchSchema>;
+
+/** Question 3 picks a title with no default. */
+export const comparisonSearchSchema = z.object({ jobTitle });
+export type ComparisonSearch = z.infer<typeof comparisonSearchSchema>;

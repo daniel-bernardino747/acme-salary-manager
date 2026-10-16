@@ -1,4 +1,4 @@
-import { intInRange, type Uint32Source } from './prng';
+import { intInRange, shuffle, type Uint32Source } from './prng';
 
 // ADR 0005, *Salaries within a group*, as amended during the seed (#15). Integer-only: a salary is
 // a whole number of steps.
@@ -32,7 +32,8 @@ function toSteps(minor: number, stepMinor: number): number {
  * The salaries of a group of 5 or more, anchored on the base. With `k = floor((size − 1) / 2)`, k
  * are drawn below the base and k above it, and the one or two left are the base exactly, so the
  * median is the base. Each planted underpaid salary then takes the place of the lowest draw, and
- * each overpaid one the highest: every rank is unchanged, so the median does not move.
+ * each overpaid one the highest: every rank is unchanged, so the median does not move. The group
+ * is then shuffled, so sorted positions do not leak into ids.
  */
 export function anchoredSalaries(next: Uint32Source, group: AnchoredGroup): number[] {
   const { baseMinor, stepMinor, size, underpaid = [], overpaid = [] } = group;
@@ -55,7 +56,7 @@ export function anchoredSalaries(next: Uint32Source, group: AnchoredGroup): numb
   const above = Array.from({ length: half }, () => intInRange(next, baseSteps + 1, high));
   const onBase = Array.from({ length: size - 2 * half }, () => baseSteps);
   const toMinor = (steps: number) => steps * stepMinor;
-  return [
+  return shuffle(next, [
     ...underpaid,
     ...below.sort(ascending).slice(underpaid.length).map(toMinor),
     ...onBase.map(toMinor),
@@ -64,5 +65,5 @@ export function anchoredSalaries(next: Uint32Source, group: AnchoredGroup): numb
       .slice(0, half - overpaid.length)
       .map(toMinor),
     ...overpaid,
-  ];
+  ]);
 }

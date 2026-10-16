@@ -87,7 +87,7 @@ export function GlobalSearch() {
       maxHeight={480}
       radius="md"
       shadow="xl"
-      classNames={{ content: classes.searchContent }}
+      classNames={{ content: classes.searchContent, actionsGroup: classes.searchGroup }}
     >
       <Spotlight.Search
         placeholder="Search employees, job titles, countries…"

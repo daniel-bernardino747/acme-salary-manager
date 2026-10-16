@@ -1,8 +1,8 @@
 import { problemSchema } from '@acme/contract';
 import { Body, Controller, HttpCode, Post } from '@nestjs/common';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { bootTestApp, type TestApp } from '../../test/http';
+import { useTestApp } from '../../test/http';
 import { ZodValidationPipe } from './zod-validation.pipe';
 
 const echoSchema = z.strictObject({
@@ -20,11 +20,7 @@ class EchoController {
 }
 
 describe('ZodValidationPipe', () => {
-  let t: TestApp;
-  beforeAll(async () => {
-    t = await bootTestApp({ controllers: [EchoController] });
-  });
-  afterAll(() => t.app.close());
+  const t = useTestApp({ controllers: [EchoController] });
 
   it('rejects an invalid body with a 400 problem whose errors carry the Zod paths', async () => {
     const res = await t
@@ -51,6 +47,6 @@ describe('ZodValidationPipe', () => {
       .send({ name: '  Ana Costa ', annualSalaryMinor: 1 })
       .expect(200);
 
-    expect(res.body).toEqual({ name: 'Ana Costa', annualSalaryMinor: 1 });
+    expect(echoSchema.parse(res.body)).toEqual({ name: 'Ana Costa', annualSalaryMinor: 1 });
   });
 });

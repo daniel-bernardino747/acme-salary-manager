@@ -1,15 +1,9 @@
 import { healthResponseSchema } from '@acme/contract';
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { bootTestApp, type TestApp } from '../../test/http';
-import { clearEmployees } from '../persistence/clear-employees';
+import { describe, expect, it } from 'vitest';
+import { useTestApp } from '../../test/http';
 
 describe('GET /api/health', () => {
-  let t: TestApp;
-  beforeAll(async () => {
-    t = await bootTestApp();
-  });
-  afterAll(() => t.app.close());
-  beforeEach(() => clearEmployees(t.db));
+  const t = useTestApp();
 
   it('returns 200 when the database answers', async () => {
     const res = await t.http().get('/api/health').expect(200);

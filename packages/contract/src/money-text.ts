@@ -1,3 +1,4 @@
+import type { Money } from './money.js';
 import { currencies, type CurrencyCode } from './reference.js';
 
 export type ParseMoneyResult =
@@ -28,4 +29,37 @@ export function parseMoney(input: string, currency: CurrencyCode): ParseMoneyRes
     return { success: false, error: 'Amount is too large' };
   }
   return { success: true, amountMinor };
+}
+
+/** The app's one locale (ADR 0004, *Copy and locale*). */
+export type AppLocale = 'en';
+
+/** `amountMinor` as an exact decimal string of major units, e.g. 125000050 with 2 decimals is "1250000.50". */
+function toDecimalString(amountMinor: number, exponent: number): `${number}` {
+  const digits = String(amountMinor).padStart(exponent + 1, '0');
+  if (exponent === 0) {
+    return digits as `${number}`;
+  }
+  const point = digits.length - exponent;
+  return `${digits.slice(0, point)}.${digits.slice(point)}` as `${number}`;
+}
+
+/**
+ * Shows money as text with its own currency's symbol (ADR 0003, *Text and integers*). The decimal
+ * string is built from the integer with string operations, and `Intl.NumberFormat` only groups it
+ * and adds the symbol, always in the explicit locale, never the machine's default.
+ */
+export function formatMoney(money: Money, locale: AppLocale): string {
+  if (!Number.isSafeInteger(money.amountMinor) || money.amountMinor < 0) {
+    throw new RangeError(
+      `formatMoney needs a non-negative safe integer, got ${money.amountMinor}.`,
+    );
+  }
+  const { exponent } = currencies[money.currency];
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: money.currency,
+    minimumFractionDigits: exponent,
+    maximumFractionDigits: exponent,
+  }).format(toDecimalString(money.amountMinor, exponent));
 }

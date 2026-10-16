@@ -5,7 +5,7 @@ import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 /** Each pay question is labelled as the question it answers (ADR 0004, *Routing*). */
 const payQuestions = [
   { to: '/pay/statistics', label: 'What do we pay for a job title in a country?' },
-  { to: '/pay/payroll', label: 'What does our payroll cost, by country and department?' },
+  { to: '/pay/payroll', label: 'What is our payroll total, by country and department?' },
   { to: '/pay/comparison', label: 'How does pay for a job title compare across countries?' },
   { to: '/pay/outliers', label: 'Who is paid out of line with their peers?' },
 ] as const;

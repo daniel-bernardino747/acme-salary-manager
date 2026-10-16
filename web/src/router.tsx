@@ -16,6 +16,7 @@ import {
 } from './routes/search';
 import { EmployeeList } from './screens/employee-list';
 import { NotFound } from './screens/not-found';
+import { PayComparison } from './screens/pay-comparison';
 import { PayStatistics } from './screens/pay-statistics';
 import { PayrollTotals } from './screens/payroll-totals';
 import { Placeholder } from './screens/placeholder';
@@ -78,7 +79,7 @@ const comparisonRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/pay/comparison',
   validateSearch: comparisonSearchSchema,
-  component: () => <Placeholder title="Pay across countries" />,
+  component: PayComparison,
 });
 
 const outliersRoute = createRoute({

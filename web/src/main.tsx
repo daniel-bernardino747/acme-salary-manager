@@ -5,9 +5,10 @@ import { RouterProvider } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createQueryClient } from './api/query-client';
-import { router } from './router';
+import { createAppRouter } from './router';
 
 const queryClient = createQueryClient();
+const router = createAppRouter();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

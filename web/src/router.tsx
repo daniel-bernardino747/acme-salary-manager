@@ -97,15 +97,16 @@ const routeTree = rootRoute.addChildren([
   outliersRoute,
 ]);
 
-/** The app's router. Tests pass a memory history; the browser uses its own. */
+/**
+ * The app's router. `main.tsx` creates it with the browser's history; tests pass a memory history.
+ * The app is a client-only SPA, so it never takes the server path, which Node would otherwise pick.
+ */
 export function createAppRouter(history?: RouterHistory) {
-  return createRouter({ routeTree, history, parseSearch, stringifySearch });
+  return createRouter({ routeTree, history, parseSearch, stringifySearch, isServer: false });
 }
-
-export const router = createAppRouter();
 
 declare module '@tanstack/react-router' {
   interface Register {
-    router: typeof router;
+    router: ReturnType<typeof createAppRouter>;
   }
 }

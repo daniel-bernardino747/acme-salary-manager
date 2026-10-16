@@ -76,6 +76,25 @@ const direction = z.enum(outlierDirections).default('below').catch('below');
 export const outliersSearchSchema = z.object({ page, direction, country, department, jobTitle });
 export type OutliersSearch = z.infer<typeof outliersSearchSchema>;
 
+/** A new direction or filter on question 4; `null` is a cleared filter. */
+export interface OutliersSearchChange {
+  direction?: string;
+  country?: string | null;
+  department?: string | null;
+  jobTitle?: string | null;
+}
+
+/**
+ * Question 4's search after a direction or filter change: back on the first page (ADR 0004,
+ * *Routing*). A cleared filter falls back to unset through the lenient schema, so it leaves the URL.
+ */
+export function changeOutliersSearch(
+  search: OutliersSearch,
+  change: OutliersSearchChange,
+): OutliersSearch {
+  return outliersSearchSchema.parse({ ...search, ...change, page: 1 });
+}
+
 /** Question 1 picks both with no defaults: nothing is fetched until both are set. */
 export const statisticsSearchSchema = z.object({ jobTitle, country });
 export type StatisticsSearch = z.infer<typeof statisticsSearchSchema>;

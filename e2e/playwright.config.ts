@@ -7,9 +7,12 @@ import { join } from 'node:path';
 
 const port = 3100;
 
-// A fresh file on every run, so the start sequence seeds it and the data is the default seed. Set
-// once here: workers load this config again and inherit the variable instead of making a new file.
-process.env.E2E_DATABASE_PATH ??= join(mkdtempSync(join(tmpdir(), 'acme-e2e-')), 'app.db');
+// A fresh file on every run, so the start sequence seeds it and the data is the default seed. Only
+// the runner starts the webServer and makes the file; workers load this config again and need none.
+const databasePath =
+  process.env.TEST_WORKER_INDEX === undefined
+    ? join(mkdtempSync(join(tmpdir(), 'acme-e2e-')), 'app.db')
+    : '';
 
 export default defineConfig({
   testDir: 'tests',
@@ -31,7 +34,7 @@ export default defineConfig({
     command: 'pnpm start',
     cwd: '..',
     url: `http://localhost:${port}/api/health`,
-    env: { DATABASE_PATH: process.env.E2E_DATABASE_PATH, PORT: String(port) },
+    env: { DATABASE_PATH: databasePath, PORT: String(port) },
     // Never an already running app: its database would not be a fresh default seed.
     reuseExistingServer: false,
     // The first boot seeds 10,000 employees before the server listens.

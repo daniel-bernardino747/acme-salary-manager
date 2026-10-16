@@ -67,3 +67,24 @@ export function anchoredSalaries(next: Uint32Source, group: AnchoredGroup): numb
     ...overpaid,
   ]);
 }
+
+/**
+ * The salaries of a small group (under 5), drawn freely in 0.88–1.12 × base with no two alike: on
+ * a collision, the next draw from the same stream replaces it. Small groups are never checked for
+ * outliers, so neither anchoring nor the bound applies.
+ */
+export function freeSalaries(next: Uint32Source, group: GroupBase): number[] {
+  const { baseMinor, stepMinor, size } = group;
+  if (!Number.isInteger(size) || size < 0 || size >= 5) {
+    throw new RangeError(`A small group has 0 to 4 employees, got ${size}.`);
+  }
+  const { low, high } = drawRange(toSteps(baseMinor, stepMinor));
+  if (high - low + 1 < size) {
+    throw new RangeError(`The draw range has fewer than ${size} distinct salaries.`);
+  }
+  const drawn = new Set<number>();
+  while (drawn.size < size) {
+    drawn.add(intInRange(next, low, high));
+  }
+  return [...drawn].map((steps) => steps * stepMinor);
+}

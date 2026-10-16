@@ -114,4 +114,23 @@ describe('findOutliers', () => {
 
     expect(findOutliers(group).smallGroupHeadcount).toBe(2);
   });
+
+  it('takes the median over the whole peer group, but lists only the members who are shown', () => {
+    // Sorted: 6,000 · 7,000 · 10,000 · 12,000 · 12,000, so the whole group's median is $10,000.00.
+    // The shown three alone (7,000 · 12,000 · 12,000) would give $12,000.00. The hidden 6,000 is
+    // below 0.80 too, but is never listed.
+    const shownUnderpaid = member(7_000_00);
+    const group = [
+      shownUnderpaid,
+      member(6_000_00, { department: 'Sales' }, false),
+      member(12_000_00),
+      member(10_000_00, { department: 'Sales' }, false),
+      member(12_000_00),
+    ];
+
+    const { outliers } = findOutliers(group);
+
+    expect(outliers.map((o) => o.employee)).toEqual([shownUnderpaid.employee]);
+    expect(outliers[0]).toMatchObject({ peerMedian: usd(10_000_00), peerHeadcount: 5 });
+  });
 });

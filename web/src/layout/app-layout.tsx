@@ -10,7 +10,7 @@ import {
   Text,
   VisuallyHidden,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 import { outliersQuery, underpaidSearch } from '../api/outliers-query';
@@ -27,11 +27,14 @@ import classes from './shell.module.css';
 export function AppLayout() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [navOpen, nav] = useDisclosure(false);
+  const desktop = useMediaQuery('(min-width: 48em)') ?? true;
   const active = activeNavItem(pathname);
 
   return (
     <AppShell
-      layout="alt"
+      // The rail runs full height beside the header on a desktop; on a phone it opens under the
+      // header, so the close button stays in reach.
+      layout={desktop ? 'alt' : 'default'}
       header={{ height: 64 }}
       navbar={{ width: 240, breakpoint: 'sm', collapsed: { mobile: !navOpen } }}
       padding={0}

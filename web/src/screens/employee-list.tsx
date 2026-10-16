@@ -139,10 +139,10 @@ export function EmployeeList() {
               {list.items.length > 0 ? (
                 <EmployeeTable employees={list.items} />
               ) : (
-                <EmptyState text={`There are no employees on page ${list.page}.`}>
+                <EmptyState text={`Page ${list.page} is past the end of the list.`}>
                   <Button
                     variant="light"
-                    onClick={() => void navigate({ search: { ...search, page: 1 } })}
+                    onClick={() => void navigate({ search: (prev) => ({ ...prev, page: 1 }) })}
                   >
                     Go to the first page
                   </Button>
@@ -150,7 +150,7 @@ export function EmployeeList() {
               )}
               <Group justify="space-between">
                 <Text size="sm" c="dimmed">
-                  {list.items.length > 0 ? listRange(list) : `${list.total} employees`}
+                  {list.items.length > 0 && listRange(list)}
                 </Text>
                 {/* The URL's page, so it moves on click while keepPreviousData shows the old one. */}
                 <Pagination

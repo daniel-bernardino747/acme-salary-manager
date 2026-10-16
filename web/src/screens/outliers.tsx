@@ -187,9 +187,10 @@ function OutliersTable({ outliers }: { outliers: Outlier[] }) {
                     )}
                   >
                     {employee.name}
-                  </Anchor>
+                  </Anchor>{' '}
+                  <CountryStamp country={country} />
                   <Text size="sm" c="gray.6">
-                    {jobTitle} · {countryName(country)} <CountryStamp country={country} />
+                    {jobTitle} · {countryName(country)}
                   </Text>
                 </Table.Td>
                 <Table.Td>{employee.department}</Table.Td>

@@ -65,6 +65,29 @@ describe('listEmployees', () => {
     expect(listEmployees(db, { page: 2, pageSize: 2 }).total).toBe(5);
   });
 
+  it('combines the country, department and job title filters with AND, and counts only matches', () => {
+    const match = insertEmployee(db, {
+      country: 'IN',
+      department: 'Data',
+      jobTitle: 'Data Scientist',
+    }).id;
+    insertEmployee(db, { country: 'BR', department: 'Data', jobTitle: 'Data Scientist' });
+    insertEmployee(db, { country: 'IN', department: 'Product', jobTitle: 'Data Scientist' });
+    insertEmployee(db, { country: 'IN', department: 'Data', jobTitle: 'Data Analyst' });
+    const ids = (filters: Parameters<typeof listEmployees>[1]) => {
+      const list = listEmployees(db, filters);
+      return { ids: list.items.map((employee) => employee.id), total: list.total };
+    };
+
+    expect(
+      ids({ ...firstPage, country: 'IN', department: 'Data', jobTitle: 'Data Scientist' }),
+    ).toEqual({ ids: [match], total: 1 });
+    expect(ids({ ...firstPage, country: 'IN' }).total).toBe(3);
+    expect(ids({ ...firstPage, department: 'Data' }).total).toBe(3);
+    expect(ids({ ...firstPage, jobTitle: 'Data Scientist' }).total).toBe(3);
+    expect(ids({ ...firstPage, country: 'JP' })).toEqual({ ids: [], total: 0 });
+  });
+
   it('returns no items for a page past the end, with the total still counted', () => {
     insertEmployee(db);
 

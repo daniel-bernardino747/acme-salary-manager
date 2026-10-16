@@ -35,3 +35,24 @@ jobs:
           script=$(grep -o 'src="/assets/[^"]*\.js"' <<< "$html" | head -n 1 | cut -d '"' -f 2)
           test -n "$script"
           curl -fsS -o /dev/null -w '%{content_type}' "localhost:3000$script" | grep -q javascript
+
+  # The end-to-end smoke test (ADR 0006), next to the check job so the unit loop never waits for a browser.
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @acme/e2e exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      # Traces are kept only for failed tests, so a red job can be diagnosed without a local rerun.
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: e2e/test-results/
+          if-no-files-found: ignore

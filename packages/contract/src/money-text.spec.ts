@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseMoney } from './index.js';
+import { currencies, formatMoney, parseMoney, type CurrencyCode } from './index.js';
 
 describe('parseMoney', () => {
   it.each([
@@ -52,5 +52,26 @@ describe('parseMoney rejects', () => {
       success: false,
       error: 'Amount is too large',
     });
+  });
+});
+
+describe('formatMoney', () => {
+  it.each([
+    [125_000_050, 'INR', '₹1,250,000.50'],
+    [1_250_000, 'JPY', '¥1,250,000'],
+    // Near the cap.
+    [899_999_999_999, 'INR', '₹8,999,999,999.99'],
+    // Past what a float of the major units holds exactly.
+    [Number.MAX_SAFE_INTEGER, 'USD', '$90,071,992,547,409.91'],
+  ] as const)('shows %d %s as "%s" in en', (amountMinor, currency, text) => {
+    expect(formatMoney({ amountMinor, currency }, 'en')).toBe(text);
+  });
+
+  it('gives each supported currency its own symbol in en', () => {
+    const shown = (Object.keys(currencies) as CurrencyCode[]).map((currency) =>
+      formatMoney({ amountMinor: 100, currency }, 'en'),
+    );
+    expect(shown).toEqual(['$1.00', '£1.00', '€1.00', '₹1.00', 'R$1.00', '¥100']);
+    expect(new Set(shown.map((text) => text.replace(/[\d.,]/g, ''))).size).toBe(shown.length);
   });
 });

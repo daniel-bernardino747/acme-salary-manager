@@ -1,4 +1,10 @@
-import { createRootRoute, createRoute, createRouter, redirect } from '@tanstack/react-router';
+import {
+  createRootRoute,
+  createRoute,
+  createRouter,
+  redirect,
+  type RouterHistory,
+} from '@tanstack/react-router';
 import { AppLayout } from './layout/app-layout';
 import {
   comparisonSearchSchema,
@@ -91,7 +97,12 @@ const routeTree = rootRoute.addChildren([
   outliersRoute,
 ]);
 
-export const router = createRouter({ routeTree, parseSearch, stringifySearch });
+/** The app's router. Tests pass a memory history; the browser uses its own. */
+export function createAppRouter(history?: RouterHistory) {
+  return createRouter({ routeTree, history, parseSearch, stringifySearch });
+}
+
+export const router = createAppRouter();
 
 declare module '@tanstack/react-router' {
   interface Register {

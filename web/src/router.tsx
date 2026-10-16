@@ -14,6 +14,7 @@ import {
   statisticsSearchSchema,
   stringifySearch,
 } from './routes/search';
+import { AddEmployee, EditEmployee } from './screens/employee-form-pages';
 import { EmployeeList } from './screens/employee-list';
 import { EmployeeView } from './screens/employee-view';
 import { NotFound } from './screens/not-found';
@@ -48,7 +49,7 @@ const employeesRoute = createRoute({
 const newEmployeeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/employees/new',
-  component: () => <Placeholder title="Add employee" />,
+  component: AddEmployee,
 });
 
 const employeeRoute = createRoute({
@@ -60,7 +61,7 @@ const employeeRoute = createRoute({
 const editEmployeeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/employees/$id/edit',
-  component: () => <Placeholder title="Edit employee" />,
+  component: EditEmployee,
 });
 
 const statisticsRoute = createRoute({

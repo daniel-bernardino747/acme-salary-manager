@@ -11,6 +11,8 @@
   --acme-under: var(--mantine-color-under-6);
   --acme-over: var(--mantine-color-over-6);
   --acme-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Mantine's placeholder is gray-5 (3.99:1 on white); gray-6 meets AA. */
+  --mantine-color-placeholder: var(--mantine-color-gray-6);
 }
 
 html {

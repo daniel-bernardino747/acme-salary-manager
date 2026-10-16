@@ -1,9 +1,11 @@
 import type { INestApplication, ModuleMetadata } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
+import { afterAll, beforeAll, beforeEach } from 'vitest';
 import { AppModule } from '../src/app.module';
 import { configureApp } from '../src/configure-app';
 import { DB } from '../src/database.module';
+import { clearEmployees } from '../src/persistence/clear-employees';
 import type { Db } from '../src/persistence/db';
 
 export interface TestApp {
@@ -25,4 +27,18 @@ export async function bootTestApp(
   configureApp(app);
   await app.init();
   return { app, db: app.get<Db>(DB), http: () => request(app.getHttpServer()) };
+}
+
+/**
+ * Registers the per-file lifecycle (ADR 0006): one app booted before all tests, an empty employees
+ * table before each, and the app closed after all. Read the returned object inside tests only.
+ */
+export function useTestApp(extra: Pick<ModuleMetadata, 'controllers'> = {}): TestApp {
+  const t = {} as TestApp;
+  beforeAll(async () => {
+    Object.assign(t, await bootTestApp(extra));
+  });
+  beforeEach(() => clearEmployees(t.db));
+  afterAll(() => t.app.close());
+  return t;
 }

@@ -1,9 +1,8 @@
 import { problemSchema } from '@acme/contract';
 import { Controller, Get, Inject } from '@nestjs/common';
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { bootTestApp, type TestApp } from '../../test/http';
+import { describe, expect, it } from 'vitest';
+import { useTestApp } from '../../test/http';
 import { DB } from '../database.module';
-import { clearEmployees } from '../persistence/clear-employees';
 import type { Db } from '../persistence/db';
 
 @Controller('test-failures')
@@ -17,12 +16,7 @@ class FailingController {
 }
 
 describe('problem responses', () => {
-  let t: TestApp;
-  beforeAll(async () => {
-    t = await bootTestApp({ controllers: [FailingController] });
-  });
-  afterAll(() => t.app.close());
-  beforeEach(() => clearEmployees(t.db));
+  const t = useTestApp({ controllers: [FailingController] });
 
   it('answers an unknown /api route with a JSON 404 problem', async () => {
     const res = await t.http().get('/api/no-such-route').expect(404);

@@ -1,5 +1,5 @@
 import { formatMoney, type Money } from '@acme/contract';
-import { employeeCount } from './pay-statistics-copy';
+import { employeeCount } from './counts';
 import { placeDecimal } from './place-decimal';
 
 /**

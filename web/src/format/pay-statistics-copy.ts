@@ -1,7 +1,5 @@
 import { countries, currencyOf, type CountryCode, type JobTitle } from '@acme/contract';
-
-/** Counts in the app's one locale (ADR 0004, *Copy and locale*), never the machine's default. */
-const counts = new Intl.NumberFormat('en');
+import { employeeCount } from './counts';
 
 export interface PeerGroupNames {
   jobTitle: JobTitle;
@@ -28,11 +26,6 @@ export function statisticsHeading({ jobTitle, country }: PeerGroupNames): string
 /** An empty peer group, shown in place of the figures, never as zeros (ADR 0004, *Question 1*). */
 export function emptyGroupText({ jobTitle, country }: PeerGroupNames): string {
   return `No employees with the title ${jobTitle} ${inCountry(country)}.`;
-}
-
-/** "1 employee", "3 employees": counts are pluralized, job titles never are. */
-export function employeeCount(headcount: number): string {
-  return headcount === 1 ? '1 employee' : `${counts.format(headcount)} employees`;
 }
 
 /** Shown above a small group's figures, which are still shown (ADR 0001, ADR 0004 *Question 1*). */

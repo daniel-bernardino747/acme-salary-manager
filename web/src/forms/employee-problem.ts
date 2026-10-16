@@ -14,11 +14,15 @@ const renamed: Record<string, FormField> = { annualSalaryMinor: 'annualSalary' }
 
 /**
  * Maps a problem's errors onto the form by `path[0]` (ADR 0004, *Forms: add and edit*), so each
- * message shows on the field it belongs to.
+ * message shows on the field it belongs to. A problem with no errors (a 404, a 500, or the generic
+ * problem of an unreadable response) is a form-level alert, and the form keeps what was typed.
  */
 export function employeeProblem(problem: Problem): EmployeeProblem {
+  if (!problem.errors?.length) {
+    return { fieldErrors: {}, formError: problem.detail ?? problem.title };
+  }
   const fieldErrors: EmployeeProblem['fieldErrors'] = {};
-  for (const error of problem.errors ?? []) {
+  for (const error of problem.errors) {
     const key = String(error.path[0]);
     const field = renamed[key] ?? (key as FormField);
     fieldErrors[field] ??= error.message;

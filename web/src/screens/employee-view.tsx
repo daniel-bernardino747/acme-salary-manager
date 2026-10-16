@@ -158,58 +158,62 @@ function Peers({ employee }: { employee: EmployeeResponse }) {
                   {formatMoney(median, 'en')}
                 </Anchor>
               </div>
-              {statistics.smallGroup && (
-                <Alert color="under" variant="light" title="Small group">
+              {statistics.smallGroup ? (
+                // A small group's notice replaces the range (ADR 0004, *Employee view*).
+                <Alert color="cover" variant="light" title="Small group">
                   {smallGroupNotice(headcount)}
                 </Alert>
+              ) : (
+                <>
+                  <RangeBar
+                    min={min.amountMinor}
+                    max={max.amountMinor}
+                    median={median.amountMinor}
+                    average={average.amountMinor}
+                    value={employee.annualSalary.amountMinor}
+                    label={`${employee.name}'s salary on the range of their peer group, from minimum to maximum`}
+                  />
+                  <Group justify="space-between" gap="xs">
+                    <Text size="sm">
+                      <Text span c="gray.6">
+                        Min{' '}
+                      </Text>
+                      {formatMoney(min, 'en')}
+                    </Text>
+                    <Text size="sm">
+                      <Text span c="gray.6">
+                        Max{' '}
+                      </Text>
+                      {formatMoney(max, 'en')}
+                    </Text>
+                  </Group>
+                  <Muted size="xs">
+                    The dot is this salary, the tick the median, and the diamond the average (
+                    {formatMoney(average, 'en')}).
+                  </Muted>
+                </>
               )}
-              <RangeBar
-                min={min.amountMinor}
-                max={max.amountMinor}
-                median={median.amountMinor}
-                average={average.amountMinor}
-                value={employee.annualSalary.amountMinor}
-                smallGroup={statistics.smallGroup}
-                label={`${employee.name}'s salary on the range of their peer group, from minimum to maximum`}
-              />
-              <Group justify="space-between" gap="xs">
-                <Text size="sm">
-                  <Text span c="gray.6">
-                    Min{' '}
-                  </Text>
-                  {formatMoney(min, 'en')}
-                </Text>
-                <Text size="sm">
-                  <Text span c="gray.6">
-                    Max{' '}
-                  </Text>
-                  {formatMoney(max, 'en')}
-                </Text>
-              </Group>
-              <Muted size="xs">
-                The dot is this salary, the tick the median, and the diamond the average (
-                {formatMoney(average, 'en')}).
-              </Muted>
-              <Group gap="lg">
-                <Anchor
-                  size="sm"
-                  renderRoot={(props) => <Link {...props} to="/pay/statistics" search={search} />}
-                >
-                  Compare with peers
-                </Anchor>
-                <Anchor
-                  size="sm"
-                  renderRoot={(props) => (
-                    <Link {...props} to="/employees" search={{ page: 1, jobTitle, country }} />
-                  )}
-                >
-                  {seeEmployeesText(headcount)}
-                </Anchor>
-              </Group>
+              <Anchor
+                size="sm"
+                renderRoot={(props) => (
+                  <Link {...props} to="/employees" search={{ page: 1, jobTitle, country }} />
+                )}
+              >
+                {seeEmployeesText(headcount)}
+              </Anchor>
             </Stack>
           );
         }}
       </QueryState>
+      {/* Always shown, whatever the peers request does (ADR 0004, *Employee view*). */}
+      <Anchor
+        size="sm"
+        mt="md"
+        display="inline-block"
+        renderRoot={(props) => <Link {...props} to="/pay/statistics" search={search} />}
+      >
+        Compare with peers
+      </Anchor>
     </Panel>
   );
 }
@@ -261,7 +265,7 @@ function DeleteEmployee({ employee, opened, onClose }: DeleteEmployeeProps) {
           <Button variant="default" onClick={onClose} disabled={remove.isPending}>
             Cancel
           </Button>
-          <Button color="red" loading={remove.isPending} onClick={() => remove.mutate()}>
+          <Button color="red.8" loading={remove.isPending} onClick={() => remove.mutate()}>
             Delete {employee.name}
           </Button>
         </Group>

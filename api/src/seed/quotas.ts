@@ -77,6 +77,27 @@ export interface Quota {
   count: number;
 }
 
+/**
+ * None of the weighted cells fall under 5, so small groups are planted: each of these cells gets
+ * exactly its count, and the rest of its country's total is spread over the other cells.
+ */
+export const smallGroupOverrides = [
+  // Empty peer group: null stats, "no employees" in question 3.
+  { jobTitle: 'Staff Software Engineer', country: 'BR', count: 0 },
+  // Small group with an even-sized median.
+  { jobTitle: 'Staff Software Engineer', country: 'NL', count: 2 },
+  // Single-employee group.
+  { jobTitle: 'Senior Data Scientist', country: 'JP', count: 1 },
+  // Largest small group: shown, marked, never checked.
+  { jobTitle: 'Sales Manager', country: 'NL', count: 4 },
+  // Smallest checked group, pinned against weight changes.
+  { jobTitle: 'Senior Data Scientist', country: 'NL', count: 5 },
+] as const satisfies readonly Quota[];
+
+function overrideFor(jobTitle: JobTitle, country: CountryCode): number | undefined {
+  return smallGroupOverrides.find((o) => o.jobTitle === jobTitle && o.country === country)?.count;
+}
+
 function weight(jobTitle: JobTitle, country: CountryCode): number {
   const profile: DepartmentTenths = countryProfile[country];
   return titleMixPermille[jobTitle] * (profile[homeDepartment[jobTitle]] ?? 10);
@@ -107,10 +128,16 @@ function largestRemainder(total: number, weights: readonly number[]): number[] {
  */
 export function headcountQuotas(): Quota[] {
   return countries.flatMap(({ code }) => {
+    const free = jobTitles.filter((t) => overrideFor(t, code) === undefined);
+    const overridden = jobTitles.reduce((sum, t) => sum + (overrideFor(t, code) ?? 0), 0);
     const counts = largestRemainder(
-      countryTotals[code],
-      jobTitles.map((t) => weight(t, code)),
+      countryTotals[code] - overridden,
+      free.map((t) => weight(t, code)),
     );
-    return jobTitles.map((jobTitle, i) => ({ jobTitle, country: code, count: counts[i] ?? 0 }));
+    return jobTitles.map((jobTitle) => ({
+      jobTitle,
+      country: code,
+      count: overrideFor(jobTitle, code) ?? counts[free.indexOf(jobTitle)] ?? 0,
+    }));
   });
 }

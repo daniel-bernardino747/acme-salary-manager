@@ -214,6 +214,9 @@ importers:
       drizzle-orm:
         specifier: ^0.45.4
         version: 0.45.4(@types/better-sqlite3@9.6.0)(better-sqlite3@13.0.3)
+      on-headers:
+        specifier: 1.1.0
+        version: 1.1.0
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -242,6 +245,9 @@ importers:
       '@types/node':
         specifier: ^24.19.2
         version: 24.19.2
+      '@types/on-headers':
+        specifier: 1.0.4
+        version: 1.0.4
       '@types/supertest':
         specifier: ^7.2.1
         version: 7.2.1
@@ -1608,6 +1614,9 @@ packages:
   '@types/node@24.19.2':
     resolution: {integrity: sha512-93d49wCWJkCyN87MxLpNN6KXPCwFw7bVUg79mGUV1OS40JGWwVCr8n61DXCSqz7CV6/VfPkb7xec7uP2M+QHWQ==}
 
+  '@types/on-headers@1.0.4':
+    resolution: {integrity: sha512-D8Dy7oiM4fFQPA1TtHVTGPFNgCCYY132dTFLezhvlPiiiyKkuW6tVipPXpUOiuTUu8Kzd+ASKjULvZld197Dhw==}
+
   '@types/qs@6.15.1':
     resolution: {integrity: sha512-GZHUBZR9hckSUhrxmp1nG6NwdpM9fCunJwyThLW1X3AyHgd9IlHb6VANpQQqDr2o/qQp6McZ3y/IA2rVzKzSbw==}
 
@@ -2919,6 +2928,10 @@ packages:
 
   on-finished@2.4.1:
     resolution: {integrity: sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg==}
+    engines: {node: '>= 0.8'}
+
+  on-headers@1.1.0:
+    resolution: {integrity: sha512-737ZY3yNnXy37FHkQxPzt4UZ2UWPWiCZWLvFZ4fu5cueciegX0zGPnrlY6bwRg4FdQOe9YU8MkmJwGhoMybl8A==}
     engines: {node: '>= 0.8'}
 
   once@1.4.0:
@@ -4769,6 +4782,10 @@ snapshots:
     dependencies:
       undici-types: 7.24.6
 
+  '@types/on-headers@1.0.4':
+    dependencies:
+      '@types/node': 24.19.2
+
   '@types/qs@6.15.1': {}
 
   '@types/range-parser@1.2.7': {}
@@ -6028,6 +6045,8 @@ snapshots:
   on-finished@2.4.1:
     dependencies:
       ee-first: 1.1.1
+
+  on-headers@1.1.0: {}
 
   once@1.4.0:
     dependencies:

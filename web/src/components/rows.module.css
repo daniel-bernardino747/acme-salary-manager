@@ -1,4 +1,4 @@
-/* Tables on a desktop, stacked records on a phone: never a sideways scroll for the key figure. */
+/* Tables on a desktop, stacked rows on a phone: never a sideways scroll for the key figure. */
 
 .tableWrap {
   background: var(--acme-panel);
@@ -40,7 +40,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-.records {
+.stacked {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -49,40 +49,40 @@
   border-radius: var(--mantine-radius-md);
 }
 
-.record {
+.row {
   display: block;
   padding: 12px 14px;
   color: inherit;
   text-decoration: none;
 }
 
-.records > li + li {
+.stacked > li + li {
   border-top: 1px solid var(--acme-hairline);
 }
 
-a.record:focus-visible {
+a.row:focus-visible {
   outline-offset: -2px;
 }
 
-.recordTop {
+.rowTop {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: var(--mantine-spacing-sm);
 }
 
-.recordName {
+.rowName {
   font-weight: 600;
   color: var(--mantine-color-visa-7);
 }
 
-.recordMeta {
+.rowMeta {
   font-size: var(--mantine-font-size-sm);
   color: var(--mantine-color-gray-6);
   margin-top: 2px;
 }
 
-.recordFigures {
+.rowFigures {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;

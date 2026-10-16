@@ -11,17 +11,17 @@
   min-width: 160px;
 }
 
-.records {
+.stacked {
   list-style: none;
   margin: 0 calc(var(--mantine-spacing-md) * -1);
   padding: 0;
 }
 
-.records > li + li {
+.stacked > li + li {
   border-top: 1px solid var(--acme-hairline);
 }
 
-.records :global(a) > div:nth-child(2) {
+.stacked :global(a) > div:nth-child(2) {
   margin-top: 6px;
 }
 

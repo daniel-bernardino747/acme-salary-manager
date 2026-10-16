@@ -18,12 +18,12 @@
   outline: 1px solid var(--mantine-color-gray-4);
 }
 
-.records {
+.stacked {
   list-style: none;
   margin: 0 calc(var(--mantine-spacing-md) * -1);
   padding: 0;
 }
 
-.records > li + li {
+.stacked > li + li {
   border-top: 1px solid var(--acme-hairline);
 }

@@ -57,6 +57,35 @@ describe('GET /api/employees', () => {
     expect(list.items.map((employee) => employee.id)).toEqual([match]);
   });
 
+  it('searches names with q, trimmed', async () => {
+    const priya = insertEmployee(t.db, { name: 'Priya Sharma' }).id;
+    insertEmployee(t.db, { name: 'Rohan Mehta' });
+
+    const res = await t.http().get('/api/employees').query({ q: '  pri sha  ' }).expect(200);
+
+    const list = employeeListResponseSchema.parse(res.body);
+    expect(list.total).toBe(1);
+    expect(list.items.map((employee) => employee.id)).toEqual([priya]);
+  });
+
+  it('takes an empty or whitespace-only q as no search', async () => {
+    insertEmployee(t.db, { name: 'Priya Sharma' });
+    insertEmployee(t.db, { name: 'Rohan Mehta' });
+
+    for (const q of ['', '   ']) {
+      const res = await t.http().get('/api/employees').query({ q }).expect(200);
+      expect(employeeListResponseSchema.parse(res.body).total).toBe(2);
+    }
+  });
+
+  it('takes a q of up to 100 characters once trimmed', async () => {
+    await t
+      .http()
+      .get('/api/employees')
+      .query({ q: ` ${'x'.repeat(100)} ` })
+      .expect(200);
+  });
+
   it('answers a page past the end with 200 and no items', async () => {
     insertEmployee(t.db);
 

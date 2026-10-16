@@ -18,7 +18,9 @@ export class OutliersService {
       peerGroupMembers(this.db, filters),
       direction,
     );
-    const listed = { items: outliers, page, pageSize, total: outliers.length, smallGroupHeadcount };
+    // Pagination is in memory: the domain ranked every outlier, so the page is a slice of it.
+    const items = outliers.slice((page - 1) * pageSize, page * pageSize);
+    const listed = { items, page, pageSize, total: outliers.length, smallGroupHeadcount };
     if (direction !== 'below') {
       return listed;
     }

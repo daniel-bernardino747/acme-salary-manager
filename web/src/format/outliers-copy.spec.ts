@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { costText, outliersHeadline, uncheckedText } from './outliers-copy';
+import { costText, noOutliersText, outliersHeadline, uncheckedText } from './outliers-copy';
 
 describe('outliersHeadline', () => {
   it.each([
@@ -31,5 +31,15 @@ describe('uncheckedText', () => {
     [0, "0 employees in small groups weren't checked."],
   ])('counts %i employees in small groups as "%s"', (smallGroupHeadcount, text) => {
     expect(uncheckedText(smallGroupHeadcount)).toBe(text);
+  });
+});
+
+describe('noOutliersText', () => {
+  it.each([
+    ['below', 'No underpaid employees for these filters.'],
+    ['above', 'No overpaid employees for these filters.'],
+    ['all', 'No employees paid out of line for these filters.'],
+  ] as const)('says nobody matched in direction %s', (direction, text) => {
+    expect(noOutliersText(direction)).toBe(text);
   });
 });

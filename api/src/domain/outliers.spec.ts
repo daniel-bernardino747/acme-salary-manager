@@ -147,6 +147,18 @@ describe('findOutliers', () => {
       [underpaid.employee, 500_00],
     ]);
   });
+
+  it('costs bringing the underpaid it finds to 0.80 in the same pass, in USD', () => {
+    // Median $10,000.00: gaps of $500.00 and $100.00. The overpaid adds nothing.
+    const group = [
+      member(7_500_00),
+      member(7_900_00),
+      member(13_000_00),
+      ...[1, 2, 3, 4].map(() => member(10_000_00)),
+    ];
+
+    expect(findOutliers(group).costToReachThreshold).toEqual(usd(600_00));
+  });
 });
 
 describe('findOutliers ranking', () => {

@@ -99,4 +99,19 @@ describe('findOutliers', () => {
     expect(outliers.map((o) => o.employee)).toEqual([underpaid.employee]);
     expect(outliers[0]?.peerHeadcount).toBe(5);
   });
+
+  it('counts the shown employees in small groups, who were not checked', () => {
+    const pair = { jobTitle: 'Accountant', country: 'US' } as const;
+    const single = { jobTitle: 'Recruiter', country: 'US' } as const;
+    const group = [
+      // A group of 2 with one member shown, and a group of 1: 2 shown employees left unchecked.
+      member(60_000_00, pair),
+      member(70_000_00, { ...pair, department: 'People' }, false),
+      member(50_000_00, single),
+      // A checked group of 5 adds nothing.
+      ...[1, 2, 3, 4, 5].map((n) => member(n * 10_000_00)),
+    ];
+
+    expect(findOutliers(group).smallGroupHeadcount).toBe(2);
+  });
 });

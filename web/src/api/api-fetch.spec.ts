@@ -76,4 +76,18 @@ describe('apiFetch', () => {
       detail: 'The server answered 502 with a response the app cannot read.',
     });
   });
+
+  it('turns a JSON error body that is not Problem Details into a generic ApiProblem', async () => {
+    serve(Response.json({ statusCode: 500, message: 'Internal server error' }, { status: 500 }));
+
+    const error = await apiFetch('/api/payroll-totals').catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(ApiProblem);
+    expect((error as ApiProblem).problem).toEqual({
+      type: 'about:blank',
+      title: 'Request failed',
+      status: 500,
+      detail: 'The server answered 500 with a response the app cannot read.',
+    });
+  });
 });

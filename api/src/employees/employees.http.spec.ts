@@ -177,3 +177,31 @@ describe('the :id of /api/employees/:id', () => {
     },
   );
 });
+
+/** A valid add or edit body. */
+const priya = {
+  name: 'Priya Sharma',
+  jobTitle: 'Software Engineer II',
+  department: 'Engineering',
+  country: 'IN',
+  annualSalaryMinor: 1_250_000_50,
+};
+
+describe('POST /api/employees', () => {
+  it('creates the employee and answers 201 with it and its Location', async () => {
+    const res = await t.http().post('/api/employees').send(priya).expect(201);
+
+    const created = employeeResponseSchema.parse(res.body);
+    expect(created).toEqual({
+      id: created.id,
+      name: 'Priya Sharma',
+      jobTitle: 'Software Engineer II',
+      department: 'Engineering',
+      country: 'IN',
+      annualSalary: { amountMinor: 1_250_000_50, currency: 'INR' },
+    });
+    expect(res.headers.location).toBe(`/api/employees/${created.id}`);
+    const stored = await t.http().get(`/api/employees/${created.id}`).expect(200);
+    expect(employeeResponseSchema.parse(stored.body)).toEqual(created);
+  });
+});

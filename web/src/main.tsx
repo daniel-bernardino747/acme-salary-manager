@@ -1,4 +1,5 @@
 import '@mantine/core/styles.css';
+import '@mantine/charts/styles.css';
 import { MantineProvider } from '@mantine/core';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from '@tanstack/react-router';

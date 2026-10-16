@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { payrollHeadline, shareText } from './payroll-copy';
+import { highestUsdFirst, payrollHeadline, shareText } from './payroll-copy';
 
 const usd = (amountMinor: number) => ({ amountMinor, currency: 'USD' as const });
 
@@ -23,5 +23,24 @@ describe('payrollHeadline', () => {
     ['Annual payroll: $0 · 0 employees', 0, usd(0)],
   ])('heads the payroll as "%s"', (headline, headcount, total) => {
     expect(payrollHeadline({ headcount, usd: total })).toBe(headline);
+  });
+});
+
+describe('highestUsdFirst', () => {
+  it('ranks rows by USD total, highest first, keeping the fixed order between equal totals', () => {
+    const rows = [
+      { department: 'Engineering', usd: usd(100_00) },
+      { department: 'Product', usd: usd(300_00) },
+      { department: 'Design', usd: usd(0) },
+      { department: 'Data', usd: usd(100_00) },
+    ];
+
+    expect(highestUsdFirst(rows).map((row) => row.department)).toEqual([
+      'Product',
+      'Engineering',
+      'Data',
+      'Design',
+    ]);
+    expect(rows[0]?.department).toBe('Engineering');
   });
 });

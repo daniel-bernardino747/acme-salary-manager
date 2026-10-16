@@ -1,6 +1,7 @@
 import {
   employeeIdSchema,
   employeeListQuerySchema,
+  employeeRequestSchema,
   type EmployeeListQuery,
   type EmployeeListResponse,
   type EmployeeRequest,
@@ -45,7 +46,10 @@ export class EmployeesController {
   }
 
   @Post()
-  add(@Body() body: EmployeeRequest, @Res({ passthrough: true }) res: Response): EmployeeResponse {
+  add(
+    @Body(new ZodValidationPipe(employeeRequestSchema)) body: EmployeeRequest,
+    @Res({ passthrough: true }) res: Response,
+  ): EmployeeResponse {
     const employee = createEmployee(this.db, body);
     res.location(`/api/employees/${employee.id}`);
     return employee;

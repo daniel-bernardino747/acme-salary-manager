@@ -1,9 +1,5 @@
-import { countries, type CountryCode, type Money } from '@acme/contract';
-
-/** A country's English name, e.g. "United Kingdom" for GB. */
-export function countryName(country: CountryCode): string {
-  return countries.find((c) => c.code === country)?.name ?? country;
-}
+import type { CountryCode, Money } from '@acme/contract';
+import { countryName } from './country-name';
 
 /** Highest median first; a country with no employees has no median, so it goes last. */
 function byMedianUsd(a: { median: Money | null }, b: { median: Money | null }): number {

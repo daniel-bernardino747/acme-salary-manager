@@ -1,4 +1,4 @@
-import { countries, formatMoney, type Money, type PayrollTotalsResponse } from '@acme/contract';
+import { formatMoney, type Money, type PayrollTotalsResponse } from '@acme/contract';
 import { Anchor, Button, Group, Skeleton, Stack, Table, Text, Title } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, type LinkProps } from '@tanstack/react-router';
@@ -7,16 +7,13 @@ import { apiFetch } from '../api/api-fetch';
 import { queryKey } from '../api/query-key';
 import { QueryState } from '../components/query-state';
 import { countText } from '../format/counts';
+import { countryName } from '../format/country-name';
 import {
   highestUsdFirst,
   payrollFootnote,
   payrollHeadline,
   shareText,
 } from '../format/payroll-copy';
-
-const countryNames = new Map<string, string>(
-  countries.map((country) => [country.code, country.name]),
-);
 
 /** Payroll totals are shown in whole units, rounded in integers (ADR 0001, *USD totals*). */
 const whole = (money: Money) => formatMoney(money, 'en', { wholeUnits: true });
@@ -54,7 +51,7 @@ function Payroll({ totals }: { totals: PayrollTotalsResponse }) {
           withLocal
           rows={highestUsdFirst(totals.byCountry).map((row) => ({
             key: row.country,
-            name: countryNames.get(row.country) ?? row.country,
+            name: countryName(row.country),
             list: { to: '/employees', search: { country: row.country } },
             ...row,
           }))}

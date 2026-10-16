@@ -27,14 +27,14 @@ export function QueryState<T>({ query, skeleton, idle = null, children }: QueryS
   }
   if (query.isError) {
     return (
-      <Alert color="red" title="Could not load this page">
+      <Alert color="red.8" title="Could not load this page">
         <Stack gap="sm">
           <Text size="sm">{errorText(query.error)}</Text>
           <Group>
             <Button
               size="xs"
               variant="light"
-              color="red"
+              color="red.8"
               loading={query.isFetching}
               onClick={() => void query.refetch()}
             >

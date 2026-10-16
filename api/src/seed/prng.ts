@@ -24,3 +24,8 @@ export function sfc32(seed: readonly [number, number, number, number]): Uint32So
   }
   return next;
 }
+
+/** A whole number from `min` to `max`, both included. */
+export function intInRange(next: Uint32Source, min: number, max: number): number {
+  return min + (next() % (max - min + 1));
+}

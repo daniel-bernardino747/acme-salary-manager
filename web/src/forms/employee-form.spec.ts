@@ -73,4 +73,12 @@ describe('employeeFormSchema', () => {
       });
     }
   });
+
+  it('checks the salary while another field is still invalid, so its message shows on blur', () => {
+    expect(errorsOf({ ...priya, name: '', jobTitle: '', annualSalary: '0' })).toEqual({
+      name: ['Required'],
+      jobTitle: ['Required'],
+      annualSalary: ['Must be greater than 0'],
+    });
+  });
 });

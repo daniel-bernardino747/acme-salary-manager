@@ -18,7 +18,7 @@ import { CountryStamp, DirectionBadge, Muted, PageHeader, Panel } from '../compo
 import { FilterBar } from '../components/filter-bar';
 import { ArrowRightIcon } from '../components/icons';
 import { QueryState } from '../components/query-state';
-import records from '../components/records.module.css';
+import rowStyles from '../components/rows.module.css';
 import { countText } from '../format/counts';
 import { countryName } from '../format/country-name';
 import { listRange, pageCount } from '../format/list-range';
@@ -116,7 +116,7 @@ export function Outliers() {
                       <OutliersTable outliers={page.items} />
                     </Box>
                     <Box hiddenFrom="sm">
-                      <OutlierRecords outliers={page.items} />
+                      <OutlierRows outliers={page.items} />
                     </Box>
                   </>
                 ) : (
@@ -159,17 +159,17 @@ export function Outliers() {
 
 function OutliersTable({ outliers }: { outliers: Outlier[] }) {
   return (
-    <div className={records.tableWrap}>
-      <Table className={records.table}>
+    <div className={rowStyles.tableWrap}>
+      <Table className={rowStyles.table}>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Employee</Table.Th>
             <Table.Th>Department</Table.Th>
-            <Table.Th className={records.money}>Salary</Table.Th>
-            <Table.Th className={records.money}>Peer median</Table.Th>
-            <Table.Th className={records.money}>Compa-ratio</Table.Th>
-            <Table.Th className={records.money}>Gap to 0.80</Table.Th>
-            <Table.Th className={records.money}>Peers</Table.Th>
+            <Table.Th className={rowStyles.money}>Salary</Table.Th>
+            <Table.Th className={rowStyles.money}>Peer median</Table.Th>
+            <Table.Th className={rowStyles.money}>Compa-ratio</Table.Th>
+            <Table.Th className={rowStyles.money}>Gap to 0.80</Table.Th>
+            <Table.Th className={rowStyles.money}>Peers</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -194,10 +194,10 @@ function OutliersTable({ outliers }: { outliers: Outlier[] }) {
                   </Text>
                 </Table.Td>
                 <Table.Td>{employee.department}</Table.Td>
-                <Table.Td className={records.money}>
+                <Table.Td className={rowStyles.money}>
                   {formatMoney(employee.annualSalary, 'en')}
                 </Table.Td>
-                <Table.Td className={records.money}>
+                <Table.Td className={rowStyles.money}>
                   {/* The same median as question 1 for this group, digit for digit. */}
                   <Anchor
                     renderRoot={(props) => (
@@ -207,7 +207,7 @@ function OutliersTable({ outliers }: { outliers: Outlier[] }) {
                     {formatMoney(outlier.peerMedian, 'en')}
                   </Anchor>
                 </Table.Td>
-                <Table.Td className={records.money}>
+                <Table.Td className={rowStyles.money}>
                   <Group gap="xs" justify="flex-end" wrap="nowrap">
                     <Text fw={700} span>
                       {placeDecimal(outlier.compaRatioHundredths, 2)}
@@ -215,11 +215,11 @@ function OutliersTable({ outliers }: { outliers: Outlier[] }) {
                     <DirectionBadge direction={outlier.direction} />
                   </Group>
                 </Table.Td>
-                <Table.Td className={records.money}>
+                <Table.Td className={rowStyles.money}>
                   {outlier.gapMinor !== null &&
                     formatMoney({ amountMinor: outlier.gapMinor, currency }, 'en')}
                 </Table.Td>
-                <Table.Td className={records.money}>{countText(outlier.peerHeadcount)}</Table.Td>
+                <Table.Td className={rowStyles.money}>{countText(outlier.peerHeadcount)}</Table.Td>
               </Table.Tr>
             );
           })}
@@ -233,21 +233,21 @@ function OutliersTable({ outliers }: { outliers: Outlier[] }) {
  * On a phone each outlier stacks: name and compa-ratio, job title · country, salary against the
  * peer median, and the gap.
  */
-function OutlierRecords({ outliers }: { outliers: Outlier[] }) {
+function OutlierRows({ outliers }: { outliers: Outlier[] }) {
   return (
-    <ul className={records.records}>
+    <ul className={rowStyles.stacked}>
       {outliers.map((outlier) => {
         const { employee } = outlier;
         const currency = employee.annualSalary.currency;
         return (
           <li key={employee.id}>
             <Link
-              className={records.record}
+              className={rowStyles.row}
               to="/employees/$id"
               params={{ id: String(employee.id) }}
             >
-              <div className={records.recordTop}>
-                <span className={records.recordName}>{employee.name}</span>
+              <div className={rowStyles.rowTop}>
+                <span className={rowStyles.rowName}>{employee.name}</span>
                 <Group gap={6} wrap="nowrap">
                   <Text fw={700} span>
                     {placeDecimal(outlier.compaRatioHundredths, 2)}
@@ -255,11 +255,11 @@ function OutlierRecords({ outliers }: { outliers: Outlier[] }) {
                   <DirectionBadge direction={outlier.direction} />
                 </Group>
               </div>
-              <div className={records.recordMeta}>
+              <div className={rowStyles.rowMeta}>
                 {employee.jobTitle} · {countryName(employee.country)}{' '}
                 <CountryStamp country={employee.country} />
               </div>
-              <div className={records.recordFigures}>
+              <div className={rowStyles.rowFigures}>
                 <span>
                   {formatMoney(employee.annualSalary, 'en')}{' '}
                   <Text span c="gray.6" size="sm">

@@ -20,7 +20,7 @@ import { CountryStamp, PageHeader } from '../components/document';
 import { FilterBar } from '../components/filter-bar';
 import { ArrowRightIcon, PlusIcon, SearchIcon } from '../components/icons';
 import { QueryState } from '../components/query-state';
-import records from '../components/records.module.css';
+import rowStyles from '../components/rows.module.css';
 import { employeeCount } from '../format/counts';
 import { countryName } from '../format/country-name';
 import { listRange, pageCount } from '../format/list-range';
@@ -136,7 +136,7 @@ export function EmployeeList() {
                     <EmployeeTable employees={list.items} />
                   </Box>
                   <Box hiddenFrom="sm">
-                    <EmployeeRecords employees={list.items} />
+                    <EmployeeRows employees={list.items} />
                   </Box>
                 </>
               ) : (
@@ -173,15 +173,15 @@ export function EmployeeList() {
 function EmployeeTable({ employees }: { employees: EmployeeResponse[] }) {
   const navigate = useNavigate();
   return (
-    <div className={records.tableWrap}>
-      <Table className={records.table}>
+    <div className={rowStyles.tableWrap}>
+      <Table className={rowStyles.table}>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Name</Table.Th>
             <Table.Th>Job title</Table.Th>
             <Table.Th>Department</Table.Th>
             <Table.Th>Country</Table.Th>
-            <Table.Th className={records.money}>Salary</Table.Th>
+            <Table.Th className={rowStyles.money}>Salary</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -204,7 +204,7 @@ function EmployeeTable({ employees }: { employees: EmployeeResponse[] }) {
                 <Table.Td style={{ whiteSpace: 'nowrap' }}>
                   {countryName(employee.country)} <CountryStamp country={employee.country} />
                 </Table.Td>
-                <Table.Td className={records.money}>
+                <Table.Td className={rowStyles.money}>
                   {formatMoney(employee.annualSalary, 'en')}
                 </Table.Td>
               </Table.Tr>
@@ -216,18 +216,18 @@ function EmployeeTable({ employees }: { employees: EmployeeResponse[] }) {
   );
 }
 
-/** On a phone each employee is one stacked record: name, job title · country, salary. */
-function EmployeeRecords({ employees }: { employees: EmployeeResponse[] }) {
+/** On a phone each employee is one stacked row: name, job title · country, salary. */
+function EmployeeRows({ employees }: { employees: EmployeeResponse[] }) {
   return (
-    <ul className={records.records}>
+    <ul className={rowStyles.stacked}>
       {employees.map((employee) => (
         <li key={employee.id}>
-          <Link className={records.record} to="/employees/$id" params={{ id: String(employee.id) }}>
-            <div className={records.recordTop}>
-              <span className={records.recordName}>{employee.name}</span>
-              <span className={records.money}>{formatMoney(employee.annualSalary, 'en')}</span>
+          <Link className={rowStyles.row} to="/employees/$id" params={{ id: String(employee.id) }}>
+            <div className={rowStyles.rowTop}>
+              <span className={rowStyles.rowName}>{employee.name}</span>
+              <span className={rowStyles.money}>{formatMoney(employee.annualSalary, 'en')}</span>
             </div>
-            <div className={records.recordMeta}>
+            <div className={rowStyles.rowMeta}>
               {employee.jobTitle} · {employee.department}{' '}
               <CountryStamp country={employee.country} />
             </div>
@@ -240,7 +240,7 @@ function EmployeeRecords({ employees }: { employees: EmployeeResponse[] }) {
 
 function EmptyState({ text, children }: { text: string; children: ReactNode }) {
   return (
-    <Stack align="center" gap="sm" py="xl" className={records.tableWrap}>
+    <Stack align="center" gap="sm" py="xl" className={rowStyles.tableWrap}>
       <Text fw={600}>{text}</Text>
       {children}
     </Stack>

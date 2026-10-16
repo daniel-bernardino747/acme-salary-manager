@@ -6,7 +6,7 @@ import { payrollTotalsQuery } from '../api/payroll-totals-query';
 import { CountryStamp, Figure, Muted, PageHeader, Panel, ShareBar } from '../components/document';
 import { PlusIcon } from '../components/icons';
 import { QueryState } from '../components/query-state';
-import records from '../components/records.module.css';
+import rowStyles from '../components/rows.module.css';
 import { countText, employeeCount } from '../format/counts';
 import { countryName } from '../format/country-name';
 import { shareBars } from '../format/overview';
@@ -100,7 +100,7 @@ function Totals(props: { name: string; rows: TotalsRow[]; withLocal?: boolean })
         <TotalsTable {...props} />
       </Box>
       <Box hiddenFrom="sm">
-        <TotalsRecords rows={props.rows} />
+        <TotalsRows rows={props.rows} />
       </Box>
     </>
   );
@@ -117,13 +117,13 @@ function TotalsTable({
 }) {
   const navigate = useNavigate();
   return (
-    <Table className={records.table} horizontalSpacing="sm">
+    <Table className={rowStyles.table} horizontalSpacing="sm">
       <Table.Thead>
         <Table.Tr>
           <Table.Th>{name}</Table.Th>
-          <Table.Th className={records.money}>Headcount</Table.Th>
-          {withLocal && <Table.Th className={records.money}>Local total</Table.Th>}
-          <Table.Th className={records.money}>USD total</Table.Th>
+          <Table.Th className={rowStyles.money}>Headcount</Table.Th>
+          {withLocal && <Table.Th className={rowStyles.money}>Local total</Table.Th>}
+          <Table.Th className={rowStyles.money}>USD total</Table.Th>
           <Table.Th className={classes.shareHead}>Share</Table.Th>
           {withLocal && (
             <Table.Th>
@@ -151,11 +151,11 @@ function TotalsTable({
                 </>
               )}
             </Table.Td>
-            <Table.Td className={records.money}>{countText(row.headcount)}</Table.Td>
+            <Table.Td className={rowStyles.money}>{countText(row.headcount)}</Table.Td>
             {withLocal && (
-              <Table.Td className={records.money}>{row.local && wholeUnits(row.local)}</Table.Td>
+              <Table.Td className={rowStyles.money}>{row.local && wholeUnits(row.local)}</Table.Td>
             )}
-            <Table.Td className={records.money} fw={600}>
+            <Table.Td className={rowStyles.money} fw={600}>
               {wholeUnits(row.usd)}
             </Table.Td>
             <Table.Td className={classes.shareCell}>
@@ -183,20 +183,20 @@ function TotalsTable({
 }
 
 /** On a phone each row stacks: name and share, the USD total, then the local total and headcount. */
-function TotalsRecords({ rows }: { rows: TotalsRow[] }) {
+function TotalsRows({ rows }: { rows: TotalsRow[] }) {
   return (
-    <ul className={classes.records}>
+    <ul className={classes.stacked}>
       {rows.map((row) => (
         <li key={row.key}>
-          <Link className={records.record} {...row.list}>
-            <div className={records.recordTop}>
-              <span className={records.recordName}>
+          <Link className={rowStyles.row} {...row.list}>
+            <div className={rowStyles.rowTop}>
+              <span className={rowStyles.rowName}>
                 {row.name} {row.country && <CountryStamp country={row.country} />}
               </span>
               <span>{shareText(row.sharePermille, row.usd)}</span>
             </div>
             <ShareBar width={row.width} />
-            <div className={records.recordFigures}>
+            <div className={rowStyles.rowFigures}>
               <Text fw={700}>{wholeUnits(row.usd)}</Text>
               <Text size="sm" c="gray.6">
                 {row.local && row.local.currency !== 'USD' && `${wholeUnits(row.local)} · `}

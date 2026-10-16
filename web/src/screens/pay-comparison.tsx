@@ -10,7 +10,7 @@ import { payComparisonPath } from '../api/pay-comparison-path';
 import { queryKey } from '../api/query-key';
 import { CountryStamp, Muted, PageHeader, Panel } from '../components/document';
 import { QueryState } from '../components/query-state';
-import records from '../components/records.module.css';
+import rowStyles from '../components/rows.module.css';
 import { comparisonFootnote, highestMedianFirst, medianBars } from '../format/comparison-copy';
 import { countText, employeeCount } from '../format/counts';
 import { countryStamp } from '../format/country-stamp';
@@ -141,7 +141,7 @@ function Comparison({ comparison }: { comparison: PayComparisonResponse }) {
           <ComparisonTable jobTitle={jobTitle} rows={rows} />
         </Box>
         <Box hiddenFrom="sm">
-          <ComparisonRecords jobTitle={jobTitle} rows={rows} />
+          <ComparisonRows jobTitle={jobTitle} rows={rows} />
         </Box>
       </Panel>
       <Muted size="xs">{comparisonFootnote(comparison.rates)}</Muted>
@@ -235,15 +235,15 @@ function LegendEntry({ kind, children }: { kind: 'full' | 'small'; children: Rea
 function ComparisonTable({ jobTitle, rows }: { jobTitle: JobTitle; rows: ComparisonRow[] }) {
   const navigate = useNavigate();
   return (
-    <Table className={records.table} horizontalSpacing="sm">
+    <Table className={rowStyles.table} horizontalSpacing="sm">
       <Table.Thead>
         <Table.Tr>
           <Table.Th>Country</Table.Th>
-          <Table.Th className={records.money}>Headcount</Table.Th>
-          <Table.Th className={records.money}>Min</Table.Th>
-          <Table.Th className={records.money}>Median</Table.Th>
-          <Table.Th className={records.money}>Average</Table.Th>
-          <Table.Th className={records.money}>Max</Table.Th>
+          <Table.Th className={rowStyles.money}>Headcount</Table.Th>
+          <Table.Th className={rowStyles.money}>Min</Table.Th>
+          <Table.Th className={rowStyles.money}>Median</Table.Th>
+          <Table.Th className={rowStyles.money}>Average</Table.Th>
+          <Table.Th className={rowStyles.money}>Max</Table.Th>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
@@ -265,7 +265,7 @@ function ComparisonTable({ jobTitle, rows }: { jobTitle: JobTitle; rows: Compari
                 </Anchor>{' '}
                 <CountryStamp country={row.country} />
               </Table.Td>
-              <Table.Td className={records.money}>
+              <Table.Td className={rowStyles.money}>
                 <Group gap="xs" justify="flex-end" wrap="nowrap">
                   {row.smallGroup && (
                     <Badge color="gray" variant="light">
@@ -283,7 +283,7 @@ function ComparisonTable({ jobTitle, rows }: { jobTitle: JobTitle; rows: Compari
                 figures.map((figure) => (
                   <Table.Td
                     key={figure}
-                    className={records.money}
+                    className={rowStyles.money}
                     fw={figure === 'median' ? 700 : undefined}
                   >
                     {row[figure] && wholeUnits(row[figure])}
@@ -299,29 +299,29 @@ function ComparisonTable({ jobTitle, rows }: { jobTitle: JobTitle; rows: Compari
 }
 
 /** On a phone each country stacks: name and headcount, the median, then min to max. */
-function ComparisonRecords({ jobTitle, rows }: { jobTitle: JobTitle; rows: ComparisonRow[] }) {
+function ComparisonRows({ jobTitle, rows }: { jobTitle: JobTitle; rows: ComparisonRow[] }) {
   return (
-    <ul className={classes.records}>
+    <ul className={classes.stacked}>
       {rows.map((row) => (
         <li key={row.country}>
           <Link
-            className={records.record}
+            className={rowStyles.row}
             to="/pay/statistics"
             search={{ jobTitle, country: row.country }}
           >
-            <div className={records.recordTop}>
-              <span className={records.recordName}>
+            <div className={rowStyles.rowTop}>
+              <span className={rowStyles.rowName}>
                 {countryName(row.country)} <CountryStamp country={row.country} />
               </span>
-              <span className={records.recordMeta}>
+              <span className={rowStyles.rowMeta}>
                 {row.smallGroup ? 'Small group · ' : ''}
                 {employeeCount(row.headcount)}
               </span>
             </div>
             {row.headcount === 0 || !row.median || !row.min || !row.max ? (
-              <div className={records.recordMeta}>No employees</div>
+              <div className={rowStyles.rowMeta}>No employees</div>
             ) : (
-              <div className={records.recordFigures}>
+              <div className={rowStyles.rowFigures}>
                 <Text fw={700}>Median {wholeUnits(row.median)}</Text>
                 <Text size="sm" c="gray.6">
                   {wholeUnits(row.min)} to {wholeUnits(row.max)}

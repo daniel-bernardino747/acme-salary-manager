@@ -59,15 +59,23 @@ export const employeeFormSchema = z
     ({ annualSalary, country }, ctx) => {
       const salary = readSalary(annualSalary, country);
       if (!salary.success) {
-        for (const message of salary.errors) {
-          ctx.addIssue({ code: 'custom', path: ['annualSalary'], message });
-        }
+        addSalaryIssues(ctx, salary.errors);
       }
     },
     { when: ({ issues }) => !issues.some((issue) => issue.path?.[0] === 'country') },
   )
-  .transform(({ annualSalary, ...employee }): EmployeeRequest => {
-    // Only reached once every field, the salary included, is valid.
+  .transform(({ annualSalary, ...employee }, ctx): EmployeeRequest => {
+    // Reached only once every field is valid, so the salary reads; it is checked again, not trusted.
     const salary = readSalary(annualSalary, employee.country);
-    return { ...employee, annualSalaryMinor: salary.success ? salary.amountMinor : 0 };
+    if (!salary.success) {
+      addSalaryIssues(ctx, salary.errors);
+      return z.NEVER;
+    }
+    return { ...employee, annualSalaryMinor: salary.amountMinor };
   });
+
+function addSalaryIssues(ctx: z.RefinementCtx, messages: string[]): void {
+  for (const message of messages) {
+    ctx.addIssue({ code: 'custom', path: ['annualSalary'], message });
+  }
+}

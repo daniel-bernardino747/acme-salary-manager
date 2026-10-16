@@ -25,6 +25,27 @@ export function highestMedianFirst<T extends { country: CountryCode; median: Mon
   );
 }
 
+/** One bar of the median chart, keyed by the country's name, which labels its axis. */
+export interface MedianBar {
+  country: string;
+  medianUsdMinor: number;
+  smallGroup: boolean;
+}
+
+/**
+ * The chart's bars, in the order given, leaving out countries with no employees (ADR 0004,
+ * *Question 3*). The median's cents are bar length only: geometry, never shown as money.
+ */
+export function medianBars(
+  rows: readonly { country: CountryCode; median: Money | null; smallGroup: boolean }[],
+): MedianBar[] {
+  return rows.flatMap(({ country, median, smallGroup }) =>
+    median === null
+      ? []
+      : [{ country: countryName(country), medianUsdMinor: median.amountMinor, smallGroup }],
+  );
+}
+
 /**
  * Rendered from the response's `rates`. The figures carry two roundings and a fixed rate, and
  * purchasing power is out of scope, so the footnote says both (ADR 0004, *Question 3*).

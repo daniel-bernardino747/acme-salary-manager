@@ -2,11 +2,13 @@ import {
   employeeListQuerySchema,
   type EmployeeListQuery,
   type EmployeeListResponse,
+  type EmployeeResponse,
 } from '@acme/contract';
-import { Controller, Get, Inject, Query } from '@nestjs/common';
+import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
 import { DB } from '../database.module';
 import { ZodValidationPipe } from '../http/zod-validation.pipe';
 import type { Db } from '../persistence/db';
+import { findEmployee } from '../persistence/find-employee';
 import { listEmployees } from '../persistence/list-employees';
 
 @Controller('employees')
@@ -19,5 +21,10 @@ export class EmployeesController {
   ): EmployeeListResponse {
     const { items, total } = listEmployees(this.db, query);
     return { items, page: query.page, pageSize: query.pageSize, total };
+  }
+
+  @Get(':id')
+  view(@Param('id') id: string): EmployeeResponse | undefined {
+    return findEmployee(this.db, Number(id));
   }
 }

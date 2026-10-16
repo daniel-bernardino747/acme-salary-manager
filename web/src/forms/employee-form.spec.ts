@@ -9,6 +9,17 @@ const priya: EmployeeFormValues = {
   annualSalary: '1,250,000.50',
 };
 
+/** Each field's messages, keyed by the field: what the form shows under it. */
+function errorsOf(values: EmployeeFormValues): Record<string, string[]> {
+  const result = employeeFormSchema.safeParse(values);
+  const errors: Record<string, string[]> = {};
+  for (const issue of result.error?.issues ?? []) {
+    const field = String(issue.path[0]);
+    (errors[field] ??= []).push(issue.message);
+  }
+  return errors;
+}
+
 describe('employeeFormSchema', () => {
   it('turns valid form values into the exact request body, the salary in minor units', () => {
     expect(employeeFormSchema.parse(priya)).toEqual({
@@ -17,6 +28,19 @@ describe('employeeFormSchema', () => {
       department: 'Engineering',
       country: 'IN',
       annualSalaryMinor: 1_250_000_50,
+    });
+  });
+
+  it("holds the salary to the contract's bounds: above 0 and at most the cap", () => {
+    expect(errorsOf({ ...priya, annualSalary: '0' })).toEqual({
+      annualSalary: ['Must be greater than 0'],
+    });
+    expect(errorsOf({ ...priya, annualSalary: '0.00' })).toEqual({
+      annualSalary: ['Must be greater than 0'],
+    });
+    expect(errorsOf({ ...priya, annualSalary: '9,000,000,000.00' })).toEqual({});
+    expect(errorsOf({ ...priya, annualSalary: '9,000,000,000.01' })).toEqual({
+      annualSalary: ['Exceeds the maximum salary'],
     });
   });
 });

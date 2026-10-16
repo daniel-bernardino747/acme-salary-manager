@@ -22,4 +22,13 @@ describe('intInRange', () => {
 
     expect(new Set(draws)).toEqual(new Set(Array.from({ length: 25 }, (_, i) => 88 + i)));
   });
+
+  it('rejects a draw past the last whole multiple of the range size, so there is no modulo bias', () => {
+    // 2³² = 3 · 1,431,655,765 + 1, so only 0xFFFFFFFF falls past the last whole multiple of 3.
+    const script = [0xffff_ffff, 0xffff_fffe];
+    const next = () => script.shift() ?? Number.NaN;
+
+    expect(intInRange(next, 10, 12)).toBe(10 + (0xffff_fffe % 3));
+    expect(script).toEqual([]);
+  });
 });

@@ -5,6 +5,7 @@ import {
   type Department,
   type JobTitle,
 } from '@acme/contract';
+import { inCell } from './cell';
 import { homeDepartment } from './home-departments';
 
 // ADR 0005, *Headcount: exact quotas*. Integers only: percentages are in tenths, multipliers in tenths.
@@ -95,7 +96,7 @@ export const smallGroupOverrides = [
 ] as const satisfies readonly Quota[];
 
 function overrideFor(jobTitle: JobTitle, country: CountryCode): number | undefined {
-  return smallGroupOverrides.find((o) => o.jobTitle === jobTitle && o.country === country)?.count;
+  return smallGroupOverrides.find(inCell(jobTitle, country))?.count;
 }
 
 function weight(jobTitle: JobTitle, country: CountryCode): number {

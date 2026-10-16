@@ -6,7 +6,7 @@ import { runSeed } from './run-seed';
 
 // The committed database golden hash (ADR 0005, *Tests*): the rows read back from a migrated
 // `:memory:` database, ordered by id, with ids. It changes only with the generator golden hash.
-const DATABASE_GOLDEN_HASH = '';
+const DATABASE_GOLDEN_HASH = '34fbc331a35f0ba6b951c5e6214777df5326fca2a745ff2e4cd0541e32e2b843';
 
 describe('seed command', () => {
   let db: Db;

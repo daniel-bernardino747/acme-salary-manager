@@ -47,3 +47,26 @@ test("question 4's headline costs the planted gaps, as the seed story test expec
     page.getByText(`Bringing them to 0.80 would cost ${cost} a year.`, { exact: true }),
   ).toBeVisible();
 });
+
+/** Added, edited and deleted below. No seeded name has this family name. */
+const added = { name: 'Aarav Playwright', jobTitle: 'Data Analyst', department: 'Data' };
+
+test('adding an employee in India saves the salary typed as 1,250,000.50 to the paisa', async ({
+  page,
+}) => {
+  await page.goto('/employees');
+  await page.getByRole('link', { name: 'Add employee' }).click();
+
+  await page.getByRole('textbox', { name: 'Name', exact: true }).fill(added.name);
+  await page.getByRole('combobox', { name: 'Job title' }).click();
+  await page.getByRole('option', { name: added.jobTitle, exact: true }).click();
+  await page.getByRole('combobox', { name: 'Department' }).click();
+  await page.getByRole('option', { name: added.department, exact: true }).click();
+  await page.getByRole('combobox', { name: 'Country' }).click();
+  await page.getByRole('option', { name: 'India', exact: true }).click();
+  await page.getByRole('textbox', { name: 'Annual salary' }).fill('1,250,000.50');
+  await page.getByRole('button', { name: 'Add employee' }).click();
+
+  await expect(page.getByRole('heading', { name: added.name, level: 2 })).toBeVisible();
+  await expect(page.getByText('₹1,250,000.50 INR', { exact: true })).toBeVisible();
+});

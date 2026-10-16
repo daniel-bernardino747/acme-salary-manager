@@ -1,4 +1,4 @@
-import { formatMoney, type Money } from '@acme/contract';
+import { formatMoney, type Money, type Rates } from '@acme/contract';
 import { employeeCount } from './counts';
 import { placeDecimal } from './place-decimal';
 
@@ -30,4 +30,12 @@ export function highestUsdFirst<T extends { usd: Money }>(rows: readonly T[]): T
     if (a.usd.amountMinor === b.usd.amountMinor) return 0;
     return a.usd.amountMinor > b.usd.amountMinor ? -1 : 1;
   });
+}
+
+/** Rendered from the response's `rates`, so it names the table that produced the figures. */
+export function payrollFootnote({ source, asOf }: Rates): string {
+  return (
+    `USD amounts converted at fixed rates from ${source}, as of ${asOf}. Each total is rounded on ` +
+    'its own, so the parts may not add up exactly to the total, or to 100%.'
+  );
 }

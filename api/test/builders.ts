@@ -1,14 +1,7 @@
-import type { CountryCode, Department, JobTitle } from '@acme/contract';
 import type { Db } from '../src/persistence/db';
 import { employees } from '../src/persistence/schema';
 
-export interface EmployeeRow {
-  name: string;
-  jobTitle: JobTitle;
-  department: Department;
-  country: CountryCode;
-  annualSalaryMinor: number;
-}
+export type EmployeeRow = Omit<typeof employees.$inferInsert, 'id'>;
 
 /** A valid employee, with any field overridden. */
 export function anEmployee(overrides: Partial<EmployeeRow> = {}): EmployeeRow {

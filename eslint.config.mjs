@@ -1,5 +1,6 @@
 import js from '@eslint/js';
 import prettier from 'eslint-config-prettier';
+import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -38,6 +39,11 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   {
     languageOptions: { globals: globals.node },
+  },
+  {
+    files: ['web/src/**/*.{ts,tsx}'],
+    ...reactHooks.configs.flat.recommended,
+    languageOptions: { globals: globals.browser },
   },
   // Layer imports in the API (ADR 0002 "Module seams", amended by ADR 0003). Specs may reach test helpers.
   ...domainImportRules(4),

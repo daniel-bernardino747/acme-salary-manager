@@ -41,16 +41,16 @@ export function toUsd(
 }
 
 /**
- * A USD total over amounts in several currencies: summed per currency, each subtotal converted once,
+ * A USD total over Money in several currencies: summed per currency, each subtotal converted once,
  * then the results added, so parts may not add up exactly to the whole (ADR 0001, *USD totals*).
  * Payroll totals and the cost to reach 0.80 both add up this way.
  */
 export function usdTotal(
-  amounts: readonly Money[],
+  moneys: readonly Money[],
   ratesPerUsd: RatesPerUsd = exchangeRates.ratesPerUsd,
 ): UsdMoney {
   const byCurrency = new Map<CurrencyCode, number[]>();
-  for (const { amountMinor, currency } of amounts) {
+  for (const { amountMinor, currency } of moneys) {
     const subtotal = byCurrency.get(currency);
     if (subtotal) {
       subtotal.push(amountMinor);

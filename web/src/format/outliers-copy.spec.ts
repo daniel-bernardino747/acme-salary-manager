@@ -4,7 +4,7 @@ import {
   costText,
   noOutliersText,
   outliersHeadline,
-  uncheckedText,
+  smallGroupCountText,
 } from './outliers-copy';
 
 describe('outliersHeadline', () => {
@@ -30,13 +30,13 @@ describe('costText', () => {
   });
 });
 
-describe('uncheckedText', () => {
+describe('smallGroupCountText', () => {
   it.each([
     [12, "12 employees in small groups weren't checked."],
     [1, "1 employee in a small group wasn't checked."],
     [0, "0 employees in small groups weren't checked."],
   ])('counts %i employees in small groups as "%s"', (smallGroupHeadcount, text) => {
-    expect(uncheckedText(smallGroupHeadcount)).toBe(text);
+    expect(smallGroupCountText(smallGroupHeadcount)).toBe(text);
   });
 });
 

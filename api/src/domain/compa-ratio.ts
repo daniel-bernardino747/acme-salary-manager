@@ -5,9 +5,9 @@ import { assertSafeInteger } from './rounding';
 export const LOWER_THRESHOLD_HUNDREDTHS = 80;
 export const UPPER_THRESHOLD_HUNDREDTHS = 120;
 
-/** `percent · amount`, asserted as a safe integer, so a cross-multiplication never loses precision. */
-function scaled(percent: number, amountMinor: number): number {
-  const product = percent * amountMinor;
+/** `percent · minor units`, asserted as a safe integer, so a cross-multiplication stays exact. */
+function scaled(percent: number, minor: number): number {
+  const product = percent * minor;
   assertSafeInteger(product, 'A cross-multiplied salary');
   return product;
 }

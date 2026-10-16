@@ -33,7 +33,7 @@ import {
   costText,
   noOutliersText,
   outliersHeadline,
-  uncheckedText,
+  smallGroupCountText,
 } from '../format/outliers-copy';
 import { placeDecimal } from '../format/place-decimal';
 import { changeOutliersSearch, type OutliersSearchChange } from '../routes/search';
@@ -73,7 +73,7 @@ export function Outliers() {
         </Text>
         {query.data && (
           <Text size="sm" c="dimmed">
-            {uncheckedText(query.data.smallGroupHeadcount)}
+            {smallGroupCountText(query.data.smallGroupHeadcount)}
           </Text>
         )}
       </Stack>

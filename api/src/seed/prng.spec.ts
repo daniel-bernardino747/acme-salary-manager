@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { intInRange, sfc32, streamFor } from './prng';
+import { intInRange, sfc32, shuffle, streamFor } from './prng';
 
 const take = (next: () => number, n: number) => Array.from({ length: n }, next);
 
@@ -41,5 +41,18 @@ describe('streamFor', () => {
     expect(take(streamFor('acme', 'Data Scientist', 'DE'), 100)).not.toEqual(cell);
     // Keys are kept apart, never concatenated.
     expect(take(streamFor('ab', 'c'), 100)).not.toEqual(take(streamFor('a', 'bc'), 100));
+  });
+});
+
+describe('shuffle', () => {
+  it('returns a reordering of the same items, the same one for the same stream', () => {
+    const sorted = Array.from({ length: 50 }, (_, i) => i);
+
+    const shuffled = shuffle(sfc32([1, 2, 3, 4]), sorted);
+
+    expect(shuffle(sfc32([1, 2, 3, 4]), sorted)).toEqual(shuffled);
+    expect(shuffled).not.toEqual(sorted);
+    expect([...shuffled].sort((a, b) => a - b)).toEqual(sorted);
+    expect(sorted).toEqual(Array.from({ length: 50 }, (_, i) => i));
   });
 });

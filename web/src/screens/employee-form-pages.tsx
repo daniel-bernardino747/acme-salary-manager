@@ -120,6 +120,8 @@ function EmployeeForm({ initialValues, submitLabel, send }: EmployeeFormProps) {
   const changeCountry = (next: string | null) => {
     const after = salaryAfterCountryChange(country, next ?? '', annualSalary);
     form.setFieldValue('country', next ?? '');
+    // A message from an earlier change names a currency that may no longer apply.
+    form.clearFieldError('annualSalary');
     if (after.message) {
       form.setFieldValue('annualSalary', after.annualSalary);
       form.setFieldError('annualSalary', after.message);

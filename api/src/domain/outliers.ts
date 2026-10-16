@@ -1,6 +1,7 @@
-import type { EmployeeResponse, Money } from '@acme/contract';
+import { exchangeRates, type EmployeeResponse, type Money } from '@acme/contract';
 import { compaRatioHundredths, gapMinor, isAboveThreshold, isBelowThreshold } from './compa-ratio';
 import { isSmallGroup } from './pay-statistics';
+import { usdTotal, type RatesPerUsd, type UsdMoney } from './conversion';
 import { median } from './statistics';
 
 /** Below 0.80 is underpaid, above 1.20 overpaid: the outlier's direction (CONTEXT.md). */
@@ -109,4 +110,18 @@ export function findOutliers(
     }
   }
   return { outliers: outliers.sort(mostExtremeFirst), smallGroupHeadcount };
+}
+
+/**
+ * The cost to reach 0.80: the sum of the underpaid outliers' gaps, each in their peer group's
+ * currency, as a USD total, per currency and converted once (ADR 0003, *Money on the wire*).
+ */
+export function costToReachThreshold(
+  outliers: readonly Pick<Outlier, 'gapMinor' | 'peerMedian'>[],
+  ratesPerUsd: RatesPerUsd = exchangeRates.ratesPerUsd,
+): UsdMoney {
+  const gaps = outliers.flatMap(({ gapMinor, peerMedian }) =>
+    gapMinor === null ? [] : [{ amountMinor: gapMinor, currency: peerMedian.currency }],
+  );
+  return usdTotal(gaps, ratesPerUsd);
 }

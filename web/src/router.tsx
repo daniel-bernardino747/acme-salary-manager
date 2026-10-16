@@ -23,7 +23,7 @@ import { PayComparison } from './screens/pay-comparison';
 import { PayStatistics } from './screens/pay-statistics';
 import { PayrollTotals } from './screens/payroll-totals';
 
-// Every route in ADR 0004, *Routing*. Screens are placeholders until their tickets land.
+// Every route in ADR 0004, *Routing*.
 
 const rootRoute = createRootRoute({
   component: AppLayout,

@@ -54,7 +54,7 @@ function DefaultSkeleton() {
 
 function describeError(error: Error): string {
   if (error instanceof ApiProblem) {
-    return error.problem.detail ?? error.problem.title;
+    return error.message;
   }
   return 'The server could not be reached. Check your connection and try again.';
 }

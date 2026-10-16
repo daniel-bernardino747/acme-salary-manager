@@ -13,6 +13,7 @@ The terms used here (peer group, compa-ratio, gap to 0.80, …) are defined in t
 
 ## Contents
 
+- [Architecture](#architecture)
 - [Setup](#setup)
 - [Commands](#commands)
 - [Seed](#seed)
@@ -20,6 +21,39 @@ The terms used here (peer group, compa-ratio, gap to 0.80, …) are defined in t
 - [Exchange rates](#exchange-rates)
 - [Known limitations](#known-limitations)
 - [How it was decided and built](#how-it-was-decided-and-built)
+
+## Architecture
+
+```mermaid
+flowchart LR
+  subgraph browser["Browser"]
+    web["React SPA<br/>Mantine · TanStack Router and Query"]
+  end
+
+  subgraph railway["One Railway service"]
+    http["NestJS<br/>controllers and services"]
+    domain["domain/<br/>pure functions: statistics, totals,<br/>USD conversion, compa-ratio, outliers"]
+    repo["persistence/<br/>one narrow Drizzle read per question"]
+    db[("SQLite file<br/>on a volume at /data")]
+    seed["seed script<br/>10,000 deterministic employees"]
+  end
+
+  contract["@acme/contract<br/>Zod schemas, reference data,<br/>exchange rates, money text, rounding"]
+
+  web -- "JSON over /api" --> http
+  http -- "serves the built SPA" --> web
+  http --> repo --> db
+  http --> domain
+  seed --> db
+  contract -.-> web
+  contract -.-> http
+  contract -.-> domain
+```
+
+- **One service, one origin.** Nest serves the built React app and the API on the same port, so there is no CORS, one deploy, and the two apps can never run different versions ([ADR 0003](docs/adr/0003-api-contract-and-shared-types.md), [#7](https://github.com/daniel-bernardino747/acme-salary-manager/issues/7)).
+- **SQL selects, the domain computes.** Each pay question is one narrow query whose rows go to one pure function. Every money rule (rounding, conversion, median, compa-ratio) lives once, in code that needs no Nest, database or network to test ([ADR 0002](docs/adr/0002-persistence-and-computation-seams.md#where-statistics-are-computed)).
+- **One contract for both apps.** Every request and response body has a Zod schema in `@acme/contract`, and both apps use the types derived from them. The API validates every request with its schema, the HTTP tests parse every response with its schema, and the web forms build on the same employee schema. The package also holds the dated rate table ([ADR 0003](docs/adr/0003-api-contract-and-shared-types.md)).
+- **Money is integer minor units plus a currency code**, never floats ([ADR 0001](docs/adr/0001-domain-model-and-money-rules.md)).
 
 ## Setup
 

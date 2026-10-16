@@ -249,3 +249,36 @@ Every ticket's acceptance criteria are checkable: the tests that must exist at w
 ````
 
 Then one `/implement #<ticket>` session per ticket, in frontier order.
+
+## Phase 3 — Build, one ticket per session
+
+Each session: `/implement #<ticket>` followed by the prompt below. The same prompt is reused for every ticket; only the number changes. The deploy ticket is `ready-for-human` and isn't run this way.
+
+````markdown
+Implement ticket #<n> of ACME Salary Manager.
+
+## Read first
+
+1. The ticket with its comments: `gh issue view <n> --comments`. Its acceptance criteria are the definition of done.
+2. The spec, #10, for the user stories this ticket serves.
+3. The ADRs the ticket cites, plus `CONTEXT.md`. Use the glossary's terms in code, tests and commit messages.
+4. The code already on `main`. Reuse what earlier tickets built (test builder, `clearEmployees`, money core, web shell); don't build a second version.
+
+## How to work
+
+- **Branch** `ticket/<n>-<slug>` off an up-to-date `main`. Comment on the ticket and assign yourself before the first commit.
+- **Test-first at the agreed seams** (ADR 0006): domain fixtures, repositories on `:memory:`, HTTP on `:memory:`, pure web functions. No mocks. One behaviour per red → green → refactor cycle, committed as `test:` / `feat:` / `refactor:`. Never batch behaviours.
+- **Configuration isn't faked as TDD.** Workspace setup, tsconfig, lint rules, CI and build wiring go in small `build:` or `chore:` commits, one concern each. Don't write a test only to have a red commit.
+- **Dependencies:** look up current versions with `npm view <pkg> version`; never rely on memory. Pin exact versions. Node and pnpm stay as pinned.
+- **Run** the typecheck and the touched test file constantly, lint and the full suite before review.
+- **The ADRs are the law.** If one turns out to be wrong or unworkable (e.g. a first-slice check fails on Windows), **stop and ask me**. Never work around an ADR silently. An agreed change gets its own `docs(adr):` commit.
+- **Out of the ticket's scope → leave it.** If you notice something another ticket owns, mention it in your final report instead of doing it.
+
+## Finish
+
+1. `/code-review` against `main`. Fixes go in their own commits.
+2. Lint, typecheck and the full suite green locally.
+3. Commit `docs/ai/` as `chore(ai): session logs`, then push and open a PR: title = ticket title, body starts with `Part of #9` and `Closes #<n>`, then a short narrative: what was built, decisions taken inside the ticket's room, anything left for later.
+4. Wait for CI. When it's green, merge with **`gh pr merge --rebase --delete-branch`**, never squash: the red → green → refactor commits are the evidence the assessment asks for.
+5. Report: what's done, test count and suite time, anything I should know before the next ticket. Then stop.
+````

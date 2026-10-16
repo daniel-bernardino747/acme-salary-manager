@@ -31,7 +31,7 @@ test('question 4 opens on Underpaid, listing the planted Senior Data Scientist i
   await page.goto('/');
   await page
     .getByRole('navigation', { name: 'Main' })
-    .getByRole('link', { name: 'Who is paid out of line with their peers?' })
+    .getByRole('link', { name: 'Outliers' })
     .click();
 
   await expect(page.getByRole('radio', { name: 'Underpaid' })).toBeChecked();
@@ -72,7 +72,7 @@ test('adding an employee in India saves the salary typed as 1,250,000.50 to the 
   await page.getByRole('textbox', { name: 'Annual salary' }).fill('1,250,000.50');
   await page.getByRole('button', { name: 'Add employee' }).click();
 
-  await expect(page.getByRole('heading', { name: addedEmployee.name, level: 2 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: addedEmployee.name, level: 1 })).toBeVisible();
   await expect(page.getByText('₹1,250,000.50 INR', { exact: true })).toBeVisible();
 });
 
@@ -83,7 +83,7 @@ async function openAddedEmployee(page: Page) {
   // The search reaches the list after its debounce; the assertion waits for it, never a timer.
   await expect(page.getByText('1–1 of 1', { exact: true })).toBeVisible();
   await page.getByRole('link', { name: addedEmployee.name, exact: true }).click();
-  await expect(page.getByRole('heading', { name: addedEmployee.name, level: 2 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: addedEmployee.name, level: 1 })).toBeVisible();
 }
 
 test('editing that employee starts from their salary and saves a raise', async ({ page }) => {

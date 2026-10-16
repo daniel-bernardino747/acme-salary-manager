@@ -25,7 +25,6 @@ describe('GET /api/pay-statistics', () => {
       jobTitle: 'Data Scientist',
       country: 'BR',
       headcount: 2,
-      smallGroup: true,
       min: { amountMinor: 180_000_00, currency: 'BRL' },
       max: { amountMinor: 240_000_00, currency: 'BRL' },
     });

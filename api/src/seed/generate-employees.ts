@@ -18,8 +18,13 @@ export interface GeneratedEmployee {
   plant: Plant | null;
 }
 
-const pick = (next: Uint32Source, list: readonly string[]) =>
-  list[intInRange(next, 0, list.length - 1)] ?? '';
+function pick(next: Uint32Source, list: readonly string[]): string {
+  const name = list[intInRange(next, 0, list.length - 1)];
+  if (name === undefined) {
+    throw new RangeError('A name list is empty.');
+  }
+  return name;
+}
 
 /**
  * A planted salary: a planted outlier's target × base, rounded half up to the step, or a boundary

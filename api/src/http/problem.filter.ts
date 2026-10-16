@@ -50,10 +50,13 @@ function toProblem(exception: unknown): Problem {
       detail: exception.message,
     };
   }
+  // A deliberate 5xx keeps its status and anything else is a 500; neither body reveals the cause,
+  // which is only logged (ADR 0003, *Validation and errors*).
+  const status = exception instanceof HttpException ? exception.getStatus() : 500;
   return {
     type: 'about:blank',
-    title: 'Internal Server Error',
-    status: 500,
+    title: STATUS_CODES[status] ?? 'Error',
+    status,
     detail: 'An unexpected error occurred',
   };
 }

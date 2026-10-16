@@ -4,6 +4,8 @@ import { defineRailway, github, project, service, volume } from 'railway/iac';
 // Apply with `railway config plan` / `railway config apply` from a linked directory. The generated
 // `*.up.railway.app` domain is not managed here: generate it in the dashboard.
 export default defineRailway(() => {
+  // DATABASE_PATH must sit under the mount, or the file lands on the container's throwaway disk.
+  const dataMount = '/data';
   const data = volume('data');
 
   const app = service('app', {
@@ -15,8 +17,8 @@ export default defineRailway(() => {
     healthcheck: '/api/health',
     // Seconds. The first boot seeds before the server listens.
     healthcheckTimeout: 300,
-    env: { DATABASE_PATH: '/data/app.db' },
-    volumeMounts: { '/data': data },
+    env: { DATABASE_PATH: `${dataMount}/app.db` },
+    volumeMounts: { [dataMount]: data },
   });
 
   return project('acme-salary-manager', { resources: [app, data] });

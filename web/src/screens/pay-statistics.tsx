@@ -104,44 +104,38 @@ function Statistics({ statistics }: { statistics: PayStatisticsResponse }) {
           )}
           <SimpleGrid cols={{ base: 1, xs: 2, md: 5 }}>
             <Figure label="Headcount" value={counts.format(headcount)} />
-            <Figure label="Minimum" value={money(statistics.min)} />
-            <Figure label="Median" value={money(statistics.median)} />
-            <Figure label="Average" value={money(statistics.average)} />
-            <Figure label="Maximum" value={money(statistics.max)} />
+            <Figure label="Minimum" value={formatFigure(statistics.min)} />
+            <Figure label="Median" value={formatFigure(statistics.median)} />
+            <Figure label="Average" value={formatFigure(statistics.average)} />
+            <Figure label="Maximum" value={formatFigure(statistics.max)} />
           </SimpleGrid>
         </>
       )}
       <Group gap="lg">
-        {headcount > 0 && (
-          <Anchor
-            renderRoot={(props) => (
-              <Link {...props} to="/employees" search={{ jobTitle, country }} />
-            )}
-          >
-            {seeEmployeesText(headcount)}
-          </Anchor>
-        )}
+        <Anchor
+          renderRoot={(props) => <Link {...props} to="/employees" search={{ jobTitle, country }} />}
+        >
+          {seeEmployeesText(headcount)}
+        </Anchor>
         <Anchor
           renderRoot={(props) => <Link {...props} to="/pay/comparison" search={{ jobTitle }} />}
         >
           Compare across countries
         </Anchor>
-        {headcount > 0 && (
-          <Anchor
-            renderRoot={(props) => (
-              <Link {...props} to="/pay/outliers" search={{ jobTitle, country }} />
-            )}
-          >
-            See who&apos;s paid out of line
-          </Anchor>
-        )}
+        <Anchor
+          renderRoot={(props) => (
+            <Link {...props} to="/pay/outliers" search={{ jobTitle, country }} />
+          )}
+        >
+          See who&apos;s paid out of line
+        </Anchor>
       </Group>
     </Stack>
   );
 }
 
 /** A figure in local currency with exact minor units: never whole units here (ADR 0004). */
-function money(figure: Money | null): string {
+function formatFigure(figure: Money | null): string {
   return figure === null ? '–' : formatMoney(figure, 'en');
 }
 

@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   changeEmployeesSearch,
+  activeFilterCount,
   changeOutliersSearch,
   employeesSearchAfterDelete,
+  employeesSearchFromOutliers,
   comparisonSearchSchema,
   employeesSearchSchema,
   outliersSearchSchema,
@@ -199,5 +201,36 @@ describe('changeOutliersSearch', () => {
       direction: 'below',
       country: 'IN',
     });
+  });
+});
+
+describe('employeesSearchFromOutliers', () => {
+  it("opens the employee list on question 4's filters, from its first page", () => {
+    const outliers = outliersSearchSchema.parse({
+      page: '3',
+      direction: 'above',
+      country: 'IN',
+      department: 'Data',
+      jobTitle: 'Data Analyst',
+    });
+
+    expect(employeesSearchFromOutliers(outliers)).toEqual({
+      page: 1,
+      country: 'IN',
+      department: 'Data',
+      jobTitle: 'Data Analyst',
+    });
+  });
+
+  it('opens the whole list when no filter is set', () => {
+    expect(employeesSearchFromOutliers(outliersSearchSchema.parse({}))).toEqual({ page: 1 });
+  });
+});
+
+describe('activeFilterCount', () => {
+  it('counts the country, department and job title filters that are set', () => {
+    expect(activeFilterCount({})).toBe(0);
+    expect(activeFilterCount({ country: 'IN', jobTitle: 'Data Analyst' })).toBe(2);
+    expect(activeFilterCount({ country: 'IN', department: 'Data', jobTitle: 'Accountant' })).toBe(3);
   });
 });

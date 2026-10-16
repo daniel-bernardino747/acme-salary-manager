@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   changeEmployeesSearch,
+  changeOutliersSearch,
   employeesSearchAfterDelete,
   comparisonSearchSchema,
   employeesSearchSchema,
@@ -170,5 +171,33 @@ describe('employeesSearchAfterDelete', () => {
   it('stays on a page that still has employees, and on the first page even when it is empty', () => {
     expect(employeesSearchAfterDelete({ page: 3 }, { items: [priya] })).toEqual({ page: 3 });
     expect(employeesSearchAfterDelete({ page: 1 }, { items: [] })).toEqual({ page: 1 });
+  });
+});
+
+describe('changeOutliersSearch', () => {
+  const current = { page: 3, direction: 'below', country: 'IN', department: 'Data' } as const;
+
+  it('applies a new direction or filter and goes back to the first page', () => {
+    expect(changeOutliersSearch(current, { direction: 'above' })).toEqual({
+      page: 1,
+      direction: 'above',
+      country: 'IN',
+      department: 'Data',
+    });
+    expect(changeOutliersSearch(current, { jobTitle: 'Data Scientist' })).toEqual({
+      page: 1,
+      direction: 'below',
+      country: 'IN',
+      department: 'Data',
+      jobTitle: 'Data Scientist',
+    });
+  });
+
+  it('unsets a cleared filter, so it leaves the URL', () => {
+    expect(changeOutliersSearch(current, { department: null })).toEqual({
+      page: 1,
+      direction: 'below',
+      country: 'IN',
+    });
   });
 });

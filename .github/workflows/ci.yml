@@ -19,17 +19,19 @@ jobs:
       - run: pnpm test
       # First-slice check (ADR 0003): the built CommonJS API boots and loads @acme/contract via require(esm).
       - run: pnpm build
-      - name: Start sequence answers /api/health and serves the SPA on the same port
+      - name: Start sequence answers /api/health and serves the SPA and its script on the same port
         env:
           DATABASE_PATH: ${{ runner.temp }}/acme.db
           PORT: '3000'
         run: |
           pnpm start &
           for i in $(seq 1 30); do
-            if curl -fsS localhost:3000/api/health; then
-              curl -fsS localhost:3000/pay/outliers | grep -q '<div id="root">'
-              exit
-            fi
+            curl -fsS localhost:3000/api/health && break
             sleep 1
           done
-          exit 1
+          html=$(curl -fsS localhost:3000/pay/outliers)
+          grep -q '<div id="root">' <<< "$html"
+          # A blank page usually means the bundle 404s, so fetch the script index.html references.
+          script=$(grep -o 'src="/assets/[^"]*\.js"' <<< "$html" | head -n 1 | cut -d '"' -f 2)
+          test -n "$script"
+          curl -fsS -o /dev/null -w '%{content_type}' "localhost:3000$script" | grep -q javascript

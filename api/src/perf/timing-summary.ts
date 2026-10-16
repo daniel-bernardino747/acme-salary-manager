@@ -4,7 +4,7 @@ export interface Samples {
   timed: readonly number[];
 }
 
-export interface Summary {
+export interface TimingSummary {
   cold: number;
   p50: number;
   p95: number;
@@ -16,7 +16,7 @@ export interface Summary {
  * rank ⌈p × n⌉ in ascending order, always a measured value. With 100 samples, p95 is the 95th
  * (ADR 0006, *Measuring the 500 ms target*).
  */
-export function summarize(samples: Samples): Summary {
+export function summarizeTimings(samples: Samples): TimingSummary {
   const sorted = [...samples.timed].sort((a, b) => a - b);
   const atRank = (p: number): number => {
     const sample = sorted[Math.ceil(p * sorted.length) - 1];
@@ -32,6 +32,6 @@ export function summarize(samples: Samples): Summary {
 export const TARGET_MS = 500;
 
 /** Pass or fail is judged on p95 server time alone; the cold request is reported, not judged. */
-export function meetsTarget(server: Summary): boolean {
+export function meetsTarget(server: TimingSummary): boolean {
   return server.p95 < TARGET_MS;
 }

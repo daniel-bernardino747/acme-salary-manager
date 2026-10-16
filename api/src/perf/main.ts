@@ -7,7 +7,7 @@ import { employeeListResponseSchema } from '@acme/contract';
 import { FIRST_PAGE, perfRequests, type PerfRequest } from './requests';
 import { renderResults, type EndpointResult, type RunInfo } from './results';
 import { serverDuration } from './server-duration';
-import { meetsTarget, summarize } from './summary';
+import { meetsTarget, summarizeTimings } from './timing-summary';
 
 // A plain script, never run in CI (ADR 0006, *Measuring the 500 ms target*):
 // `pnpm perf <baseUrl> --region <region> --seed-mode <mode> --client <where this runs from>`.
@@ -55,8 +55,8 @@ async function measure(
   }
   const result = {
     request,
-    server: summarize({ cold: cold.server, timed: timed.map((t) => t.server) }),
-    client: summarize({ cold: cold.client, timed: timed.map((t) => t.client) }),
+    server: summarizeTimings({ cold: cold.server, timed: timed.map((t) => t.server) }),
+    client: summarizeTimings({ cold: cold.client, timed: timed.map((t) => t.client) }),
   };
   console.log(
     `${request.label}: server p95 ${result.server.p95.toFixed(2)} ms, client p95 ${result.client.p95.toFixed(2)} ms`,

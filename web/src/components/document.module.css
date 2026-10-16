@@ -17,8 +17,8 @@
 .band {
   height: 8px;
   margin-top: var(--mantine-spacing-md);
-  margin-bottom: var(--mantine-spacing-lg);
   border-radius: 2px;
+  opacity: 0.75;
   background:
     repeating-linear-gradient(
       100deg,
@@ -43,8 +43,8 @@
   white-space: nowrap;
   color: var(--mantine-color-visa-7);
   padding: 3px 5px;
-  border: 1px solid currentColor;
-  outline: 1px solid currentColor;
+  border: 1px solid var(--mantine-color-visa-4);
+  outline: 1px solid var(--mantine-color-visa-4);
   outline-offset: 1.5px;
   border-radius: 1px;
   margin: 2px 3px;
@@ -114,9 +114,10 @@
 
 .tick {
   position: absolute;
-  top: 6px;
+  z-index: 1;
+  top: 4px;
   width: 2px;
-  height: 16px;
+  height: 20px;
   margin-left: -1px;
   background: var(--mantine-color-visa-7);
 }

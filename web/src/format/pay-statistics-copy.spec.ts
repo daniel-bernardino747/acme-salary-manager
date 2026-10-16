@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { emptyGroupText, statisticsHeading } from './pay-statistics-copy';
+import { emptyGroupText, smallGroupNotice, statisticsHeading } from './pay-statistics-copy';
 
 describe('statisticsHeading', () => {
   it.each([
@@ -19,5 +19,18 @@ describe('emptyGroupText', () => {
     expect(emptyGroupText({ jobTitle: 'Recruiter', country: 'US' })).toBe(
       'No employees with the title Recruiter in the United States.',
     );
+  });
+});
+
+describe('smallGroupNotice', () => {
+  const rest =
+    'With so few people these figures say little about the role, and they reveal individual pay. ' +
+    'Outlier checks skip groups under 5.';
+
+  it.each([
+    [3, `Only 3 employees. ${rest}`],
+    [1, `Only 1 employee. ${rest}`],
+  ])('warns about a small group of %i', (headcount, notice) => {
+    expect(smallGroupNotice(headcount)).toBe(notice);
   });
 });

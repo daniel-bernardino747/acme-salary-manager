@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   changeEmployeesSearch,
+  employeesSearchAfterDelete,
   comparisonSearchSchema,
   employeesSearchSchema,
   outliersSearchSchema,
@@ -143,5 +144,31 @@ describe('changeEmployeesSearch', () => {
       page: 1,
       department: 'Data',
     });
+  });
+});
+
+describe('employeesSearchAfterDelete', () => {
+  const priya = {
+    id: 7,
+    name: 'Priya Sharma',
+    jobTitle: 'Software Engineer II',
+    department: 'Engineering',
+    country: 'IN',
+    annualSalary: { amountMinor: 1_250_000_50, currency: 'INR' },
+  } as const;
+
+  it('steps back one page when the delete emptied the page, keeping the search and filters', () => {
+    const search = { page: 3, q: 'sharma', country: 'IN' } as const;
+
+    expect(employeesSearchAfterDelete(search, { items: [] })).toEqual({
+      page: 2,
+      q: 'sharma',
+      country: 'IN',
+    });
+  });
+
+  it('stays on a page that still has employees, and on the first page even when it is empty', () => {
+    expect(employeesSearchAfterDelete({ page: 3 }, { items: [priya] })).toEqual({ page: 3 });
+    expect(employeesSearchAfterDelete({ page: 1 }, { items: [] })).toEqual({ page: 1 });
   });
 });

@@ -54,7 +54,12 @@ export interface PayrollTotals {
 function usdTotal(salaries: readonly Money[], ratesPerUsd: RatesPerUsd): UsdMoney {
   const byCurrency = new Map<CurrencyCode, number[]>();
   for (const { amountMinor, currency } of salaries) {
-    byCurrency.set(currency, [...(byCurrency.get(currency) ?? []), amountMinor]);
+    const amounts = byCurrency.get(currency);
+    if (amounts) {
+      amounts.push(amountMinor);
+    } else {
+      byCurrency.set(currency, [amountMinor]);
+    }
   }
   const converted = [...byCurrency].map(
     ([currency, amounts]) =>

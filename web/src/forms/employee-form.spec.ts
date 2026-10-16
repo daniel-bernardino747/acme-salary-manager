@@ -43,4 +43,15 @@ describe('employeeFormSchema', () => {
       annualSalary: ['Exceeds the maximum salary'],
     });
   });
+
+  it('asks for every field left empty, and for no salary until a country is picked', () => {
+    const empty = { name: ' ', jobTitle: '', department: '', country: '', annualSalary: '' };
+    expect(errorsOf(empty)).toEqual({
+      name: ['Required'],
+      jobTitle: ['Required'],
+      department: ['Required'],
+      country: ['Required'],
+    });
+    expect(errorsOf({ ...priya, annualSalary: '  ' })).toEqual({ annualSalary: ['Required'] });
+  });
 });

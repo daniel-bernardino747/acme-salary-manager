@@ -88,3 +88,20 @@ describe('formatMoney in whole units', () => {
     expect(formatMoney({ amountMinor, currency }, 'en', { wholeUnits: true })).toBe(text);
   });
 });
+
+describe('formatMoney as plain input', () => {
+  it.each([
+    [125_000_050, 'INR', '1250000.50'],
+    [5, 'USD', '0.05'],
+    [1_250_000, 'JPY', '1250000'],
+  ] as const)('shows %d %s as "%s", with no grouping or symbol', (amountMinor, currency, text) => {
+    expect(formatMoney({ amountMinor, currency }, 'en', { plainInput: true })).toBe(text);
+  });
+
+  it('reads back through parseMoney as the same amount', () => {
+    const text = formatMoney({ amountMinor: 125_000_050, currency: 'INR' }, 'en', {
+      plainInput: true,
+    });
+    expect(parseMoney(text, 'INR')).toEqual({ success: true, amountMinor: 125_000_050 });
+  });
+});

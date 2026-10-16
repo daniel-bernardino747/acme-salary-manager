@@ -26,6 +26,8 @@ export interface Outlier {
 
 export interface OutlierFindings {
   outliers: Outlier[];
+  /** Shown employees whose peer group has fewer than 5, so they were not checked (ADR 0003). */
+  smallGroupHeadcount: number;
 }
 
 /** An employee's direction against their peer median, or `null` inside 0.80–1.20. */
@@ -52,14 +54,17 @@ function peerGroups(members: readonly PeerGroupMember[]): PeerGroupMember[][] {
 
 /**
  * Question 4: the shown employees whose compa-ratio against their whole peer group's median, as
- * shown, is strictly below 0.80 or strictly above 1.20, in groups of 5 or more (ADR 0001, *Outliers*).
+ * shown, is strictly below 0.80 or strictly above 1.20, in groups of 5 or more (ADR 0001,
+ * *Outliers*). The same pass counts the shown employees in small groups, who were not checked.
  */
 export function findOutliers(members: readonly PeerGroupMember[]): OutlierFindings {
   const outliers: Outlier[] = [];
+  let smallGroupHeadcount = 0;
   for (const group of peerGroups(members)) {
     const peerMedian = median(group.map((m) => m.employee.annualSalary.amountMinor));
     // A small group's median isn't meaningful, so its members are never checked.
     if (peerMedian === null || isSmallGroup(group.length)) {
+      smallGroupHeadcount += group.filter((m) => m.shown).length;
       continue;
     }
     for (const { employee, shown } of group) {
@@ -76,5 +81,5 @@ export function findOutliers(members: readonly PeerGroupMember[]): OutlierFindin
       }
     }
   }
-  return { outliers };
+  return { outliers, smallGroupHeadcount };
 }

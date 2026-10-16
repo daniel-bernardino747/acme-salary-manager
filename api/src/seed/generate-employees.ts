@@ -53,6 +53,10 @@ function cellEmployees({ jobTitle, country, count }: Quota): GeneratedEmployee[]
     plant,
     salary: plantedSalaryMinor(plant, baseMinor, stepMinor),
   }));
+  // Rows are matched back to their plant by salary, so no two plants in a cell may share one.
+  if (new Set(planted.map((p) => p.salary)).size !== planted.length) {
+    throw new RangeError(`${jobTitle} · ${country}: two plants share a salary.`);
+  }
   const group = {
     baseMinor,
     stepMinor,

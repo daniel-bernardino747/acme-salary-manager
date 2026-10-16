@@ -17,6 +17,7 @@ import {
 import { EmployeeList } from './screens/employee-list';
 import { NotFound } from './screens/not-found';
 import { PayStatistics } from './screens/pay-statistics';
+import { PayrollTotals } from './screens/payroll-totals';
 import { Placeholder } from './screens/placeholder';
 
 // Every route in ADR 0004, *Routing*. Screens are placeholders until their tickets land.
@@ -70,7 +71,7 @@ const statisticsRoute = createRoute({
 const payrollRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/pay/payroll',
-  component: () => <Placeholder title="Annual payroll" />,
+  component: PayrollTotals,
 });
 
 const comparisonRoute = createRoute({

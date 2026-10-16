@@ -12,7 +12,8 @@
     "test": "pnpm --filter @acme/contract build && pnpm -r --if-present run test",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
-    "start": "pnpm --filter @acme/api run start:prod"
+    "start": "pnpm --filter @acme/api run start:prod",
+    "perf": "pnpm --filter @acme/api run perf"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

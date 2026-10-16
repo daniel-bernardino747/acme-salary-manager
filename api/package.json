@@ -10,6 +10,7 @@
     "migrate": "node dist/migrate.js",
     "seed": "node dist/seed/main.js",
     "start:prod": "node dist/migrate.js && node dist/seed/main.js --if-empty && node dist/main.js",
+    "perf": "node dist/perf/main.js",
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {

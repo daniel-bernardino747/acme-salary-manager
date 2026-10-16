@@ -14,21 +14,3 @@ export function sumMinor(values: readonly number[]): number {
   }
   return sum;
 }
-
-/**
- * `sum / n` rounded half up to a whole minor unit, by integer quotient and remainder (ADR 0001,
- * *Rounding*): `r = sum mod n`, `q = (sum − r) / n`, up if `2r ≥ n`. Sums of salaries are never
- * negative.
- */
-export function divideRoundHalfUp(sum: number, n: number): number {
-  assertSafeInteger(sum, 'The dividend');
-  if (!Number.isSafeInteger(n) || n < 1) {
-    throw new RangeError(`The divisor must be a positive integer, got ${n}.`);
-  }
-  if (sum < 0) {
-    throw new RangeError(`The dividend must not be negative, got ${sum}.`);
-  }
-  const remainder = sum % n;
-  const quotient = (sum - remainder) / n;
-  return 2 * remainder >= n ? quotient + 1 : quotient;
-}

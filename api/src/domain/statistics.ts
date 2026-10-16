@@ -1,4 +1,5 @@
-import { divideRoundHalfUp, sumMinor } from './rounding';
+import { divideRoundHalfUp } from '@acme/contract';
+import { sumMinor } from './rounding';
 
 /**
  * The median salary in minor units: the middle value, or the mean of the two middle values of an
@@ -11,10 +12,12 @@ export function median(salaries: readonly number[]): number | null {
   if (upper === undefined) {
     return null;
   }
-  if (sorted.length % 2 === 1) {
+  const lower = sorted[middle - 1];
+  // `lower` is missing only for a single salary, which is odd-sized anyway.
+  if (sorted.length % 2 === 1 || lower === undefined) {
     return upper;
   }
-  return divideRoundHalfUp(sumMinor([sorted[middle - 1] ?? upper, upper]), 2);
+  return divideRoundHalfUp(sumMinor([lower, upper]), 2);
 }
 
 /** The average salary in minor units, rounded half up once. `null` for an empty set, never 0. */

@@ -8,6 +8,7 @@ import {
   type ExceptionFilter,
 } from '@nestjs/common';
 import type { Response } from 'express';
+import { ValidationFailedException } from './zod-validation.pipe';
 
 /** Turns every error into Problem Details (ADR 0003). A 500 never reveals its cause. */
 @Catch()
@@ -31,6 +32,15 @@ export class ProblemFilter implements ExceptionFilter {
 }
 
 function toProblem(exception: unknown): Problem {
+  if (exception instanceof ValidationFailedException) {
+    return {
+      type: 'about:blank',
+      title: 'Validation failed',
+      status: 400,
+      detail: exception.detail,
+      errors: exception.errors,
+    };
+  }
   if (exception instanceof HttpException && exception.getStatus() < 500) {
     const status = exception.getStatus();
     return {

@@ -24,8 +24,10 @@ export interface EndpointResult {
 /** Milliseconds to two decimals: the precision of the `Server-Timing` header. */
 const ms = (duration: number): string => duration.toFixed(2);
 
-const figures = (summary: Summary): string[] =>
-  [summary.cold, summary.p50, summary.p95, summary.max].map(ms);
+/** The figures of each summary, in the order the table's columns give them. */
+const FIGURES = ['cold', 'p50', 'p95', 'max'] as const satisfies readonly (keyof Summary)[];
+
+const figures = (summary: Summary): string[] => FIGURES.map((figure) => ms(summary[figure]));
 
 const row = (cells: string[]): string => `| ${cells.join(' | ')} |`;
 
@@ -69,11 +71,11 @@ export function renderResults(run: RunInfo, endpoints: readonly EndpointResult[]
     row([
       'Endpoint',
       'Request',
-      ...['cold', 'p50', 'p95', 'max'].map((figure) => `Server ${figure}`),
-      ...['cold', 'p50', 'p95', 'max'].map((figure) => `Client ${figure}`),
+      ...FIGURES.map((figure) => `Server ${figure}`),
+      ...FIGURES.map((figure) => `Client ${figure}`),
       'Result',
     ]),
-    row(['---', '---', ...Array<string>(8).fill('---:'), '---']),
+    row(['---', '---', ...Array<string>(2 * FIGURES.length).fill('---:'), '---']),
     ...endpoints.map((endpoint) =>
       row([
         endpoint.request.label,

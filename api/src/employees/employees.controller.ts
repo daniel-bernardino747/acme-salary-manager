@@ -58,8 +58,11 @@ export class EmployeesController {
   }
 
   @Put(':id')
-  edit(@Param('id') id: string, @Body() body: EmployeeRequest): EmployeeResponse {
-    const employee = replaceEmployee(this.db, Number(id), body);
+  edit(
+    @Param('id', new ZodValidationPipe(employeeIdSchema)) id: number,
+    @Body(new ZodValidationPipe(employeeRequestSchema)) body: EmployeeRequest,
+  ): EmployeeResponse {
+    const employee = replaceEmployee(this.db, id, body);
     if (!employee) throw new NotFoundException(`Employee ${id} does not exist`);
     return employee;
   }

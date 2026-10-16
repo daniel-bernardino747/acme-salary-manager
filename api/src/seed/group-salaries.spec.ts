@@ -27,4 +27,20 @@ describe('anchoredSalaries', () => {
       }
     },
   );
+
+  it('puts planted salaries in place of the lowest and highest draws, so the median does not move', () => {
+    const group = { baseMinor, stepMinor, size: 7 };
+    // 0.70, 0.80 and 1.30 × $84,300.
+    const underpaid = [59_010_00, 67_440_00];
+    const overpaid = [109_590_00];
+    const ascending = (salaries: readonly number[]) => [...salaries].sort((a, b) => a - b);
+
+    const drawn = ascending(anchoredSalaries(streamFor('a'), group));
+    const planted = anchoredSalaries(streamFor('a'), { ...group, underpaid, overpaid });
+
+    expect(ascending(planted)).toEqual(
+      ascending([...underpaid, ...drawn.slice(2, -1), ...overpaid]),
+    );
+    expect(median(planted)).toBe(baseMinor);
+  });
 });

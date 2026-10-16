@@ -50,9 +50,11 @@
   transition: background-color 150ms var(--acme-ease);
 }
 
-.link:hover {
-  background: var(--mantine-color-cover-6);
-  color: var(--mantine-color-white);
+@media (hover: hover) {
+  .link:hover:not([data-active]) {
+    background: var(--mantine-color-cover-6);
+    color: var(--mantine-color-white);
+  }
 }
 
 .link[data-active] {
@@ -123,6 +125,7 @@
 
 .kbd {
   margin-left: auto;
+  font-family: inherit;
   padding: 1px 6px;
   border: 1px solid var(--mantine-color-gray-3);
   border-radius: 3px;
@@ -157,4 +160,16 @@
 
 .searchContent {
   border: 1px solid var(--acme-hairline);
+}
+
+.searchGroup {
+  margin-top: var(--mantine-spacing-xs);
+}
+
+.searchContent .searchGroup::before {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 600;
+  font-size: var(--mantine-font-size-sm);
+  color: var(--mantine-color-gray-6);
 }

@@ -129,9 +129,10 @@ export function EmployeeList() {
                 <Text size="sm" c="dimmed">
                   {list.items.length > 0 ? listRange(list) : `${list.total} employees`}
                 </Text>
+                {/* The URL's page, so it moves on click while keepPreviousData shows the old one. */}
                 <Pagination
                   total={pageCount(list)}
-                  value={list.page}
+                  value={search.page}
                   onChange={(page) => void navigate({ search: (prev) => ({ ...prev, page }) })}
                 />
               </Group>

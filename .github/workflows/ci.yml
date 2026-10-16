@@ -17,3 +17,16 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+      # First-slice check (ADR 0003): the built CommonJS API boots and loads @acme/contract via require(esm).
+      - run: pnpm build
+      - name: Start sequence answers /api/health
+        env:
+          DATABASE_PATH: ${{ runner.temp }}/acme.db
+          PORT: '3000'
+        run: |
+          pnpm start &
+          for i in $(seq 1 30); do
+            curl -fsS localhost:3000/api/health && exit 0
+            sleep 1
+          done
+          exit 1

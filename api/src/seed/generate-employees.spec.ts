@@ -4,6 +4,7 @@ import { median } from '../domain/statistics';
 import { generateEmployees } from './generate-employees';
 import { baseSalaryMinor, salaryStepMinor } from './base-salaries';
 import { homeDepartment } from './home-departments';
+import { namesByCountry } from './names';
 import { boundaryPlants, plantedOutliers } from './plants';
 import { headcountQuotas } from './quotas';
 
@@ -68,5 +69,19 @@ describe('generateEmployees', () => {
         expect(100 * employee.annualSalaryMinor).toBeLessThanOrEqual(115 * (groupMedian ?? 0));
       }
     }
+  });
+
+  it('names everyone "Given Family" from their country\'s lists, with accented, apostrophe and hyphen names but no ß', () => {
+    for (const { name, country } of employees) {
+      const { given, family } = namesByCountry[country];
+      const first = given.find((g) => name.startsWith(`${g} `));
+      expect(first && family).toContain(first && name.slice(first.length + 1));
+    }
+    const names = employees.map((e) => e.name);
+    expect(names.some((n) => n.includes('João'))).toBe(true);
+    expect(names.some((n) => n.includes('Müller'))).toBe(true);
+    expect(names.some((n) => n.includes("O'Connor"))).toBe(true);
+    expect(names.some((n) => n.includes('Anna-Lena'))).toBe(true);
+    expect(names.some((n) => n.includes('ß'))).toBe(false);
   });
 });

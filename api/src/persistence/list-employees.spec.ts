@@ -47,4 +47,27 @@ describe('listEmployees', () => {
       total: 2,
     });
   });
+
+  it('pages through employees whose names tie in id order, never repeating or skipping one', () => {
+    // Inserted out of name order, with three Ana Costas.
+    const ids = ['Ana Costa', 'Bruno Lima', 'Ana Costa', 'Ana Costa', 'Aarav Shah'].map(
+      (name) => insertEmployee(db, { name }).id,
+    );
+    const [ana1, bruno, ana2, ana3, aarav] = ids;
+    const pageIds = (page: number) =>
+      listEmployees(db, { page, pageSize: 2 }).items.map((employee) => employee.id);
+
+    expect([pageIds(1), pageIds(2), pageIds(3)]).toEqual([
+      [aarav, ana1],
+      [ana2, ana3],
+      [bruno],
+    ]);
+    expect(listEmployees(db, { page: 2, pageSize: 2 }).total).toBe(5);
+  });
+
+  it('returns no items for a page past the end, with the total still counted', () => {
+    insertEmployee(db);
+
+    expect(listEmployees(db, { page: 2, pageSize: 25 })).toEqual({ items: [], total: 1 });
+  });
 });

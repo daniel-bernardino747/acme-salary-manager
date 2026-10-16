@@ -4,11 +4,10 @@ import {
   divideRoundHalfUpBigInt,
   exchangeRates,
   type CountryCode,
-  type CurrencyCode,
   type Department,
   type Money,
 } from '@acme/contract';
-import { toUsd, type RatesPerUsd, type UsdMoney } from './conversion';
+import { toUsd, usdTotal, type RatesPerUsd, type UsdMoney } from './conversion';
 import { sumMinor } from './rounding';
 
 /** An employee as payroll totals see them: where they sit and what they are paid. */
@@ -45,27 +44,6 @@ export interface PayrollTotals {
   byCountry: CountryPayroll[];
   byDepartment: DepartmentPayroll[];
   grandTotal: GrandTotal;
-}
-
-/**
- * A USD payroll total: salaries summed per currency, each subtotal converted once, then the results
- * added, so parts may not add up exactly to the whole (ADR 0001, *USD totals*).
- */
-function usdTotal(salaries: readonly Money[], ratesPerUsd: RatesPerUsd): UsdMoney {
-  const byCurrency = new Map<CurrencyCode, number[]>();
-  for (const { amountMinor, currency } of salaries) {
-    const amounts = byCurrency.get(currency);
-    if (amounts) {
-      amounts.push(amountMinor);
-    } else {
-      byCurrency.set(currency, [amountMinor]);
-    }
-  }
-  const converted = [...byCurrency].map(
-    ([currency, amounts]) =>
-      toUsd({ amountMinor: sumMinor(amounts), currency }, ratesPerUsd).amountMinor,
-  );
-  return { amountMinor: sumMinor(converted), currency: 'USD' };
 }
 
 /**

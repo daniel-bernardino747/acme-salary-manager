@@ -14,4 +14,14 @@ describe('placeDecimal', () => {
   ])('places the point in %i with %i decimals as "%s"', (value, decimals, text) => {
     expect(placeDecimal(value, decimals)).toBe(text);
   });
+
+  it.each([
+    [-5, 2, 'a negative value'],
+    [7.9, 2, 'a value that is not an integer'],
+    [Number.NaN, 2, 'NaN'],
+    [79, 0, 'no decimals, which would leave a trailing point'],
+    [79, 1.5, 'a fractional number of decimals'],
+  ])('rejects %d with %d decimals (%s)', (value, decimals) => {
+    expect(() => placeDecimal(value, decimals)).toThrow(RangeError);
+  });
 });

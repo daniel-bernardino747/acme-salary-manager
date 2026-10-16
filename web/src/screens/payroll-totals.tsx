@@ -2,8 +2,7 @@ import type { CountryCode, Money, PayrollTotalsResponse } from '@acme/contract';
 import { Anchor, Box, Button, Group, Skeleton, Stack, Table, Text } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, type LinkProps } from '@tanstack/react-router';
-import { apiFetch } from '../api/api-fetch';
-import { queryKey } from '../api/query-key';
+import { payrollTotalsQuery } from '../api/payroll-totals-query';
 import { CountryStamp, Figure, Muted, PageHeader, Panel, ShareBar } from '../components/document';
 import { PlusIcon } from '../components/icons';
 import { QueryState } from '../components/query-state';
@@ -18,10 +17,7 @@ import classes from './payroll-totals.module.css';
 
 /** Question 2: payroll per country and per department (ADR 0004, *Question 2*). */
 export function PayrollTotals() {
-  const query = useQuery({
-    queryKey: queryKey('payroll-totals'),
-    queryFn: () => apiFetch<PayrollTotalsResponse>('/api/payroll-totals'),
-  });
+  const query = useQuery(payrollTotalsQuery());
 
   return (
     <Stack gap="lg">

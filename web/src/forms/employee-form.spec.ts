@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { employeeFormSchema, salaryPreview, type EmployeeFormValues } from './employee-form';
+import {
+  employeeFormSchema,
+  salaryAfterCountryChange,
+  salaryPreview,
+  type EmployeeFormValues,
+} from './employee-form';
 
 const priya: EmployeeFormValues = {
   name: '  Priya Sharma ',
@@ -100,5 +105,26 @@ describe('salaryPreview', () => {
     ['a salary out of bounds', '0', 'US'],
   ])('shows nothing for %s', (_, annualSalary, country) => {
     expect(salaryPreview(annualSalary, country)).toBeNull();
+  });
+});
+
+describe('salaryAfterCountryChange', () => {
+  it('clears a salary typed in another currency, saying which currency to enter it in', () => {
+    expect(salaryAfterCountryChange('US', 'JP', '120,000')).toEqual({
+      annualSalary: '',
+      message: 'Salary was in USD; enter it in JPY.',
+    });
+  });
+
+  it('keeps the salary between two countries with the same currency', () => {
+    expect(salaryAfterCountryChange('DE', 'NL', '64,000')).toEqual({
+      annualSalary: '64,000',
+      message: null,
+    });
+  });
+
+  it('has nothing to clear when no salary is typed, or no country was picked before', () => {
+    expect(salaryAfterCountryChange('US', 'JP', '')).toEqual({ annualSalary: '', message: null });
+    expect(salaryAfterCountryChange('', 'JP', '')).toEqual({ annualSalary: '', message: null });
   });
 });

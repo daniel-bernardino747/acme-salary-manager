@@ -20,3 +20,14 @@ export function shareText(sharePermille: number | null, total: Money): string {
 export function payrollHeadline({ headcount, usd }: { headcount: number; usd: Money }): string {
   return `Annual payroll: ${formatMoney(usd, 'en', { wholeUnits: true })} · ${employeeCount(headcount)}`;
 }
+
+/**
+ * Payroll rows as a ranking: by USD total, highest first (ADR 0004, *Question 2*). A client-side
+ * sort, not arithmetic. It is stable, so equal totals keep the API's fixed order.
+ */
+export function highestUsdFirst<T extends { usd: Money }>(rows: readonly T[]): T[] {
+  return rows.toSorted((a, b) => {
+    if (a.usd.amountMinor === b.usd.amountMinor) return 0;
+    return a.usd.amountMinor > b.usd.amountMinor ? -1 : 1;
+  });
+}

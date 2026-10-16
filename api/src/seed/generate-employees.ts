@@ -1,5 +1,11 @@
-import { divideRoundHalfUp, type EmployeeRequest } from '@acme/contract';
+import {
+  divideRoundHalfUp,
+  type CountryCode,
+  type EmployeeRequest,
+  type JobTitle,
+} from '@acme/contract';
 import { baseSalaryMinor, salaryStepMinor } from './base-salaries';
+import { inCell } from './cell';
 import { anchoredSalaries, freeSalaries } from './group-salaries';
 import { homeDepartment } from './home-departments';
 import { namesByCountry } from './names';
@@ -41,10 +47,8 @@ function plantedSalaryMinor(plant: Plant, baseMinor: number, stepMinor: number):
   return divideRoundHalfUp(plant.targetHundredths * (baseMinor / stepMinor), 100) * stepMinor;
 }
 
-const plantsIn = (jobTitle: string, country: string): Plant[] =>
-  [...plantedOutliers, ...boundaryPlants].filter(
-    (p) => p.jobTitle === jobTitle && p.country === country,
-  );
+const plantsIn = (jobTitle: JobTitle, country: CountryCode): Plant[] =>
+  [...plantedOutliers, ...boundaryPlants].filter(inCell(jobTitle, country));
 
 function cellEmployees({ jobTitle, country, count }: Quota): GeneratedEmployee[] {
   const baseMinor = baseSalaryMinor(jobTitle, country);

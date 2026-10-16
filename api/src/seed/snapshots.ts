@@ -1,6 +1,15 @@
-import { countries, currencyOf, exchangeRates, formatMoney, jobTitles } from '@acme/contract';
+import {
+  countries,
+  currencyOf,
+  exchangeRates,
+  formatMoney,
+  jobTitles,
+  type CountryCode,
+  type JobTitle,
+} from '@acme/contract';
 import { toUsd } from '../domain/conversion';
 import { baseSalaryMinor } from './base-salaries';
+import { inCell } from './cell';
 import { homeDepartment } from './home-departments';
 import type { Quota } from './quotas';
 
@@ -17,8 +26,8 @@ function table(header: readonly string[], rows: readonly (readonly string[])[]):
 
 /** The headcount of every title and country, with row and column totals, as Markdown. */
 export function quotaSnapshot(quotas: readonly Quota[]): string {
-  const countOf = (jobTitle: string, country: string) =>
-    quotas.find((q) => q.jobTitle === jobTitle && q.country === country)?.count ?? 0;
+  const countOf = (jobTitle: JobTitle, country: CountryCode) =>
+    quotas.find(inCell(jobTitle, country))?.count ?? 0;
   const sum = (values: readonly number[]) => values.reduce((a, b) => a + b, 0);
   const codes = countries.map((c) => c.code);
   const rows = jobTitles.map((t) => {

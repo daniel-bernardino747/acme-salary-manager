@@ -81,4 +81,22 @@ describe('GET /api/outliers', () => {
     expect(page.items.map((o) => o.employee.id)).toEqual([second.id]);
     expect(page.costToReachThreshold?.usd).toEqual({ amountMinor: 1_500_00, currency: 'USD' });
   });
+
+  it('sets the gap to 0.80 on underpaid rows and leaves it null on overpaid ones', async () => {
+    // Median $10,000.00: $7,000.00 is $1,000.00 short; $14,000.00 is overpaid.
+    const group = { jobTitle: 'Product Manager', country: 'US' } as const;
+    const underpaid = insertEmployee(t.db, { ...group, annualSalaryMinor: 7_000_00 });
+    const overpaid = insertEmployee(t.db, { ...group, annualSalaryMinor: 14_000_00 });
+    for (const salary of [10_000_00, 10_000_00, 10_000_00]) {
+      insertEmployee(t.db, { ...group, annualSalaryMinor: salary });
+    }
+
+    const res = await t.http().get('/api/outliers').expect(200);
+
+    const { items } = outliersResponseSchema.parse(res.body);
+    expect(items.map((o) => [o.employee.id, o.direction, o.gapMinor])).toEqual([
+      [overpaid.id, 'above', null],
+      [underpaid.id, 'below', 1_000_00],
+    ]);
+  });
 });

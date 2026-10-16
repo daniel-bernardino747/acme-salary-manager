@@ -10,3 +10,13 @@ describe('serverDuration', () => {
     expect(serverDuration(header)).toBe(expected);
   });
 });
+
+describe('serverDuration on a header it cannot read', () => {
+  // A missing or foreign header means the app isn't the one measured; no figure may come from it.
+  it.each([null, '', 'app;dur=', 'app;dur=abc', 'db;dur=12', 'app;dur=-1'])(
+    'refuses %j',
+    (header) => {
+      expect(() => serverDuration(header)).toThrow(/Server-Timing/);
+    },
+  );
+});

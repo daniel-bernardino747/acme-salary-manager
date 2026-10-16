@@ -141,7 +141,7 @@ Everything is under `/api`, and both apps share the request and response schemas
 - Filters combine with AND. On outliers they narrow who is shown, never the peer group a median is taken over.
 - Query parameters are strict: an unknown one, such as `?contry=IN`, is a 400.
 
-**An employee** in a request body is `{ name, jobTitle, department, country, annualSalaryMinor }`. `name` is 1–100 characters once trimmed. `annualSalaryMinor` is the annual salary as a whole number of minor units (cents, paise; yen for JPY), greater than 0. There is no currency field: it follows from the country. In a response, the salary is `annualSalary: { amountMinor, currency }`, and the employee has its `id`.
+**An employee** in a request body is `{ name, jobTitle, department, country, annualSalaryMinor }`. `name` is 1–100 characters once trimmed. `annualSalaryMinor` is the annual salary as a whole number of minor units (cents, paise; yen for JPY), greater than 0 and at most the cap in [`employee.ts`](packages/contract/src/employee.ts). There is no currency field: it follows from the country. In a response, the salary is `annualSalary: { amountMinor, currency }`, and the employee has its `id`.
 
 **Money** is `{ "amountMinor": <integer>, "currency": "<ISO 4217 code>" }` on the wire, in requests and responses alike. USD figures are in cents. Every response with a USD figure also carries `rates: { source, asOf }`.
 

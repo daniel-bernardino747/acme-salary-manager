@@ -45,6 +45,7 @@
 
 .kbd {
   margin-left: auto;
+  font-family: inherit;
   padding: 2px 7px;
   border: 1px solid var(--mantine-color-gray-3);
   border-radius: 3px;

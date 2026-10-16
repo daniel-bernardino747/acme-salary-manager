@@ -15,7 +15,13 @@ export interface EmployeeList {
 
 /** One page of employees in `name, id` order, with the total count (ADR 0003, *Listing*). */
 export function listEmployees(db: Db, query: EmployeeListQuery): EmployeeList {
-  const rows = db.select().from(employees).orderBy(employees.name, employees.id).all();
+  const rows = db
+    .select()
+    .from(employees)
+    .orderBy(employees.name, employees.id)
+    .limit(query.pageSize)
+    .offset((query.page - 1) * query.pageSize)
+    .all();
   const total = db.select({ n: count() }).from(employees).get()?.n ?? 0;
   return { items: rows.map(toEmployee), total };
 }

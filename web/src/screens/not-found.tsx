@@ -1,4 +1,4 @@
-import { Button, Group, Text } from '@mantine/core';
+import { Button, Group, Stack, Text } from '@mantine/core';
 import { Link } from '@tanstack/react-router';
 import { PageHeader } from '../components/document';
 import { SearchIcon } from '../components/icons';
@@ -6,10 +6,10 @@ import { openGlobalSearch } from '../layout/global-search';
 
 export function NotFound() {
   return (
-    <>
+    <Stack gap="lg">
       <PageHeader title="Page not found" />
       <Text>There is no page at this address.</Text>
-      <Group gap="sm" mt="lg">
+      <Group gap="sm">
         <Button component={Link} to="/">
           Go to the overview
         </Button>
@@ -17,6 +17,6 @@ export function NotFound() {
           Search employees
         </Button>
       </Group>
-    </>
+    </Stack>
   );
 }

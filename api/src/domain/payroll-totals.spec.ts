@@ -147,4 +147,42 @@ describe('payrollTotals', () => {
     expect(totals.byCountry.map((row) => row.sharePermille)).toEqual(Array(7).fill(null));
     expect(totals.byDepartment.map((row) => row.sharePermille)).toEqual(Array(9).fill(null));
   });
+
+  it('keeps a country row each for Germany and the Netherlands, sharing one EUR subtotal elsewhere', () => {
+    // Each country's €50,000.00 converts on its own to $16,666.666… → $16,666.67. Their shared
+    // €100,000.00 converts once to $33,333.333… → $33,333.33 for Engineering and the grand total,
+    // a cent less than the two country rows added up. Each country's share: 1,666,667/3,333,333 =
+    // 0.50000015 → 500.
+    const totals = payrollTotals(
+      [
+        employee('DE', 'Engineering', 50_000_00, 'EUR'),
+        employee('NL', 'Engineering', 50_000_00, 'EUR'),
+      ],
+      rates,
+    );
+
+    expect(totals.byCountry.filter((row) => row.headcount > 0)).toEqual([
+      {
+        country: 'DE',
+        headcount: 1,
+        local: money(50_000_00, 'EUR'),
+        usd: money(16_666_67, 'USD'),
+        sharePermille: 500,
+      },
+      {
+        country: 'NL',
+        headcount: 1,
+        local: money(50_000_00, 'EUR'),
+        usd: money(16_666_67, 'USD'),
+        sharePermille: 500,
+      },
+    ]);
+    expect(totals.byDepartment[0]).toEqual({
+      department: 'Engineering',
+      headcount: 2,
+      usd: money(33_333_33, 'USD'),
+      sharePermille: 1000,
+    });
+    expect(totals.grandTotal).toEqual({ headcount: 2, usd: money(33_333_33, 'USD') });
+  });
 });

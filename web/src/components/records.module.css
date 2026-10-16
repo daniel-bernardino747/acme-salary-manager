@@ -1,0 +1,92 @@
+/* Tables on a desktop, stacked records on a phone: never a sideways scroll for the key figure. */
+
+.tableWrap {
+  background: var(--acme-panel);
+  border: 1px solid var(--acme-hairline);
+  border-radius: var(--mantine-radius-md);
+  overflow: hidden;
+}
+
+.table thead th {
+  background: var(--mantine-color-gray-0);
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--mantine-color-gray-7);
+  white-space: nowrap;
+}
+
+.table tbody tr {
+  transition: background-color 120ms var(--acme-ease);
+}
+
+.table tbody tr[data-link] {
+  cursor: pointer;
+}
+
+.table tbody tr:hover {
+  background: color-mix(in srgb, var(--mantine-color-visa-0) 70%, white);
+}
+
+/* Focus is a first-class state: the focused row lifts, the rest hold still. */
+.table tbody tr:focus-within {
+  background: var(--mantine-color-visa-0);
+  box-shadow: inset 0 0 0 1px var(--mantine-color-visa-3);
+}
+
+.money {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.records {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--acme-panel);
+  border: 1px solid var(--acme-hairline);
+  border-radius: var(--mantine-radius-md);
+}
+
+.record {
+  display: block;
+  padding: 12px 14px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.records > li + li {
+  border-top: 1px solid var(--acme-hairline);
+}
+
+a.record:focus-visible {
+  outline-offset: -2px;
+}
+
+.recordTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--mantine-spacing-sm);
+}
+
+.recordName {
+  font-weight: 600;
+  color: var(--mantine-color-visa-7);
+}
+
+.recordMeta {
+  font-size: var(--mantine-font-size-sm);
+  color: var(--mantine-color-gray-6);
+  margin-top: 2px;
+}
+
+.recordFigures {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin-top: 6px;
+  font-size: var(--mantine-font-size-sm);
+}

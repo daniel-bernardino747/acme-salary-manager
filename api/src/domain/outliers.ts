@@ -75,9 +75,13 @@ function peerGroups(members: readonly PeerGroupMember[]): PeerGroupMember[][] {
 /**
  * Question 4: the shown employees whose compa-ratio against their whole peer group's median, as
  * shown, is strictly below 0.80 or strictly above 1.20, in groups of 5 or more (ADR 0001,
- * *Outliers*), most extreme first. The same pass counts the shown employees in small groups, who were not checked.
+ * *Outliers*), most extreme first. Asked for a direction, it ranks only that one, so the underpaid
+ * are never buried under the overpaid (ADR 0003). The same pass counts the shown employees in small groups, who were not checked.
  */
-export function findOutliers(members: readonly PeerGroupMember[]): OutlierFindings {
+export function findOutliers(
+  members: readonly PeerGroupMember[],
+  only?: OutlierDirection,
+): OutlierFindings {
   const outliers: Outlier[] = [];
   let smallGroupHeadcount = 0;
   for (const group of peerGroups(members)) {
@@ -90,7 +94,7 @@ export function findOutliers(members: readonly PeerGroupMember[]): OutlierFindin
     for (const { employee, shown } of group) {
       const salary = employee.annualSalary.amountMinor;
       const direction = directionOf(salary, peerMedian);
-      if (shown && direction !== null) {
+      if (shown && direction !== null && (only === undefined || direction === only)) {
         outliers.push({
           employee,
           peerMedian: { amountMinor: peerMedian, currency: employee.annualSalary.currency },

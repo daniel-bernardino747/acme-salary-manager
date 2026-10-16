@@ -21,7 +21,12 @@ export function inCountry(country: CountryCode): string {
  * job title is shown as it is, never pluralized.
  */
 export function statisticsHeading({ jobTitle, country }: PeerGroupNames): string {
-  return `${jobTitle} ${inCountry(country)} · ${currencyOf(country)}`;
+  return `${peerGroupName({ jobTitle, country })} · ${currencyOf(country)}`;
+}
+
+/** A peer group by name, e.g. "Software Engineer II in India", for a title its stamp completes. */
+export function peerGroupName({ jobTitle, country }: PeerGroupNames): string {
+  return `${jobTitle} ${inCountry(country)}`;
 }
 
 /** An empty peer group, shown in place of the figures, never as zeros (ADR 0004, *Question 1*). */

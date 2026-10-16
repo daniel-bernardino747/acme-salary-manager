@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "pnpm --filter @acme/contract build && pnpm -r --parallel run dev",
     "build": "pnpm -r run build",
-    "typecheck": "pnpm --filter @acme/contract build && pnpm -r --if-present run typecheck",
+    "typecheck": "pnpm --filter @acme/contract build && pnpm -r --if-present run typecheck && tsc -p .railway",
     "test": "pnpm --filter @acme/contract build && pnpm -r --if-present run test",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",

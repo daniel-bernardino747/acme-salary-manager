@@ -1,5 +1,6 @@
 import type { EmployeeResponse, Money } from '@acme/contract';
 import { compaRatioHundredths, isAboveThreshold, isBelowThreshold } from './compa-ratio';
+import { isSmallGroup } from './pay-statistics';
 import { median } from './statistics';
 
 /** Below 0.80 is underpaid, above 1.20 overpaid: the outlier's direction (CONTEXT.md). */
@@ -51,13 +52,14 @@ function peerGroups(members: readonly PeerGroupMember[]): PeerGroupMember[][] {
 
 /**
  * Question 4: the shown employees whose compa-ratio against their whole peer group's median, as
- * shown, is strictly below 0.80 or strictly above 1.20 (ADR 0001, *Outliers*).
+ * shown, is strictly below 0.80 or strictly above 1.20, in groups of 5 or more (ADR 0001, *Outliers*).
  */
 export function findOutliers(members: readonly PeerGroupMember[]): OutlierFindings {
   const outliers: Outlier[] = [];
   for (const group of peerGroups(members)) {
     const peerMedian = median(group.map((m) => m.employee.annualSalary.amountMinor));
-    if (peerMedian === null) {
+    // A small group's median isn't meaningful, so its members are never checked.
+    if (peerMedian === null || isSmallGroup(group.length)) {
       continue;
     }
     for (const { employee, shown } of group) {

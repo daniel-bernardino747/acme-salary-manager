@@ -42,15 +42,15 @@ describe('shareBars', () => {
 });
 
 describe('overviewDateLine', () => {
-  it("states today's date in the app's locale and the organization's size", () => {
-    expect(overviewDateLine(new Date(2026, 9, 16), 10_000)).toBe(
+  it("states today's date and how many employees work in how many countries", () => {
+    expect(overviewDateLine(new Date(2026, 9, 16), 10_000, 7)).toBe(
       'Friday, October 16, 2026 · 10,000 employees in 7 countries',
     );
   });
 
-  it('counts one employee in the singular', () => {
-    expect(overviewDateLine(new Date(2026, 0, 1), 1)).toBe(
-      'Thursday, January 1, 2026 · 1 employee in 7 countries',
+  it('counts the countries that have employees, one in the singular', () => {
+    expect(overviewDateLine(new Date(2026, 0, 1), 1, 1)).toBe(
+      'Thursday, January 1, 2026 · 1 employee in 1 country',
     );
   });
 });

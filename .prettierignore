@@ -4,3 +4,5 @@ coverage
 *.md
 .claude
 api/drizzle/meta
+test-results
+playwright-report

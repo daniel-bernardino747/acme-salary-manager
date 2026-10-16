@@ -1,5 +1,5 @@
 import type { PerfRequest } from './requests';
-import { meetsTarget, TARGET_MS, type Summary } from './summary';
+import { meetsTarget, TARGET_MS, type TimingSummary } from './timing-summary';
 
 /** What the results file says about the run itself (ADR 0006, *Write-up*). */
 export interface RunInfo {
@@ -17,17 +17,17 @@ export interface RunInfo {
 
 export interface EndpointResult {
   request: PerfRequest;
-  server: Summary;
-  client: Summary;
+  server: TimingSummary;
+  client: TimingSummary;
 }
 
 /** Milliseconds to two decimals: the precision of the `Server-Timing` header. */
 const ms = (duration: number): string => duration.toFixed(2);
 
 /** The figures of each summary, in the order the table's columns give them. */
-const FIGURES = ['cold', 'p50', 'p95', 'max'] as const satisfies readonly (keyof Summary)[];
+const FIGURES = ['cold', 'p50', 'p95', 'max'] as const satisfies readonly (keyof TimingSummary)[];
 
-const figures = (summary: Summary): string[] => FIGURES.map((figure) => ms(summary[figure]));
+const figures = (summary: TimingSummary): string[] => FIGURES.map((figure) => ms(summary[figure]));
 
 const row = (cells: string[]): string => `| ${cells.join(' | ')} |`;
 

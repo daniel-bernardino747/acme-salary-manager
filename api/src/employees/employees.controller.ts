@@ -15,6 +15,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
   Query,
   Res,
 } from '@nestjs/common';
@@ -24,6 +25,7 @@ import { ZodValidationPipe } from '../http/zod-validation.pipe';
 import { createEmployee } from '../persistence/create-employee';
 import type { Db } from '../persistence/db';
 import { findEmployee } from '../persistence/find-employee';
+import { replaceEmployee } from '../persistence/replace-employee';
 import { listEmployees } from '../persistence/list-employees';
 
 @Controller('employees')
@@ -53,5 +55,10 @@ export class EmployeesController {
     const employee = createEmployee(this.db, body);
     res.location(`/api/employees/${employee.id}`);
     return employee;
+  }
+
+  @Put(':id')
+  edit(@Param('id') id: string, @Body() body: EmployeeRequest): EmployeeResponse | undefined {
+    return replaceEmployee(this.db, Number(id), body);
   }
 }

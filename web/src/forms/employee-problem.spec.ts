@@ -49,4 +49,20 @@ describe('employeeProblem', () => {
   ])('shows %s, which has no errors, as a form-level alert', (_, problem, alert) => {
     expect(employeeProblem(problem)).toEqual({ fieldErrors: {}, formError: alert });
   });
+
+  it('shows an error whose path names no form field as a form-level alert, the rest on fields', () => {
+    const problem: Problem = {
+      ...validationFailed,
+      errors: [
+        { path: [], message: 'Unrecognized key: "currency"' },
+        { path: ['id'], message: 'Must be a positive integer' },
+        { path: ['country'], message: 'Invalid option' },
+      ],
+    };
+
+    expect(employeeProblem(problem)).toEqual({
+      fieldErrors: { country: 'Invalid option' },
+      formError: 'Unrecognized key: "currency". Must be a positive integer.',
+    });
+  });
 });

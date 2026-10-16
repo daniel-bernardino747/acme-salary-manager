@@ -7,9 +7,12 @@ export interface ConfigureOptions {
   webRoot?: string;
 }
 
+/** Every endpoint lives under this prefix; the SPA gets every other path (ADR 0003). */
+const API_PREFIX = 'api';
+
 /** App-wide setup shared by `main.ts` and the HTTP tests. */
 export function configureApp(app: NestExpressApplication, options: ConfigureOptions = {}): void {
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix(API_PREFIX);
   if (options.webRoot) {
     serveWebApp(app, options.webRoot);
   }
@@ -24,7 +27,7 @@ function serveWebApp(app: NestExpressApplication, webRoot: string): void {
   app.useStaticAssets(webRoot);
   app.use((req: Request, res: Response, next: NextFunction) => {
     const isRead = req.method === 'GET' || req.method === 'HEAD';
-    const isApi = req.path === '/api' || req.path.startsWith('/api/');
+    const isApi = req.path === `/${API_PREFIX}` || req.path.startsWith(`/${API_PREFIX}/`);
     // A path with an extension asks for a file the static handler didn't find, so it stays a 404.
     const isFile = path.posix.extname(req.path) !== '';
     if (isRead && !isApi && !isFile) {

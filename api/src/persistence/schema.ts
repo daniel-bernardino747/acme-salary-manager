@@ -1,3 +1,4 @@
+import type { CountryCode, Department, JobTitle } from '@acme/contract';
 import { sql } from 'drizzle-orm';
 import { check, index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
@@ -7,9 +8,9 @@ export const employees = sqliteTable(
   {
     id: integer('id').primaryKey({ autoIncrement: true }),
     name: text('name').notNull(),
-    jobTitle: text('job_title').notNull(),
-    department: text('department').notNull(),
-    country: text('country').notNull(),
+    jobTitle: text('job_title').$type<JobTitle>().notNull(),
+    department: text('department').$type<Department>().notNull(),
+    country: text('country').$type<CountryCode>().notNull(),
     annualSalaryMinor: integer('annual_salary_minor').notNull(),
   },
   (t) => [

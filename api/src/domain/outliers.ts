@@ -37,6 +37,18 @@ function directionOf(salaryMinor: number, medianMinor: number): OutlierDirection
   return null;
 }
 
+/**
+ * Most extreme first: by distance from 1.00, compared by cross-multiplying, `|s₁−m₁|·m₂` against
+ * `|s₂−m₂|·m₁` (ADR 0003, *Outliers*).
+ */
+function mostExtremeFirst(a: Outlier, b: Outlier): number {
+  const distance = (o: Outlier) =>
+    Math.abs(o.employee.annualSalary.amountMinor - o.peerMedian.amountMinor);
+  const aScaled = distance(a) * b.peerMedian.amountMinor;
+  const bScaled = distance(b) * a.peerMedian.amountMinor;
+  return bScaled - aScaled;
+}
+
 /** The members of each peer group, keyed by job title and country. */
 function peerGroups(members: readonly PeerGroupMember[]): PeerGroupMember[][] {
   const groups = new Map<string, PeerGroupMember[]>();
@@ -55,7 +67,7 @@ function peerGroups(members: readonly PeerGroupMember[]): PeerGroupMember[][] {
 /**
  * Question 4: the shown employees whose compa-ratio against their whole peer group's median, as
  * shown, is strictly below 0.80 or strictly above 1.20, in groups of 5 or more (ADR 0001,
- * *Outliers*). The same pass counts the shown employees in small groups, who were not checked.
+ * *Outliers*), most extreme first. The same pass counts the shown employees in small groups, who were not checked.
  */
 export function findOutliers(members: readonly PeerGroupMember[]): OutlierFindings {
   const outliers: Outlier[] = [];
@@ -81,5 +93,5 @@ export function findOutliers(members: readonly PeerGroupMember[]): OutlierFindin
       }
     }
   }
-  return { outliers, smallGroupHeadcount };
+  return { outliers: outliers.sort(mostExtremeFirst), smallGroupHeadcount };
 }

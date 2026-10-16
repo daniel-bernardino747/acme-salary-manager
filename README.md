@@ -3,9 +3,9 @@
 A web app where ACME's HR Manager keeps the salaries of about 10,000 employees across seven countries, and answers four pay questions without a spreadsheet:
 
 1. **Pay statistics:** what do we pay a given job title in a given country?
-2. **Payroll totals:** what does payroll cost per country and per department?
+2. **Payroll totals:** what is the payroll total per country and per department?
 3. **Cross-country comparison:** how does pay for one job title compare across countries?
-4. **Outliers:** who is paid out of line for their role?
+4. **Outliers:** who is paid out of line for their job title in their country?
 
 **Live:** <https://acme-production-08d3.up.railway.app>
 

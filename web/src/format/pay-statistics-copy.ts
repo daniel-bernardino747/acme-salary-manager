@@ -42,3 +42,8 @@ export function smallGroupNotice(headcount: number): string {
     'role, and they reveal individual pay. Outlier checks skip groups under 5.'
   );
 }
+
+/** The link from the figures to the peer group's employee list, e.g. "See these 47 employees". */
+export function seeEmployeesText(headcount: number): string {
+  return headcount === 1 ? 'See this employee' : `See these ${employeeCount(headcount)}`;
+}

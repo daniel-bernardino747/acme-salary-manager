@@ -29,9 +29,9 @@ describe('toUsd', () => {
     // 9,007,199,254,740,991 / 3 = 3,002,399,751,580,330 remainder 1, so it rounds down.
     // In floats, the product · 10⁶ loses its last digits and the result comes out at …330.5.
     const rates = { ...exchangeRates.ratesPerUsd, GBP: 3_000_000 };
-    expect(toUsd({ amountMinor: Number.MAX_SAFE_INTEGER, currency: 'GBP' }, rates).amountMinor).toBe(
-      3_002_399_751_580_330,
-    );
+    expect(
+      toUsd({ amountMinor: Number.MAX_SAFE_INTEGER, currency: 'GBP' }, rates).amountMinor,
+    ).toBe(3_002_399_751_580_330);
   });
 
   it('refuses a result that is not a safe integer', () => {

@@ -54,4 +54,11 @@ describe('seed command', () => {
     ]);
     expect(employeesById(db)).toEqual(before);
   });
+
+  it('with --if-empty seeds an empty table, as the start sequence needs', () => {
+    expect(seed(['--if-empty'])).toBe(0);
+
+    expect(countEmployees(db)).toBe(10_000);
+    expect(databaseGoldenHash(db)).toBe(DATABASE_GOLDEN_HASH);
+  });
 });

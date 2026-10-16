@@ -20,6 +20,8 @@ describe('layer imports', () => {
     ['domain/money.ts', '../health/health.controller'],
     ['domain/money.ts', '@nestjs/common'],
     ['domain/money.ts', 'drizzle-orm'],
+    ['domain/stats/median.ts', '../../persistence/db'],
+    ['domain/stats/median.ts', '../../app.module'],
     ['persistence/employees.ts', '../health/health.controller'],
     ['persistence/employees.ts', '../app.module'],
     ['persistence/employees.ts', '@nestjs/common'],
@@ -30,6 +32,8 @@ describe('layer imports', () => {
   it.each([
     ['domain/money.ts', '@acme/contract'],
     ['domain/money.ts', './rounding'],
+    ['domain/stats/median.ts', '../money'],
+    ['domain/stats/median.ts', './rounding'],
     ['persistence/employees.ts', '../domain/money'],
     ['persistence/employees.ts', './schema'],
     ['persistence/employees.ts', 'drizzle-orm'],

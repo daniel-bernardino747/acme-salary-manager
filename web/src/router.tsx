@@ -18,10 +18,10 @@ import { AddEmployee, EditEmployee } from './screens/employee-form-pages';
 import { EmployeeList } from './screens/employee-list';
 import { EmployeeView } from './screens/employee-view';
 import { NotFound } from './screens/not-found';
+import { Outliers } from './screens/outliers';
 import { PayComparison } from './screens/pay-comparison';
 import { PayStatistics } from './screens/pay-statistics';
 import { PayrollTotals } from './screens/payroll-totals';
-import { Placeholder } from './screens/placeholder';
 
 // Every route in ADR 0004, *Routing*. Screens are placeholders until their tickets land.
 
@@ -88,7 +88,7 @@ const outliersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/pay/outliers',
   validateSearch: outliersSearchSchema,
-  component: () => <Placeholder title="Paid out of line" />,
+  component: Outliers,
 });
 
 const routeTree = rootRoute.addChildren([

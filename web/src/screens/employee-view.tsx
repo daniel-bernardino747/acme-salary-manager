@@ -1,34 +1,30 @@
-import { countries, formatMoney, type EmployeeResponse } from '@acme/contract';
-import {
-  Alert,
-  Anchor,
-  Button,
-  Group,
-  Modal,
-  Paper,
-  SimpleGrid,
-  Skeleton,
-  Stack,
-  Text,
-  Title,
-} from '@mantine/core';
+import { formatMoney, type EmployeeResponse, type PayStatisticsResponse } from '@acme/contract';
+import { Alert, Anchor, Box, Button, Group, Modal, Skeleton, Stack, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
+import type { ReactNode } from 'react';
 import { apiFetch } from '../api/api-fetch';
 import { employeePath } from '../api/employees-path';
 import { employeesQuery } from '../api/employees-query';
 import { errorText } from '../api/error-text';
+import { payStatisticsPath } from '../api/pay-statistics-path';
 import { queryKey } from '../api/query-key';
 import { useEmployee } from '../api/use-employee';
+import { CountryStamp, Figure, Muted, PageHeader, Panel, RangeBar } from '../components/document';
 import { EmployeeNotFound } from '../components/employee-not-found';
+import { ChevronLeftIcon } from '../components/icons';
 import { QueryState } from '../components/query-state';
+import { countryName } from '../format/country-name';
+import {
+  emptyGroupText,
+  seeEmployeesText,
+  smallGroupNotice,
+  statisticsHeading,
+} from '../format/pay-statistics-copy';
 import { lastEmployeesSearch } from '../routes/last-employees-search';
-import { employeesSearchAfterDelete } from '../routes/search';
-
-const countryNames = new Map<string, string>(
-  countries.map((country) => [country.code, country.name]),
-);
+import { employeesSearchAfterDelete, type EmployeesSearch } from '../routes/search';
+import classes from './employee-view.module.css';
 
 /**
  * One employee: their name, job title, department, country and salary, with Edit, Delete and
@@ -50,55 +46,160 @@ export function EmployeeView() {
 function Employee({ employee }: { employee: EmployeeResponse }) {
   const [confirming, confirm] = useDisclosure(false);
   const id = String(employee.id);
+  const { jobTitle, department, country } = employee;
   return (
-    <Stack gap="md">
-      <Group justify="space-between" align="flex-start">
-        <Title order={2}>{employee.name}</Title>
-        <Group gap="sm">
+    <Stack gap="lg">
+      <PageHeader
+        back={
+          <Anchor
+            size="sm"
+            mb="xs"
+            className={classes.back}
+            renderRoot={(props) => (
+              <Link {...props} to="/employees" search={lastEmployeesSearch.get()} />
+            )}
+          >
+            <ChevronLeftIcon size={16} />
+            Employees
+          </Anchor>
+        }
+        title={employee.name}
+        meta={
+          <>
+            <MetaLink search={{ page: 1, jobTitle }}>{jobTitle}</MetaLink>
+            {' · '}
+            <MetaLink search={{ page: 1, department }}>{department}</MetaLink>
+            {' · '}
+            <MetaLink search={{ page: 1, country }}>{countryName(country)}</MetaLink>{' '}
+            <CountryStamp country={country} />
+          </>
+        }
+        actions={
           <Button
-            variant="default"
             renderRoot={(props) => <Link {...props} to="/employees/$id/edit" params={{ id }} />}
           >
             Edit
           </Button>
-          <Button color="red" variant="light" onClick={confirm.open}>
-            Delete
-          </Button>
-        </Group>
+        }
+      />
+      <Box className={classes.grid}>
+        <Panel title="Annual salary">
+          <Figure>{`${formatMoney(employee.annualSalary, 'en')} ${employee.annualSalary.currency}`}</Figure>
+          <Muted>Annual gross base pay, in the currency of {countryName(country)}.</Muted>
+        </Panel>
+        <Peers employee={employee} />
+      </Box>
+      <Group justify="space-between" className={classes.danger} wrap="wrap" gap="sm">
+        <Muted>Deleting removes {employee.name} for good. It cannot be undone.</Muted>
+        <Button color="red" variant="subtle" onClick={confirm.open}>
+          Delete
+        </Button>
       </Group>
-      <SimpleGrid cols={{ base: 1, xs: 2 }}>
-        <Field label="Job title" value={employee.jobTitle} />
-        <Field label="Department" value={employee.department} />
-        <Field label="Country" value={countryNames.get(employee.country) ?? employee.country} />
-        <Field
-          label="Annual salary"
-          value={`${formatMoney(employee.annualSalary, 'en')} ${employee.annualSalary.currency}`}
-        />
-      </SimpleGrid>
-      <Anchor
-        renderRoot={(props) => (
-          <Link
-            {...props}
-            to="/pay/statistics"
-            search={{ jobTitle: employee.jobTitle, country: employee.country }}
-          />
-        )}
-      >
-        Compare with peers
-      </Anchor>
       <DeleteEmployee employee={employee} opened={confirming} onClose={confirm.close} />
     </Stack>
   );
 }
 
-function Field({ label, value }: { label: string; value: string }) {
+function MetaLink({ search, children }: { search: EmployeesSearch; children: ReactNode }) {
   return (
-    <Paper withBorder p="md">
-      <Text size="sm" c="dimmed">
-        {label}
-      </Text>
-      <Text fw={500}>{value}</Text>
-    </Paper>
+    <Anchor
+      inherit
+      c="gray.7"
+      renderRoot={(props) => <Link {...props} to="/employees" search={search} />}
+    >
+      {children}
+    </Anchor>
+  );
+}
+
+/**
+ * The employee's peer group from `GET /api/pay-statistics` (ADR 0004, *Employee view*, as amended
+ * by #40): the median, the range with this salary marked, and the headcount. No compa-ratio: that
+ * needs a field on the employee resource.
+ */
+function Peers({ employee }: { employee: EmployeeResponse }) {
+  const { jobTitle, country } = employee;
+  const search = { jobTitle, country };
+  const query = useQuery({
+    queryKey: queryKey('pay-statistics', search),
+    queryFn: () => apiFetch<PayStatisticsResponse>(payStatisticsPath(search) ?? ''),
+  });
+  return (
+    <Panel title="Peers">
+      <Muted>{statisticsHeading(search)}</Muted>
+      <QueryState query={query} skeleton={<Skeleton height={120} mt="sm" />}>
+        {(statistics) => {
+          const { min, median, average, max, headcount } = statistics;
+          if (!min || !median || !average || !max) {
+            return <Text mt="sm">{emptyGroupText(statistics)}</Text>;
+          }
+          return (
+            <Stack gap="sm" mt="sm">
+              <div>
+                <Text size="sm" c="gray.6">
+                  Peer median
+                </Text>
+                <Anchor
+                  fw={700}
+                  fz="xl"
+                  renderRoot={(props) => <Link {...props} to="/pay/statistics" search={search} />}
+                >
+                  {formatMoney(median, 'en')}
+                </Anchor>
+              </div>
+              {statistics.smallGroup && (
+                <Alert color="under" variant="light" title="Small group">
+                  {smallGroupNotice(headcount)}
+                </Alert>
+              )}
+              <RangeBar
+                min={min.amountMinor}
+                max={max.amountMinor}
+                median={median.amountMinor}
+                average={average.amountMinor}
+                value={employee.annualSalary.amountMinor}
+                smallGroup={statistics.smallGroup}
+                label={`${employee.name}'s salary on the range of their peer group, from minimum to maximum`}
+              />
+              <Group justify="space-between" gap="xs">
+                <Text size="sm">
+                  <Text span c="gray.6">
+                    Min{' '}
+                  </Text>
+                  {formatMoney(min, 'en')}
+                </Text>
+                <Text size="sm">
+                  <Text span c="gray.6">
+                    Max{' '}
+                  </Text>
+                  {formatMoney(max, 'en')}
+                </Text>
+              </Group>
+              <Muted size="xs">
+                The dot is this salary, the tick the median, and the diamond the average (
+                {formatMoney(average, 'en')}).
+              </Muted>
+              <Group gap="lg">
+                <Anchor
+                  size="sm"
+                  renderRoot={(props) => <Link {...props} to="/pay/statistics" search={search} />}
+                >
+                  Compare with peers
+                </Anchor>
+                <Anchor
+                  size="sm"
+                  renderRoot={(props) => (
+                    <Link {...props} to="/employees" search={{ page: 1, jobTitle, country }} />
+                  )}
+                >
+                  {seeEmployeesText(headcount)}
+                </Anchor>
+              </Group>
+            </Stack>
+          );
+        }}
+      </QueryState>
+    </Panel>
   );
 }
 
@@ -160,14 +261,14 @@ function DeleteEmployee({ employee, opened, onClose }: DeleteEmployeeProps) {
 
 function ViewSkeleton() {
   return (
-    <Stack gap="md" aria-busy="true" aria-label="Loading">
-      <Skeleton height={32} width="40%" />
-      <SimpleGrid cols={{ base: 1, xs: 2 }}>
-        {Array.from({ length: 4 }, (_, field) => (
-          <Skeleton key={field} height={64} />
-        ))}
-      </SimpleGrid>
-      <Skeleton height={16} width={160} />
+    <Stack gap="lg" aria-busy="true" aria-label="Loading">
+      <Skeleton height={14} width={90} />
+      <Skeleton height={36} width="40%" />
+      <Skeleton height={18} width="55%" />
+      <Box className={classes.grid}>
+        <Skeleton height={140} />
+        <Skeleton height={220} />
+      </Box>
     </Stack>
   );
 }

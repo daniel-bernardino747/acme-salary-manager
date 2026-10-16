@@ -1,4 +1,9 @@
-import { countrySchema, departmentSchema, jobTitleSchema } from '@acme/contract';
+import {
+  countrySchema,
+  departmentSchema,
+  jobTitleSchema,
+  type EmployeeListResponse,
+} from '@acme/contract';
 import { z } from 'zod';
 
 /**
@@ -51,6 +56,17 @@ export function changeEmployeesSearch(
 ): EmployeesSearch {
   const next = employeesSearchSchema.parse({ ...search, ...change, page: 1 });
   return next.q?.trim() ? next : { ...next, q: undefined };
+}
+
+/**
+ * Where the list lands after a delete, given the page it was on as it reads now: one page back if
+ * that page came back empty and is past the first (ADR 0004, *Data fetching*).
+ */
+export function employeesSearchAfterDelete(
+  search: EmployeesSearch,
+  page: Pick<EmployeeListResponse, 'items'>,
+): EmployeesSearch {
+  return page.items.length === 0 && search.page > 1 ? { ...search, page: search.page - 1 } : search;
 }
 
 /** `all` omits the API's `direction` parameter (ADR 0004, *Question 4*). */

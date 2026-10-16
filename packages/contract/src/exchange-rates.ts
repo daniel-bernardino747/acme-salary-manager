@@ -39,7 +39,7 @@ export function deriveRatePerUsd(eurToLocal: string, eurToUsd: string): number {
  */
 export const ecbReferenceRates = {
   date: '2026-09-30',
-  url: 'https://data-api.ecb.europa.eu/service/data/EXR/D.USD+GBP+INR+BRL+JPY.EUR.SP00.A?startPeriod=2026-09-30&endPeriod=2026-09-30',
+  url: 'https://data-api.ecb.europa.eu/service/data/EXR/D.USD+GBP+INR+BRL+JPY.EUR.SP00.A?startPeriod=2026-09-30&endPeriod=2026-09-30&format=csvdata',
   perEur: {
     USD: '1.1355',
     GBP: '0.85463',

@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import { insertEmployee } from '../../test/builders';
 import { countEmployees } from '../persistence/count-employees';
 import { createDb, type Db } from '../persistence/db';
+import { employeesById } from '../persistence/employees-by-id';
 import { databaseGoldenHash } from './golden-hash';
 import { runSeed } from './run-seed';
 
@@ -38,5 +40,18 @@ describe('seed command', () => {
       expect.stringMatching(/^Seeded 10,000 employees in \d+ ms\.$/),
       `Database golden hash: ${DATABASE_GOLDEN_HASH}`,
     ]);
+  });
+
+  it('by default refuses a non-empty table, exits non-zero, points to --reset and leaves the rows', () => {
+    insertEmployee(db);
+    insertEmployee(db, { name: 'Kenji Watanabe', country: 'JP', annualSalaryMinor: 9_000_000 });
+    const before = employeesById(db);
+
+    expect(seed([])).toBe(1);
+
+    expect(lines).toEqual([
+      'Seed refused: the table already has 2 employees. Run with --reset to replace them.',
+    ]);
+    expect(employeesById(db)).toEqual(before);
   });
 });

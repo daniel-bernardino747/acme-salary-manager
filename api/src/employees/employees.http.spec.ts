@@ -186,7 +186,7 @@ describe('the :id of /api/employees/:id', () => {
     },
   );
 
-  it.each(['put'] as const)('is checked by %s too', async (method) => {
+  it.each(['put', 'delete'] as const)('is checked by %s too', async (method) => {
     insertEmployee(t.db);
 
     const res = await t.http()[method]('/api/employees/0').send(priya).expect(400);

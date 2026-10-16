@@ -4,7 +4,9 @@ import {
   comparisonSearchSchema,
   employeesSearchSchema,
   outliersSearchSchema,
+  parseSearch,
   statisticsSearchSchema,
+  stringifySearch,
 } from './routes/search';
 import { NotFound } from './screens/not-found';
 import { Placeholder } from './screens/placeholder';
@@ -89,7 +91,7 @@ const routeTree = rootRoute.addChildren([
   outliersRoute,
 ]);
 
-export const router = createRouter({ routeTree });
+export const router = createRouter({ routeTree, parseSearch, stringifySearch });
 
 declare module '@tanstack/react-router' {
   interface Register {

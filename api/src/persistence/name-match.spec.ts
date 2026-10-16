@@ -10,4 +10,9 @@ describe('nameMatch', () => {
     expect(nameMatch('pri sha')).toBe('"pri"* AND "sha"*');
     expect(nameMatch('  pri \t  sha ')).toBe('"pri"* AND "sha"*');
   });
+
+  it('doubles a quote inside a word, so it stays inside the quoted word', () => {
+    expect(nameMatch('o"connor')).toBe('"o""connor"*');
+    expect(nameMatch('"')).toBe('""""*');
+  });
 });

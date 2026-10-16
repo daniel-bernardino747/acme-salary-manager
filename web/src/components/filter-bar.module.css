@@ -1,0 +1,40 @@
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--mantine-spacing-sm);
+}
+
+.country {
+  width: 180px;
+}
+
+.department {
+  width: 190px;
+}
+
+.jobTitle {
+  width: 250px;
+}
+
+@media (max-width: 48em) {
+  .bar > * {
+    width: 100%;
+  }
+
+  .fields {
+    display: none;
+  }
+
+  .fields[data-open] {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .country,
+  .department,
+  .jobTitle {
+    width: 100%;
+  }
+}

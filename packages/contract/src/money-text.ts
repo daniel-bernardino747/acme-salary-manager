@@ -47,6 +47,8 @@ function toDecimalString(amountMinor: number, exponent: number): `${number}` {
 export interface FormatMoneyOptions {
   /** Whole major units (payroll totals, the comparison), rounded half up in integers first. */
   wholeUnits?: boolean;
+  /** No grouping and no symbol, e.g. "1250000.50", to pre-fill the edit form's text field. */
+  plainInput?: boolean;
 }
 
 /** Whole major units of `amountMinor`, rounded half up by integer quotient and remainder (ADR 0001). */
@@ -77,10 +79,14 @@ export function formatMoney(
   const [amount, decimals] = options.wholeUnits
     ? [roundToWholeUnits(money.amountMinor, exponent), 0]
     : [money.amountMinor, exponent];
+  const text = toDecimalString(amount, decimals);
+  if (options.plainInput) {
+    return text;
+  }
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: money.currency,
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
-  }).format(toDecimalString(amount, decimals));
+  }).format(text);
 }

@@ -158,6 +158,15 @@ describe('GET /api/employees/:id', () => {
   });
 });
 
+/** A valid add or edit body. */
+const priya = {
+  name: 'Priya Sharma',
+  jobTitle: 'Software Engineer II',
+  department: 'Engineering',
+  country: 'IN',
+  annualSalaryMinor: 1_250_000_50,
+};
+
 describe('the :id of /api/employees/:id', () => {
   it.each(['abc', '0', '-3', '2.5', '1e3', '0x10', '007', '9007199254740993'])(
     'answers %s with a 400 problem, since an id is a positive integer written plainly',
@@ -176,16 +185,15 @@ describe('the :id of /api/employees/:id', () => {
       expect(problem.errors?.map((error) => error.message)).toEqual(['Must be a positive integer']);
     },
   );
-});
 
-/** A valid add or edit body. */
-const priya = {
-  name: 'Priya Sharma',
-  jobTitle: 'Software Engineer II',
-  department: 'Engineering',
-  country: 'IN',
-  annualSalaryMinor: 1_250_000_50,
-};
+  it.each(['put'] as const)('is checked by %s too', async (method) => {
+    insertEmployee(t.db);
+
+    const res = await t.http()[method]('/api/employees/0').send(priya).expect(400);
+
+    expect(problemSchema.parse(res.body).detail).toBe('Path parameter is invalid');
+  });
+});
 
 describe('POST /api/employees', () => {
   it('creates the employee and answers 201 with it and its Location', async () => {
@@ -279,5 +287,21 @@ describe('PUT /api/employees/:id', () => {
     expect(problemSchema.parse(res.body)).toMatchObject({ title: 'Not Found', status: 404 });
     const list = await t.http().get('/api/employees').expect(200);
     expect(employeeListResponseSchema.parse(list.body).total).toBe(0);
+  });
+
+  it('answers an invalid body with a 400 problem naming the path, and changes nothing', async () => {
+    const kenji = insertEmployee(t.db, { name: 'Kenji Watanabe' });
+
+    const res = await t
+      .http()
+      .put(`/api/employees/${kenji.id}`)
+      .send({ ...priya, annualSalaryMinor: 0 })
+      .expect(400);
+
+    expect(problemSchema.parse(res.body).errors?.map((error) => error.path)).toEqual([
+      ['annualSalaryMinor'],
+    ]);
+    const stored = await t.http().get(`/api/employees/${kenji.id}`).expect(200);
+    expect(employeeResponseSchema.parse(stored.body).name).toBe('Kenji Watanabe');
   });
 });

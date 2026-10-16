@@ -31,7 +31,7 @@ import { QueryState } from '../components/query-state';
 import { countText, employeeCount } from '../format/counts';
 import { countryName } from '../format/country-name';
 import { costText, smallGroupCountText } from '../format/outliers-copy';
-import { shareBars, topOutliers } from '../format/overview';
+import { overviewDateLine, shareBars, topOutliers } from '../format/overview';
 import { payrollFootnote, shareText } from '../format/payroll-copy';
 import { placeDecimal } from '../format/place-decimal';
 import { wholeUnits } from '../format/whole-units';
@@ -46,11 +46,16 @@ const countryOptions = countries.map((country) => ({ value: country.code, label:
  * role, who is paid out of line, and the annual payroll. Each panel loads and fails on its own.
  */
 export function Overview() {
+  // The same query as the payroll panel, so the date line costs no request of its own.
+  const payroll = useQuery({
+    queryKey: queryKey('payroll-totals'),
+    queryFn: () => apiFetch<PayrollTotalsResponse>('/api/payroll-totals'),
+  });
   return (
     <Stack gap="lg">
       <PageHeader
         title="Overview"
-        question="Start here: find someone, look up pay, act on outliers."
+        meta={payroll.data && overviewDateLine(new Date(), payroll.data.grandTotal.headcount)}
       />
       <button type="button" className={classes.find} onClick={openGlobalSearch}>
         <SearchIcon size={22} />
@@ -245,7 +250,8 @@ function AnnualPayroll() {
                       >
                         {countryName(row.country)}
                       </Anchor>
-                      <Text size="sm" fw={600}>
+                      <CountryStamp country={row.country} />
+                      <Text size="sm" fw={600} ml="auto">
                         {shareText(row.sharePermille, row.usd)}
                       </Text>
                     </Group>

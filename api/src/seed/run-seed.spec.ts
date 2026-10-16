@@ -29,4 +29,14 @@ describe('seed command', () => {
 
     expect(databaseGoldenHash(db)).toBe(DATABASE_GOLDEN_HASH);
   });
+
+  it('prints the row count, the database golden hash and the duration', () => {
+    seed([]);
+
+    // The duration is wall-clock time, so only its form is checked (ADR 0006, *Determinism*).
+    expect(lines).toEqual([
+      expect.stringMatching(/^Seeded 10,000 employees in \d+ ms\.$/),
+      `Database golden hash: ${DATABASE_GOLDEN_HASH}`,
+    ]);
+  });
 });

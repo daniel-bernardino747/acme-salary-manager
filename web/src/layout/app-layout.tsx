@@ -31,6 +31,7 @@ export function AppLayout() {
 
   return (
     <AppShell
+      layout="alt"
       header={{ height: 64 }}
       navbar={{ width: 240, breakpoint: 'sm', collapsed: { mobile: !navOpen } }}
       padding={0}
@@ -83,11 +84,11 @@ export function AppLayout() {
         onClick={nav.close}
       >
         <Stack gap={2} h="100%">
-          <Link to="/" className={classes.brand}>
+          <Box component={Link} to="/" className={classes.brand} visibleFrom="sm">
             ACME Salary Manager
             <span className={classes.brandLine}>HR · 7 countries</span>
-          </Link>
-          <Box h={18} />
+          </Box>
+          <Box h={18} visibleFrom="sm" />
           {navItems
             .filter((item) => item.group === 'main')
             .map((item) => (

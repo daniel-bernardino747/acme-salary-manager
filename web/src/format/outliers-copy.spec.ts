@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { costText, outliersHeadline } from './outliers-copy';
+import { costText, outliersHeadline, uncheckedText } from './outliers-copy';
 
 describe('outliersHeadline', () => {
   it.each([
@@ -21,5 +21,15 @@ describe('costText', () => {
     [0, 'Bringing them to 0.80 would cost $0 a year.'],
   ])('states a cost of %i cents in whole USD', (amountMinor, text) => {
     expect(costText({ amountMinor, currency: 'USD' })).toBe(text);
+  });
+});
+
+describe('uncheckedText', () => {
+  it.each([
+    [12, "12 employees in small groups weren't checked."],
+    [1, "1 employee in a small group wasn't checked."],
+    [0, "0 employees in small groups weren't checked."],
+  ])('counts %i employees in small groups as "%s"', (smallGroupHeadcount, text) => {
+    expect(uncheckedText(smallGroupHeadcount)).toBe(text);
   });
 });

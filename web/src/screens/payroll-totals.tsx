@@ -203,7 +203,7 @@ function TotalsRecords({ rows }: { rows: TotalsRow[] }) {
             <div className={records.recordFigures}>
               <Text fw={700}>{wholeUnits(row.usd)}</Text>
               <Text size="sm" c="gray.6">
-                {row.local && `${wholeUnits(row.local)} · `}
+                {row.local && row.local.currency !== 'USD' && `${wholeUnits(row.local)} · `}
                 {employeeCount(row.headcount)}
               </Text>
             </div>

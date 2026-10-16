@@ -6,9 +6,9 @@
     "build": "nest build -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "migrate": "node dist/persistence/migrate.js",
+    "migrate": "node dist/migrate.js",
     "seed": "node dist/seed/seed.js",
-    "start:prod": "node dist/persistence/migrate.js && node dist/seed/seed.js --if-empty && node dist/main.js",
+    "start:prod": "node dist/migrate.js && node dist/seed/seed.js --if-empty && node dist/main.js",
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {

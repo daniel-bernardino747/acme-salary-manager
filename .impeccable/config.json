@@ -1,0 +1,15 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [".impeccable/mocks/decision/challenger-centre-rail.html"],
+        "createdAt": "2026-10-16T19:41:13.833Z",
+        "reason": "catalog world rw-centre-rail-reference-setting specifies unbleached bone paper; sketch renders the dealt challenger as defined"
+      }
+    ]
+  }
+}

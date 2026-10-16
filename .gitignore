@@ -52,3 +52,10 @@ desktop.ini
 # Playwright output
 test-results/
 playwright-report/
+
+# Impeccable working files (decision page, mocks, review captures, hook cache)
+.impeccable/mocks/
+.impeccable/questions/
+.impeccable/review/
+.impeccable/build/
+**/.impeccable/hook.cache.json

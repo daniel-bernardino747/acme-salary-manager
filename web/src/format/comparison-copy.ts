@@ -9,7 +9,8 @@ function byMedianUsd(a: { median: Money | null }, b: { median: Money | null }): 
   if (b.median === null) {
     return -1;
   }
-  return b.median.amountMinor - a.median.amountMinor;
+  if (a.median.amountMinor === b.median.amountMinor) return 0;
+  return a.median.amountMinor > b.median.amountMinor ? -1 : 1;
 }
 
 /**

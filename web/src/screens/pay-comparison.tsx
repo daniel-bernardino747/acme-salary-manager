@@ -1,5 +1,5 @@
 import { BarChart } from '@mantine/charts';
-import { formatMoney, jobTitles, type Money, type PayComparisonResponse } from '@acme/contract';
+import { countries, jobTitles, type JobTitle, type PayComparisonResponse } from '@acme/contract';
 import {
   Anchor,
   Badge,
@@ -22,21 +22,26 @@ import { QueryState } from '../components/query-state';
 import { comparisonFootnote, highestMedianFirst, medianBars } from '../format/comparison-copy';
 import { countText } from '../format/counts';
 import { countryName } from '../format/country-name';
+import { wholeUnits } from '../format/whole-units';
 import { comparisonSearchSchema } from '../routes/search';
 
 /**
  * The comparison is in whole USD: its figures carry two roundings and a fixed rate, so cents would
- * claim a precision they do not have. Rounded in integers (ADR 0004, *Question 3*).
+ * claim a precision they do not have (ADR 0004, *Question 3*). A bar's length is its median in
+ * cents; its tooltip and axis labels are that median in whole USD.
  */
-const whole = (money: Money) => formatMoney(money, 'en', { wholeUnits: true });
-
-/** A bar's length is its median in cents; its labels are that median in whole USD. */
-const wholeUsd = (amountMinor: number) => whole({ amountMinor, currency: 'USD' });
+const wholeUsd = (amountMinor: number) => wholeUnits({ amountMinor, currency: 'USD' });
 
 /** Small groups are drawn muted, so one person's pay does not read as a national median. */
-const barColor = { checked: 'blue.6', smallGroup: 'gray.4' } as const;
+const barColor = { fiveOrMore: 'blue.6', smallGroup: 'gray.4' } as const;
+
+/** The chart grows with its bars, and its skeleton holds the room for every country. */
+const chartHeight = (bars: number) => bars * 44 + 40;
 
 type ComparisonRow = PayComparisonResponse['rows'][number];
+
+/** The table's figure columns, in order after Country and Headcount. */
+const figures = ['min', 'median', 'average', 'max'] as const;
 
 /** Question 3: one job title across every country, in USD (ADR 0004, *Question 3*). */
 export function PayComparison() {
@@ -90,20 +95,20 @@ function Comparison({ comparison }: { comparison: PayComparisonResponse }) {
         ) : (
           <>
             <BarChart
-              h={bars.length * 44 + 40}
+              h={chartHeight(bars.length)}
               data={bars.map((bar) => ({
                 ...bar,
-                color: bar.smallGroup ? barColor.smallGroup : barColor.checked,
+                color: bar.smallGroup ? barColor.smallGroup : barColor.fiveOrMore,
               }))}
               dataKey="country"
               orientation="vertical"
-              series={[{ name: 'medianUsdMinor', label: 'Median', color: barColor.checked }]}
+              series={[{ name: 'medianUsdMinor', label: 'Median', color: barColor.fiveOrMore }]}
               valueFormatter={wholeUsd}
               yAxisProps={{ width: 120 }}
               gridAxis="x"
             />
             <Group gap="lg">
-              <LegendEntry color={barColor.checked}>5 or more employees</LegendEntry>
+              <LegendEntry color={barColor.fiveOrMore}>5 or more employees</LegendEntry>
               <LegendEntry color={barColor.smallGroup}>fewer than 5 employees</LegendEntry>
             </Group>
           </>
@@ -126,13 +131,7 @@ function LegendEntry({ color, children }: { color: string; children: ReactNode }
   );
 }
 
-function ComparisonTable({
-  jobTitle,
-  rows,
-}: {
-  jobTitle: PayComparisonResponse['jobTitle'];
-  rows: ComparisonRow[];
-}) {
+function ComparisonTable({ jobTitle, rows }: { jobTitle: JobTitle; rows: ComparisonRow[] }) {
   const navigate = useNavigate();
   return (
     <Table.ScrollContainer minWidth={720}>
@@ -183,9 +182,9 @@ function ComparisonTable({
                     No employees
                   </Table.Td>
                 ) : (
-                  [row.min, row.median, row.average, row.max].map((figure, i) => (
-                    <Table.Td key={i} ta="right" style={{ whiteSpace: 'nowrap' }}>
-                      {figure && whole(figure)}
+                  figures.map((figure) => (
+                    <Table.Td key={figure} ta="right" style={{ whiteSpace: 'nowrap' }}>
+                      {row[figure] && wholeUnits(row[figure])}
                     </Table.Td>
                   ))
                 )}
@@ -202,7 +201,7 @@ function ComparisonSkeleton() {
   return (
     <Stack gap="lg" aria-busy="true" aria-label="Loading">
       <Skeleton height={24} width="45%" />
-      <Skeleton height={7 * 44 + 40} />
+      <Skeleton height={chartHeight(countries.length)} />
       <Stack gap="xs">
         {Array.from({ length: 8 }, (_, row) => (
           <Skeleton key={row} height={28} />

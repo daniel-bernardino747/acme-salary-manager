@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { deriveRatePerUsd, ecbReferenceRates, exchangeRates } from './index.js';
+import { deriveRatePerUsd, ecbReferenceRates, exchangeRates, ratesSchema } from './index.js';
 
 describe('deriveRatePerUsd', () => {
   it('divides EUR→local by EUR→USD to 6 decimals, rounding half up', () => {
@@ -43,5 +43,20 @@ describe('exchange rate table', () => {
       BRL: deriveRatePerUsd(perEur.BRL, perEur.USD),
       JPY: deriveRatePerUsd(perEur.JPY, perEur.USD),
     });
+  });
+});
+
+describe('ratesSchema', () => {
+  it('states the source and as-of date of the shipped table', () => {
+    expect(ratesSchema.parse({ source: exchangeRates.source, asOf: exchangeRates.asOf })).toEqual({
+      source: 'ECB euro foreign exchange reference rates, derived to USD',
+      asOf: '2026-09-30',
+    });
+  });
+
+  it('rejects an as-of that is not a calendar date, and any other field', () => {
+    const rates = { source: exchangeRates.source, asOf: exchangeRates.asOf };
+    expect(ratesSchema.safeParse({ ...rates, asOf: '30/09/2026' }).success).toBe(false);
+    expect(ratesSchema.safeParse({ ...rates, ratesPerUsd: {} }).success).toBe(false);
   });
 });

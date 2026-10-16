@@ -33,7 +33,7 @@ const countryNames = new Map<string, string>(
   countries.map((country) => [country.code, country.name]),
 );
 
-/** One employee's record, with Edit, Delete and "Compare with peers" (ADR 0004, *Employee view*). */
+/** One employee: their name, job title, department, country and salary, with Edit, Delete and "Compare with peers" (ADR 0004, *Employee view*). */
 export function EmployeeView() {
   const { id: idParam } = useParams({ from: '/employees/$id' });
   const { query, notFound } = useEmployee(idParam);

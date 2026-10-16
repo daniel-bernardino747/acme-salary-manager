@@ -8,20 +8,25 @@ import { plantedCostToReachThreshold } from '../../api/test/seed-story';
 test.describe.configure({ mode: 'serial' });
 
 /** The planted underpaid employee in the smallest checked group (ADR 0005, *Planted outliers*). */
-const plantedSeniorDataScientistNl = generateEmployees().find(
-  ({ plant }) =>
-    plant !== null &&
-    'direction' in plant &&
-    plant.direction === 'below' &&
-    plant.jobTitle === 'Senior Data Scientist' &&
-    plant.country === 'NL',
-)?.employee;
+function plantedSeniorDataScientistNl() {
+  const found = generateEmployees().find(
+    ({ plant }) =>
+      plant !== null &&
+      'direction' in plant &&
+      plant.direction === 'below' &&
+      plant.jobTitle === 'Senior Data Scientist' &&
+      plant.country === 'NL',
+  );
+  if (!found) {
+    throw new RangeError('The seed plants no underpaid Senior Data Scientist · NL.');
+  }
+  return found.employee;
+}
 
 test('question 4 opens on Underpaid, listing the planted Senior Data Scientist in the Netherlands', async ({
   page,
 }) => {
-  expect(plantedSeniorDataScientistNl).toBeDefined();
-  const name = plantedSeniorDataScientistNl?.name ?? '';
+  const { name } = plantedSeniorDataScientistNl();
 
   await page.goto('/');
   await page

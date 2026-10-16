@@ -20,4 +20,10 @@ describe('assertRateTable', () => {
       expect(() => assertRateTable({ ...exchangeRates.ratesPerUsd, JPY: rate })).toThrow(/JPY/);
     },
   );
+
+  it('fails fast on a rate that is not a whole number of millionths', () => {
+    expect(() => assertRateTable({ ...exchangeRates.ratesPerUsd, JPY: 156_996_918.5 })).toThrow(
+      /JPY/,
+    );
+  });
 });

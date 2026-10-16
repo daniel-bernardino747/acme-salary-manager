@@ -25,16 +25,11 @@ function seed(db: Db, log: (line: string) => void): void {
  * Returns the process exit code.
  */
 export function runSeed(db: Db, args: readonly string[], log: (line: string) => void): number {
-  if (args.includes('--if-empty')) {
-    const existing = countEmployees(db);
-    log(
-      existing > 0
-        ? `Seed skipped: the table already has ${existing} employees.`
-        : 'Seed skipped: the generator is not implemented yet.',
-    );
+  const existing = countEmployees(db);
+  if (existing > 0 && args.includes('--if-empty')) {
+    log(`Seed skipped: the table already has ${count.format(existing)} employees.`);
     return 0;
   }
-  const existing = countEmployees(db);
   if (existing > 0) {
     log(
       `Seed refused: the table already has ${count.format(existing)} employees. Run with --reset to replace them.`,

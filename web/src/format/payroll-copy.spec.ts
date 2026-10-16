@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { highestUsdFirst, payrollHeadline, shareText } from './payroll-copy';
+import { highestUsdFirst, payrollFootnote, payrollHeadline, shareText } from './payroll-copy';
 
 const usd = (amountMinor: number) => ({ amountMinor, currency: 'USD' as const });
 
@@ -42,5 +42,15 @@ describe('highestUsdFirst', () => {
       'Design',
     ]);
     expect(rows[0]?.department).toBe('Engineering');
+  });
+});
+
+describe('payrollFootnote', () => {
+  it('names the rate source and date, and says the parts may not add up', () => {
+    expect(payrollFootnote({ source: 'ECB reference rates', asOf: '2026-09-30' })).toBe(
+      'USD amounts converted at fixed rates from ECB reference rates, as of 2026-09-30. ' +
+        'Each total is rounded on its own, so the parts may not add up exactly to the total, ' +
+        'or to 100%.',
+    );
   });
 });

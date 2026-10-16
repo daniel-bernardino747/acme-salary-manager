@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { employeesSearchSchema, outliersSearchSchema } from './search';
+import {
+  comparisonSearchSchema,
+  employeesSearchSchema,
+  outliersSearchSchema,
+  statisticsSearchSchema,
+} from './search';
 
 describe('employeesSearchSchema', () => {
   it('keeps valid values', () => {
@@ -62,5 +67,30 @@ describe('outliersSearchSchema', () => {
       direction: 'below',
       jobTitle: 'Accountant',
     });
+  });
+});
+
+describe('statisticsSearchSchema', () => {
+  it('keeps a picked title and country, with no defaults', () => {
+    expect(statisticsSearchSchema.parse({})).toEqual({});
+    expect(statisticsSearchSchema.parse({ jobTitle: 'Data Scientist', country: 'JP' })).toEqual({
+      jobTitle: 'Data Scientist',
+      country: 'JP',
+    });
+  });
+
+  it('drops an unknown title or country, so that picker shows empty', () => {
+    expect(statisticsSearchSchema.parse({ jobTitle: 'Wizard', country: 'JP' })).toEqual({
+      country: 'JP',
+    });
+  });
+});
+
+describe('comparisonSearchSchema', () => {
+  it('keeps a picked title and drops an unknown one', () => {
+    expect(comparisonSearchSchema.parse({ jobTitle: 'Recruiter' })).toEqual({
+      jobTitle: 'Recruiter',
+    });
+    expect(comparisonSearchSchema.parse({ jobTitle: 'recruiter' })).toEqual({});
   });
 });

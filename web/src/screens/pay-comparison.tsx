@@ -107,7 +107,12 @@ function Comparison({ comparison }: { comparison: PayComparisonResponse }) {
               orientation="vertical"
               series={[{ name: 'medianUsdMinor', label: 'Median', color: barColor.fiveOrMore }]}
               valueFormatter={wholeUsd}
-              yAxisProps={{ width: 190, tick: (props: TickProps) => <CountryTick {...props} /> }}
+              // A phone keeps the bars wide: the axis names the country, and the table below carries the stamp.
+              yAxisProps={
+                narrow
+                  ? { width: 110 }
+                  : { width: 190, tick: (props: TickProps) => <CountryTick {...props} /> }
+              }
               // A phone has room for three evenly spaced labels, a desktop for five.
               xAxisProps={{ tickCount: narrow ? 3 : 5 }}
               gridAxis="x"

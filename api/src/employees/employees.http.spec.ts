@@ -244,3 +244,29 @@ describe('POST /api/employees with an invalid body', () => {
     expect(problemSchema.parse(res.body).errors?.[0]?.message).toContain('currency');
   });
 });
+
+describe('PUT /api/employees/:id', () => {
+  it('replaces every field and answers 200 with the employee', async () => {
+    const { id } = insertEmployee(t.db, {
+      name: 'Kenji Watanabe',
+      jobTitle: 'Data Analyst',
+      department: 'Data',
+      country: 'JP',
+      annualSalaryMinor: 7_000_000,
+    });
+
+    const res = await t.http().put(`/api/employees/${id}`).send(priya).expect(200);
+
+    const replaced = {
+      id,
+      name: 'Priya Sharma',
+      jobTitle: 'Software Engineer II',
+      department: 'Engineering',
+      country: 'IN',
+      annualSalary: { amountMinor: 1_250_000_50, currency: 'INR' },
+    };
+    expect(employeeResponseSchema.parse(res.body)).toEqual(replaced);
+    const stored = await t.http().get(`/api/employees/${id}`).expect(200);
+    expect(employeeResponseSchema.parse(stored.body)).toEqual(replaced);
+  });
+});

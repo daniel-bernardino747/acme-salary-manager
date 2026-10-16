@@ -1,5 +1,6 @@
 import type { Money } from './money.js';
 import { currencies, type CurrencyCode } from './reference.js';
+import { divideRoundHalfUp } from './rounding.js';
 
 export type ParseMoneyResult =
   { success: true; amountMinor: number } | { success: false; error: string };
@@ -51,14 +52,6 @@ export interface FormatMoneyOptions {
   plainInput?: boolean;
 }
 
-/** Whole major units of `amountMinor`, rounded half up by integer quotient and remainder (ADR 0001). */
-function roundToWholeUnits(amountMinor: number, exponent: number): number {
-  const unit = 10 ** exponent;
-  const remainder = amountMinor % unit;
-  const quotient = (amountMinor - remainder) / unit;
-  return 2 * remainder >= unit ? quotient + 1 : quotient;
-}
-
 /**
  * Shows money as text with its own currency's symbol (ADR 0003, *Text and integers*). The decimal
  * string is built from the integer with string operations, and `Intl.NumberFormat` only groups it
@@ -77,7 +70,7 @@ export function formatMoney(
   }
   const { exponent } = currencies[money.currency];
   const [amount, decimals] = options.wholeUnits
-    ? [roundToWholeUnits(money.amountMinor, exponent), 0]
+    ? [divideRoundHalfUp(money.amountMinor, 10 ** exponent), 0]
     : [money.amountMinor, exponent];
   const text = toDecimalString(amount, decimals);
   if (options.plainInput) {

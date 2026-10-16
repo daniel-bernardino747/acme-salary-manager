@@ -1,4 +1,10 @@
-import { currencies, exchangeRates, type CurrencyCode, type Money } from '@acme/contract';
+import {
+  currencies,
+  divideRoundHalfUpBigInt,
+  exchangeRates,
+  type CurrencyCode,
+  type Money,
+} from '@acme/contract';
 import { assertSafeInteger } from './rounding';
 
 /** Rates are scaled by 10⁶ (ADR 0001, *Exchange rate table*). */
@@ -9,8 +15,8 @@ export type RatesPerUsd = Readonly<Record<CurrencyCode, number>>;
 
 /**
  * Converts a local amount to USD cents once: `localMinor · 10^(2 − exp) · 10⁶ / rate`, rounded half
- * up. The product passes 2⁵³ for large totals, so it runs in BigInt here and nowhere else, and the
- * result is asserted as a safe integer (ADR 0001).
+ * up. The product passes 2⁵³ for large totals, so it runs in BigInt, the only place money does,
+ * and the result is asserted as a safe integer (ADR 0001).
  */
 export function toUsd(money: Money, ratesPerUsd: RatesPerUsd = exchangeRates.ratesPerUsd): Money {
   assertSafeInteger(money.amountMinor, 'The amount to convert');
@@ -23,10 +29,7 @@ export function toUsd(money: Money, ratesPerUsd: RatesPerUsd = exchangeRates.rat
   }
   const exponentGap = USD_EXPONENT - BigInt(currencies[money.currency].exponent);
   const numerator = BigInt(money.amountMinor) * 10n ** exponentGap * RATE_SCALE;
-  const denominator = BigInt(rate);
-  const quotient = numerator / denominator;
-  const remainder = numerator % denominator;
-  const cents = Number(2n * remainder >= denominator ? quotient + 1n : quotient);
+  const cents = Number(divideRoundHalfUpBigInt(numerator, BigInt(rate)));
   assertSafeInteger(cents, 'The converted amount');
   return { amountMinor: cents, currency: 'USD' };
 }

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { CurrencyCode } from './reference.js';
+import { divideRoundHalfUpBigInt } from './rounding.js';
 
 /** Rates are local currency units per 1 USD, scaled to 6 decimals (ADR 0001). */
 const RATE_DECIMALS = 6;
@@ -26,10 +27,7 @@ export function deriveRatePerUsd(eurToLocal: string, eurToUsd: string): number {
   if (denominator === 0n) {
     throw new RangeError('EUR→USD must be greater than 0.');
   }
-  const quotient = numerator / denominator;
-  const remainder = numerator % denominator;
-  const rate = 2n * remainder >= denominator ? quotient + 1n : quotient;
-  return Number(rate);
+  return Number(divideRoundHalfUpBigInt(numerator, denominator));
 }
 
 /**

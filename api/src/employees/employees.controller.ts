@@ -58,7 +58,9 @@ export class EmployeesController {
   }
 
   @Put(':id')
-  edit(@Param('id') id: string, @Body() body: EmployeeRequest): EmployeeResponse | undefined {
-    return replaceEmployee(this.db, Number(id), body);
+  edit(@Param('id') id: string, @Body() body: EmployeeRequest): EmployeeResponse {
+    const employee = replaceEmployee(this.db, Number(id), body);
+    if (!employee) throw new NotFoundException(`Employee ${id} does not exist`);
+    return employee;
   }
 }

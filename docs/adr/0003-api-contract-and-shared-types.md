@@ -24,7 +24,8 @@ There is no codegen, but there is a build: Nest's `tsc` will not compile a works
 - The root `test` and `typecheck` scripts start with `pnpm --filter @acme/contract build`, so they never read a stale `dist`. CI runs the same scripts. `dev` runs `tsc -w` for `contract` next to `nest start --watch` and `vite`. A change to `contract` may need a Nest restart in watch mode (noted in the README).
 - Both apps always consume `dist`, with no Vite alias and no tsconfig `paths` to the source.
 - **Jest is ruled out for `api`**, because its module system does not support `require(esm)`. `api` tests use Vitest with `unplugin-swc`, so Nest's decorator metadata, and with it DI, works.
-- pnpm is pinned in `packageManager`. The root `package.json` allows `better-sqlite3`'s install script under that pnpm version's key (`onlyBuiltDependencies` on pnpm 10). Without it, the native binding is silently missing, locally and on Railway.
+- pnpm is pinned in `packageManager`. ~~The root `package.json` allows `better-sqlite3`'s install script under that pnpm version's key (`onlyBuiltDependencies` on pnpm 10). Without it, the native binding is silently missing, locally and on Railway.~~
+  *Amended during the API skeleton (#11):* pnpm is pinned at 12, which reads build permissions from `allowBuilds` in `pnpm-workspace.yaml`, not from `package.json`. `better-sqlite3` is listed there. Version 13 has no install script: it ships prebuilt N-API binaries for Windows and Linux (glibc and musl, x64 and arm64), so the native binding no longer depends on an install script running. The entry stays in case a later version brings one back. `@swc/core` and `esbuild` are allowed there too, because pnpm 12 fails an install that has unapproved build scripts.
 
 **First-slice checks.** These are added to the ones in ADR 0002:
 

@@ -110,6 +110,43 @@ describe('listEmployees', () => {
     expect(listEmployees(db, { ...firstPage, q: '   ' }).total).toBe(2);
   });
 
+  // ADR 0002, *Name search*: the tokenizer fixture table, row for row.
+  it.each([
+    ["o'connor", "Siobhan O'Connor", true],
+    ['connor', "Siobhan O'Connor", true],
+    ['oconnor', "Siobhan O'Connor", false],
+    ['anna lena', 'Anna-Lena Schmidt', true],
+    ['anna-lena', 'Anna-Lena Schmidt', true],
+    ['annalena', 'Anna-Lena Schmidt', false],
+    ['joao', 'João Silva', true],
+    ['muller', 'Lukas Müller', true],
+    ['gross', 'Hanna Groß', false],
+    ['groß', 'Hanna Groß', true],
+  ])('a search for %j finds %j: %s', (q, name, found) => {
+    const { id } = insertEmployee(db, { name });
+    insertEmployee(db, { name: 'Priya Sharma' });
+
+    expect(listEmployees(db, { ...firstPage, q }).items.map((employee) => employee.id)).toEqual(
+      found ? [id] : [],
+    );
+  });
+
+  it.each([
+    ['AND', ['Andrea Rossi']],
+    ['pri OR', []],
+    ['pri -', []],
+    ['*', []],
+    ['"', []],
+    ['NOT sharma', []],
+  ])('reads %j as text, so it can neither fail nor widen the search', (q, names) => {
+    insertEmployee(db, { name: 'Andrea Rossi' });
+    insertEmployee(db, { name: 'Priya Sharma' });
+
+    expect(listEmployees(db, { ...firstPage, q }).items.map((employee) => employee.name)).toEqual(
+      names,
+    );
+  });
+
   it('returns no items for a page past the end, with the total still counted', () => {
     insertEmployee(db);
 

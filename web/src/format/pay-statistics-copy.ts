@@ -31,7 +31,7 @@ export function emptyGroupText({ jobTitle, country }: PeerGroupNames): string {
 }
 
 /** "1 employee", "3 employees": counts are pluralized, job titles never are. */
-function employeeCount(headcount: number): string {
+export function employeeCount(headcount: number): string {
   return headcount === 1 ? '1 employee' : `${counts.format(headcount)} employees`;
 }
 

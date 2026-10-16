@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { median } from '../domain/statistics';
-import { anchoredSalaries } from './group-salaries';
+import { anchoredSalaries, freeSalaries } from './group-salaries';
 import { streamFor } from './prng';
 
 // A $84,300 base in $100 steps: draws run from ceil(0.88 · 843) = 742 to floor(1.12 · 843) = 944 steps.
@@ -71,5 +71,31 @@ describe('anchoredSalaries', () => {
 
     expect(salaries).not.toEqual([...salaries].sort((a, b) => a - b));
     expect(salaries[0]).not.toBe(59_010_00);
+  });
+});
+
+describe('freeSalaries', () => {
+  it.each([0, 1, 2, 3, 4])(
+    'draws a small group of %i freely in 0.88–1.12, with no two alike',
+    (size) => {
+      for (const stream of ['a', 'b', 'c', 'd', 'e']) {
+        const salaries = freeSalaries(streamFor(stream), { baseMinor, stepMinor, size });
+
+        expect(salaries).toHaveLength(size);
+        expect(new Set(salaries).size).toBe(size);
+        for (const salary of salaries) {
+          expect(salary % stepMinor).toBe(0);
+          expect(salary).toBeGreaterThanOrEqual(lowest);
+          expect(salary).toBeLessThanOrEqual(highest);
+        }
+      }
+    },
+  );
+
+  it('redraws on a collision, from the same stream', () => {
+    // A base of 10 steps leaves only 9, 10 and 11 to draw, so three draws must collide and redraw.
+    const salaries = freeSalaries(streamFor('a'), { baseMinor: 10, stepMinor: 1, size: 3 });
+
+    expect([...salaries].sort((a, b) => a - b)).toEqual([9, 10, 11]);
   });
 });

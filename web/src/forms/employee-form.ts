@@ -126,7 +126,7 @@ export function salaryPreview(annualSalary: string, country: string): string | n
 }
 
 /** A country's currency, or `null` while none is picked. */
-function currencyOfPicked(country: string): CurrencyCode | null {
+export function currencyOfPicked(country: string): CurrencyCode | null {
   const code = countrySchema.safeParse(country);
   return code.success ? currencyOf(code.data) : null;
 }

@@ -1,12 +1,11 @@
-import { countries, departments, jobTitles } from '@acme/contract';
+import { departments, jobTitles } from '@acme/contract';
 import { Badge, Button, Group, Select } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import type { ReactNode } from 'react';
 import { activeFilterCount } from '../routes/search';
 import { FilterIcon } from './icons';
 import classes from './filter-bar.module.css';
-
-const countryOptions = countries.map((country) => ({ value: country.code, label: country.name }));
+import { countryOptions } from '../format/country-name';
 
 export interface Filters {
   country?: string;

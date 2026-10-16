@@ -1,5 +1,5 @@
 import type { CountryCode, Money, Rates } from '@acme/contract';
-import { inCountry } from './pay-statistics-copy';
+import { inCountry } from './country-name';
 import { placeDecimal } from './place-decimal';
 
 /**

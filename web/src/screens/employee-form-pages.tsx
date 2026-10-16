@@ -1,5 +1,4 @@
 import {
-  countries,
   departments,
   jobTitles,
   type EmployeeRequest,
@@ -30,8 +29,7 @@ import {
 } from '../forms/employee-form';
 import { employeeProblem } from '../forms/employee-problem';
 import classes from './employee-form-pages.module.css';
-
-const countryOptions = countries.map((country) => ({ value: country.code, label: country.name }));
+import { countryOptions } from '../format/country-name';
 
 /** `/employees/new` (ADR 0004, *Forms: add and edit*). */
 export function AddEmployee() {

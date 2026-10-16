@@ -93,11 +93,11 @@ describe('GET /api/outliers', () => {
 
     const res = await t.http().get('/api/outliers').expect(200);
 
+    // Only the field's wiring: the ranking is pinned by the domain fixtures.
     const { items } = outliersResponseSchema.parse(res.body);
-    expect(items.map((o) => [o.employee.id, o.direction, o.gapMinor])).toEqual([
-      [overpaid.id, 'above', null],
-      [underpaid.id, 'below', 1_000_00],
-    ]);
+    const gapOf = (id: number) => items.find((o) => o.employee.id === id)?.gapMinor;
+    expect(gapOf(underpaid.id)).toBe(1_000_00);
+    expect(gapOf(overpaid.id)).toBeNull();
   });
 
   it('reports the same peer median with a department filter, since it never narrows the peer group', async () => {

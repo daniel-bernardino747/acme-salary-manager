@@ -100,6 +100,33 @@ describe('GET /api/outliers', () => {
     ]);
   });
 
+  it('reports the same peer median with a department filter, since it never narrows the peer group', async () => {
+    // The whole group: 7,000 · 10,000 · 10,000 · 12,000 · 12,000, median $10,000.00. Product alone
+    // (7,000 · 12,000 · 12,000) would give $12,000.00, and would be too small to check.
+    const group = { jobTitle: 'Product Manager', country: 'US' } as const;
+    const underpaid = insertEmployee(t.db, {
+      ...group,
+      department: 'Product',
+      annualSalaryMinor: 7_000_00,
+    });
+    insertEmployee(t.db, { ...group, department: 'Product', annualSalaryMinor: 12_000_00 });
+    insertEmployee(t.db, { ...group, department: 'Product', annualSalaryMinor: 12_000_00 });
+    insertEmployee(t.db, { ...group, department: 'Sales', annualSalaryMinor: 10_000_00 });
+    insertEmployee(t.db, { ...group, department: 'Sales', annualSalaryMinor: 10_000_00 });
+
+    const all = outliersResponseSchema.parse((await t.http().get('/api/outliers')).body);
+    const filtered = outliersResponseSchema.parse(
+      (await t.http().get('/api/outliers').query({ department: 'Product' }).expect(200)).body,
+    );
+
+    expect(filtered.items.map((o) => o.employee.id)).toEqual([underpaid.id]);
+    expect(filtered.items[0]?.peerMedian).toEqual(all.items[0]?.peerMedian);
+    expect(filtered.items[0]).toMatchObject({
+      peerMedian: { amountMinor: 10_000_00, currency: 'USD' },
+      peerHeadcount: 5,
+    });
+  });
+
   it.each([
     ['an unknown direction', { direction: 'all' }, ['direction']],
     ['a country not in the list', { country: 'UK' }, ['country']],

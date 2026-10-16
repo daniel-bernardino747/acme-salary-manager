@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { employeeRequestSchema } from './index.js';
+import { employeeRequestSchema, employeeResponseSchema } from './index.js';
 
 const body = {
   name: 'Priya Sharma',
@@ -41,5 +41,25 @@ describe('employeeRequestSchema', () => {
     expect(employeeRequestSchema.safeParse({ ...body, country: 'UK' }).success).toBe(false);
     expect(employeeRequestSchema.safeParse({ ...body, department: 'Legal' }).success).toBe(false);
     expect(employeeRequestSchema.safeParse({ ...body, jobTitle: 'CEO' }).success).toBe(false);
+  });
+});
+
+describe('employeeResponseSchema', () => {
+  const employee = {
+    id: 7,
+    name: 'Priya Sharma',
+    jobTitle: 'Software Engineer II',
+    department: 'Engineering',
+    country: 'IN',
+    annualSalary: { amountMinor: 2_400_000_00, currency: 'INR' },
+  };
+
+  it('carries the salary as Money', () => {
+    expect(employeeResponseSchema.parse(employee)).toEqual(employee);
+  });
+
+  it("rejects a salary in a currency other than the country's", () => {
+    const inEuros = { ...employee, annualSalary: { amountMinor: 2_400_000_00, currency: 'EUR' } };
+    expect(employeeResponseSchema.safeParse(inEuros).success).toBe(false);
   });
 });

@@ -11,6 +11,10 @@ const sharePermilleSchema = z.int().min(0).nullable();
 
 const headcountSchema = z.int().min(0);
 
+/** `GET /api/payroll-totals` takes no parameters, and is strict like every query (ADR 0003). */
+export const payrollTotalsQuerySchema = z.strictObject({});
+export type PayrollTotalsQuery = z.infer<typeof payrollTotalsQuerySchema>;
+
 /**
  * `GET /api/payroll-totals`, question 2 (ADR 0003, *Money on the wire*, with ADR 0004's additions):
  * every country and every department, and the grand total, with the rates that produced the USD

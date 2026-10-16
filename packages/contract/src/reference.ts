@@ -30,6 +30,15 @@ export const countrySchema = z.enum(
   countries.map((c) => c.code) as [CountryCode, ...CountryCode[]],
 );
 
+/** The currency a country's salaries are in. */
+export function currencyOf(country: CountryCode): CurrencyCode {
+  const found = countries.find((c) => c.code === country);
+  if (!found) {
+    throw new RangeError(`Unsupported country: ${country}.`);
+  }
+  return found.currency;
+}
+
 export const departments = [
   'Engineering',
   'Product',

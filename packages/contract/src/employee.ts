@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { countrySchema, departmentSchema, jobTitleSchema } from './reference.js';
+import { moneySchema } from './money.js';
+import { countrySchema, currencyOf, departmentSchema, jobTitleSchema } from './reference.js';
 
 /**
  * The highest annual salary, in minor units. 10,000 employees at the cap still sum below 2⁵³ in one
@@ -22,3 +23,19 @@ export const employeeRequestSchema = z.strictObject({
     .max(MAX_ANNUAL_SALARY_MINOR, 'Exceeds the maximum salary'),
 });
 export type EmployeeRequest = z.infer<typeof employeeRequestSchema>;
+
+/** An employee as the API returns it, with the salary in the country's currency. */
+export const employeeResponseSchema = z
+  .strictObject({
+    id: z.int().positive(),
+    name: z.string(),
+    jobTitle: jobTitleSchema,
+    department: departmentSchema,
+    country: countrySchema,
+    annualSalary: moneySchema,
+  })
+  .refine((employee) => employee.annualSalary.currency === currencyOf(employee.country), {
+    message: "The salary must be in the country's currency",
+    path: ['annualSalary', 'currency'],
+  });
+export type EmployeeResponse = z.infer<typeof employeeResponseSchema>;

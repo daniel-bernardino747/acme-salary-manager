@@ -1,5 +1,6 @@
 import {
   countries,
+  departments,
   divideRoundHalfUpBigInt,
   exchangeRates,
   type CountryCode,
@@ -26,8 +27,17 @@ export interface CountryPayroll {
   sharePermille: number | null;
 }
 
+/** One department's payroll total in USD, across every currency it pays in. */
+export interface DepartmentPayroll {
+  department: Department;
+  headcount: number;
+  usd: Money;
+  sharePermille: number | null;
+}
+
 export interface PayrollTotals {
   byCountry: CountryPayroll[];
+  byDepartment: DepartmentPayroll[];
 }
 
 /**
@@ -57,8 +67,8 @@ function sharePermille(part: Money, grandTotal: Money): number {
 }
 
 /**
- * Question 2: the payroll total of every country, in fixed order, with its share of the grand
- * total. Countries without employees are listed too, at 0.
+ * Question 2: the payroll total of every country and every department, each in fixed order, with
+ * its share of the grand total. Those without employees are listed too, at 0.
  */
 export function payrollTotals(
   employees: readonly PayrollEmployee[],
@@ -82,5 +92,17 @@ export function payrollTotals(
       sharePermille: sharePermille(usd, grandTotal),
     };
   });
-  return { byCountry };
+  const byDepartment = departments.map((department) => {
+    const salaries = employees
+      .filter((employee) => employee.department === department)
+      .map((employee) => employee.annualSalary);
+    const usd = usdTotal(salaries, ratesPerUsd);
+    return {
+      department,
+      headcount: salaries.length,
+      usd,
+      sharePermille: sharePermille(usd, grandTotal),
+    };
+  });
+  return { byCountry, byDepartment };
 }

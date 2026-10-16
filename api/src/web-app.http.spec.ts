@@ -16,6 +16,13 @@ describe('serving the web app', () => {
     expect(res.text).toContain('data-fixture="web-app"');
   });
 
+  it('serves the built files the app loads', async () => {
+    const res = await t.http().get('/assets/app.js').expect(200);
+
+    expect(res.headers['content-type']).toMatch(/^(text|application)\/javascript/);
+    expect(res.text).toContain("export const fixture = 'web-app';");
+  });
+
   it('answers a missing file, such as a stale hashed asset, with a 404 and not the app', async () => {
     const res = await t.http().get('/assets/index-0ld.js').expect(404);
 

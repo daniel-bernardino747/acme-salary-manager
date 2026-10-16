@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { outliersHeadline } from './outliers-copy';
+import { costText, outliersHeadline } from './outliers-copy';
 
 describe('outliersHeadline', () => {
   it.each([
@@ -9,5 +9,17 @@ describe('outliersHeadline', () => {
     [1, 'below', '1 employee paid below 0.80 of their peer median'],
   ] as const)('heads %i outliers in direction %s as "%s"', (total, direction, headline) => {
     expect(outliersHeadline(total, direction)).toBe(headline);
+  });
+});
+
+describe('costText', () => {
+  it.each([
+    // $80,898.32 rounds to whole dollars, down.
+    [80_898_32, 'Bringing them to 0.80 would cost $80,898 a year.'],
+    // An exact half dollar rounds up.
+    [1_234_50, 'Bringing them to 0.80 would cost $1,235 a year.'],
+    [0, 'Bringing them to 0.80 would cost $0 a year.'],
+  ])('states a cost of %i cents in whole USD', (amountMinor, text) => {
+    expect(costText({ amountMinor, currency: 'USD' })).toBe(text);
   });
 });

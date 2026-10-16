@@ -35,7 +35,7 @@ function verdict(endpoints: readonly EndpointResult[]): string {
   if (missed.length === 0) {
     return `**Result: pass.** The p95 server time is under ${TARGET_MS} ms on every endpoint.`;
   }
-  const labels = missed.map((endpoint) => endpoint.request.label);
+  const labels = missed.map((endpoint) => `"${endpoint.request.label}"`);
   const named =
     labels.length === 1
       ? labels.join('')

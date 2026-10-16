@@ -40,16 +40,21 @@ function directionOf(salaryMinor: number, medianMinor: number): OutlierDirection
 /**
  * Most extreme first: by distance from 1.00, compared by cross-multiplying, `|s₁−m₁|·m₂` against
  * `|s₂−m₂|·m₁` (ADR 0003, *Outliers*). The products can pass 2⁵³, so they are taken in BigInt.
+ * Ties order by `name, id`, as the list does; names compare by code unit, as SQLite's default
+ * collation does, so the order never depends on the machine's locale.
  */
 function mostExtremeFirst(a: Outlier, b: Outlier): number {
   const distance = (o: Outlier) =>
     BigInt(Math.abs(o.employee.annualSalary.amountMinor - o.peerMedian.amountMinor));
   const aScaled = distance(a) * BigInt(b.peerMedian.amountMinor);
   const bScaled = distance(b) * BigInt(a.peerMedian.amountMinor);
-  if (aScaled === bScaled) {
-    return 0;
+  if (aScaled !== bScaled) {
+    return aScaled > bScaled ? -1 : 1;
   }
-  return aScaled > bScaled ? -1 : 1;
+  if (a.employee.name !== b.employee.name) {
+    return a.employee.name < b.employee.name ? -1 : 1;
+  }
+  return a.employee.id - b.employee.id;
 }
 
 /** The members of each peer group, keyed by job title and country. */

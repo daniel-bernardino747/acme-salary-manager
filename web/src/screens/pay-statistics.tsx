@@ -3,11 +3,10 @@ import { Alert, Anchor, Group, Select, SimpleGrid, Skeleton, Stack, Text } from 
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { payStatisticsQuery } from '../api/pay-statistics-query';
-import { CountryStamp, Figure, Muted, PageHeader, Panel, RangeBar } from '../components/document';
+import { Figure, Muted, PageHeader, Panel, RangeBar } from '../components/document';
 import { QueryState } from '../components/query-state';
 import {
   emptyGroupText,
-  peerGroupName,
   seeEmployeesText,
   smallGroupNotice,
   statisticsHeading,
@@ -73,19 +72,13 @@ export function PayStatistics() {
 function Statistics({ statistics }: { statistics: PayStatisticsResponse }) {
   const { jobTitle, country, headcount, min, median, average, max } = statistics;
   return (
-    <Panel
-      title={
-        <>
-          {peerGroupName(statistics)} <CountryStamp country={country} />
-        </>
-      }
-    >
+    <Panel title={statisticsHeading(statistics)}>
       {headcount === 0 || !min || !median || !average || !max ? (
         <Text>{emptyGroupText(statistics)}</Text>
       ) : (
         <Stack gap="lg">
           {statistics.smallGroup && (
-            <Alert color="under" variant="light" title="Small group">
+            <Alert color="cover" variant="light" title="Small group">
               {smallGroupNotice(headcount)}
             </Alert>
           )}

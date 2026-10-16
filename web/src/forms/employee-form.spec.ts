@@ -54,4 +54,12 @@ describe('employeeFormSchema', () => {
     });
     expect(errorsOf({ ...priya, annualSalary: '  ' })).toEqual({ annualSalary: ['Required'] });
   });
+
+  it('reads a JPY salary as whole yen, and rejects any decimal', () => {
+    const kenji = { ...priya, name: 'Kenji Watanabe', country: 'JP', annualSalary: '7,000,000' };
+    expect(employeeFormSchema.parse(kenji)).toMatchObject({ annualSalaryMinor: 7_000_000 });
+    expect(errorsOf({ ...kenji, annualSalary: '7,000,000.5' })).toEqual({
+      annualSalary: ['JPY has no decimals'],
+    });
+  });
 });

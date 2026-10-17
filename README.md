@@ -9,6 +9,8 @@ A web app where ACME's HR Manager keeps the salaries of about 10,000 employees a
 
 **Live:** <https://acme-production-08d3.up.railway.app>
 
+**Demo video:** <https://drive.google.com/file/d/1eu3bQpj5snDPwf4Yu1yKGAu4ZuTTG0U5/view?usp=sharing> (4:43, a walk through the four questions and adding, editing and deleting an employee)
+
 The terms used here (peer group, compa-ratio, gap to 0.80, …) are defined in the glossary, [`CONTEXT.md`](CONTEXT.md).
 
 ## Contents

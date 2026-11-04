@@ -155,48 +155,67 @@ describe('listEmployees', () => {
   });
 
   describe('annual salary range', () => {
-    // Four German salaries and one Dutch, all in EUR.
+    // Four German salaries and one Dutch, all in EUR. Clara and David differ in job title and
+    // department, so each of those filters picks one of them.
     beforeEach(() => {
       for (const [name, country, annualSalaryMinor] of [
         ['Anna Becker', 'DE', 49_999_99],
         ['Ben Fischer', 'DE', 50_000_00],
-        ['Clara Hoffmann', 'DE', 80_000_00],
-        ['David Wagner', 'DE', 80_000_01],
         ['Eva de Vries', 'NL', 60_000_00],
       ] as const) {
         insertEmployee(db, { name, country, annualSalaryMinor });
       }
+      insertEmployee(db, {
+        name: 'Clara Hoffmann',
+        country: 'DE',
+        jobTitle: 'Data Analyst',
+        annualSalaryMinor: 80_000_00,
+      });
+      insertEmployee(db, {
+        name: 'David Wagner',
+        country: 'DE',
+        department: 'Data',
+        annualSalaryMinor: 80_000_01,
+      });
     });
-    const names = (query: Partial<EmployeeListQuery>) => {
+    const listed = (query: Partial<EmployeeListQuery>) => {
       const list = listEmployees(db, { ...firstPage, country: 'DE', ...query });
       return { names: list.items.map((employee) => employee.name), total: list.total };
     };
 
     it('keeps salaries equal to either bound, since both are inclusive', () => {
-      expect(names({ minSalaryMinor: 50_000_00, maxSalaryMinor: 80_000_00 })).toEqual({
+      expect(listed({ minSalaryMinor: 50_000_00, maxSalaryMinor: 80_000_00 })).toEqual({
         names: ['Ben Fischer', 'Clara Hoffmann'],
         total: 2,
       });
     });
 
     it('takes a minimum alone or a maximum alone', () => {
-      expect(names({ minSalaryMinor: 80_000_00 })).toEqual({
+      expect(listed({ minSalaryMinor: 80_000_00 })).toEqual({
         names: ['Clara Hoffmann', 'David Wagner'],
         total: 2,
       });
-      expect(names({ maxSalaryMinor: 50_000_00 })).toEqual({
+      expect(listed({ maxSalaryMinor: 50_000_00 })).toEqual({
         names: ['Anna Becker', 'Ben Fischer'],
         total: 2,
       });
     });
 
-    it('combines with the country and the name search using AND, and counts the same rows', () => {
-      expect(names({ minSalaryMinor: 50_000_00, q: 'clara' })).toEqual({
+    it('combines with every filter and the name search using AND, and counts the same rows', () => {
+      expect(listed({ minSalaryMinor: 50_000_00, q: 'clara' })).toEqual({
         names: ['Clara Hoffmann'],
         total: 1,
       });
-      expect(names({ country: 'NL', minSalaryMinor: 50_000_00 })).toEqual({
+      expect(listed({ country: 'NL', minSalaryMinor: 50_000_00 })).toEqual({
         names: ['Eva de Vries'],
+        total: 1,
+      });
+      expect(listed({ minSalaryMinor: 80_000_00, department: 'Data' })).toEqual({
+        names: ['David Wagner'],
+        total: 1,
+      });
+      expect(listed({ minSalaryMinor: 80_000_00, jobTitle: 'Data Analyst' })).toEqual({
+        names: ['Clara Hoffmann'],
         total: 1,
       });
     });

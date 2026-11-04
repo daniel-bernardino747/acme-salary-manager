@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { commitSalaryBound, salaryBoundText } from './salary-range';
+import {
+  commitSalaryBound,
+  commitSalaryField,
+  salaryBoundText,
+  salaryFieldText,
+  salaryFields,
+  syncSalaryFields,
+  typeSalaryBound,
+} from './salary-range';
 
 const germany = { country: 'DE' } as const;
 const ranged = { country: 'DE', minSalaryMinor: 50_000_00, maxSalaryMinor: 80_000_00 } as const;
@@ -62,5 +70,44 @@ describe('salaryBoundText', () => {
     expect(salaryBoundText(50_000_50, 'DE')).toBe('50000.50');
     expect(salaryBoundText(6_000_000, 'JP')).toBe('6000000');
     expect(salaryBoundText(undefined, 'DE')).toBe('');
+  });
+});
+
+describe('the salary fields', () => {
+  it("committing one field keeps the other field's text and error", () => {
+    let state = typeSalaryBound(salaryFields(ranged), 'max', 'abc');
+    state = commitSalaryField(state, 'max').state;
+    expect(state.errors.max).not.toBeNull();
+
+    const committed = commitSalaryField(typeSalaryBound(state, 'min', '60,000'), 'min');
+    expect(committed.change).toEqual({ minSalaryMinor: 60_000_00 });
+    const synced = syncSalaryFields(committed.state, { ...ranged, minSalaryMinor: 60_000_00 });
+
+    expect(salaryFieldText(synced, 'min')).toBe('60000.00');
+    expect(salaryFieldText(synced, 'max')).toBe('abc');
+    expect(synced.errors.max).toBe(state.errors.max);
+  });
+
+  it('a range change that is not its own commit, like Back, shows the URL in both fields', () => {
+    let state = typeSalaryBound(salaryFields(ranged), 'min', '95,000');
+    state = commitSalaryField(state, 'min').state;
+    expect(state.errors.min).toBe('The minimum must not exceed the maximum');
+
+    const back = syncSalaryFields(state, { country: 'DE', minSalaryMinor: 50_000_00 });
+
+    expect(salaryFieldText(back, 'min')).toBe('50000.00');
+    expect(salaryFieldText(back, 'max')).toBe('');
+    expect(back.errors).toEqual({ min: null, max: null });
+  });
+
+  it('committing the value already in the URL changes nothing, so the list keeps its page', () => {
+    const state = commitSalaryField(typeSalaryBound(salaryFields(ranged), 'min', '50,000'), 'min');
+
+    expect(state.change).toBeNull();
+    expect(salaryFieldText(state.state, 'min')).toBe('50000.00');
+  });
+
+  it('committing a field with nothing typed changes nothing', () => {
+    expect(commitSalaryField(salaryFields(ranged), 'max').change).toBeNull();
   });
 });

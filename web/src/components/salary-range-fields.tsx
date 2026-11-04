@@ -31,9 +31,19 @@ interface SalaryBoundFieldProps extends SalaryRangeFieldsProps {
 function SalaryBoundField({ bound, range, onChange }: SalaryBoundFieldProps) {
   const currency = currencyOf(range.country);
   const committed = bound === 'min' ? range.minSalaryMinor : range.maxSalaryMinor;
-  // What is typed and not yet committed; null shows the bound from the URL, so Back/Forward does too.
+  // What is typed and not yet committed; null shows the bound from the URL.
   const [typed, setTyped] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // When either bound changes in the URL (a commit, Back or Forward), drop what is typed and its
+  // error, so the field shows what the URL holds. Adjusted during render, without remounting, so
+  // focus stays where it is.
+  const rangeKey = `${range.minSalaryMinor}-${range.maxSalaryMinor}`;
+  const [seenRange, setSeenRange] = useState(rangeKey);
+  if (seenRange !== rangeKey) {
+    setSeenRange(rangeKey);
+    setTyped(null);
+    setError(null);
+  }
 
   const commit = () => {
     if (typed === null) return;

@@ -14,6 +14,10 @@ export function employeesPath(search: EmployeesSearch): string {
   if (search.country) params.set('country', search.country);
   if (search.department) params.set('department', search.department);
   if (search.jobTitle) params.set('jobTitle', search.jobTitle);
+  if (search.minSalaryMinor !== undefined)
+    params.set('minSalaryMinor', String(search.minSalaryMinor));
+  if (search.maxSalaryMinor !== undefined)
+    params.set('maxSalaryMinor', String(search.maxSalaryMinor));
   return `/api/employees?${params}`;
 }
 

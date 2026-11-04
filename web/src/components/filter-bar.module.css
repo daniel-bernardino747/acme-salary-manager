@@ -17,8 +17,57 @@
   width: 250px;
 }
 
+.salary {
+  width: 420px;
+}
+
+/*
+ * The employee list's bar: every control is one item of the same wrapping row, each with a base
+ * width it can grow from, so every row reaches the right edge at any width.
+ */
+@media (min-width: 48em) {
+  .bar[data-fill] {
+    align-items: flex-start;
+  }
+
+  .bar[data-fill] .fields {
+    display: contents;
+  }
+
+  .bar[data-fill] .leading {
+    flex: 1.4 1 240px;
+  }
+
+  .bar[data-fill] .country {
+    flex: 1 1 170px;
+    width: auto;
+  }
+
+  .bar[data-fill] .department {
+    flex: 1 1 190px;
+    width: auto;
+  }
+
+  .bar[data-fill] .jobTitle {
+    flex: 1.4 1 240px;
+    width: auto;
+  }
+
+  .bar[data-fill] .salary {
+    flex: 2.2 1 400px;
+    width: auto;
+  }
+
+  /* "Clear filters" sits on the fields' baseline, at its own width. */
+  .bar[data-fill] .trailing {
+    flex: none;
+    align-self: flex-end;
+  }
+}
+
 @media (max-width: 48em) {
-  .bar > * {
+  .bar > *,
+  .trailing > * {
     width: 100%;
   }
 
@@ -34,7 +83,8 @@
 
   .country,
   .department,
-  .jobTitle {
+  .jobTitle,
+  .salary {
     width: 100%;
   }
 }

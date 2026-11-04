@@ -32,18 +32,28 @@ interface FilterBarProps {
    * country never pushes the other filters onto a new line.
    */
   salaryRange?: ReactNode;
+  /** On a desktop, each row of controls stretches to the full width instead of stopping short. */
+  fill?: boolean;
 }
 
 /**
- * Country, department and job title, and the list's opt-in annual salary range. On a desktop they sit in one row; on a phone they fold behind
- * a "Filters" button showing how many are set (ADR 0004, as amended by #40).
+ * Country, department and job title, and the list's opt-in annual salary range. On a desktop they
+ * wrap in rows, which `fill` stretches to the full width; on a phone they fold behind a "Filters"
+ * button showing how many are set (ADR 0004, as amended by #40).
  */
-export function FilterBar({ filters, onChange, leading, trailing, salaryRange }: FilterBarProps) {
+export function FilterBar({
+  filters,
+  onChange,
+  leading,
+  trailing,
+  salaryRange,
+  fill,
+}: FilterBarProps) {
   const [open, toggle] = useDisclosure(false);
   const count = activeFilterCount(filters);
   return (
-    <div className={classes.bar}>
-      {leading}
+    <div className={classes.bar} data-fill={fill || undefined}>
+      {leading && <div className={classes.leading}>{leading}</div>}
       <Button
         hiddenFrom="sm"
         variant="default"
@@ -96,9 +106,9 @@ export function FilterBar({ filters, onChange, leading, trailing, salaryRange }:
           searchable
           className={classes.jobTitle}
         />
-        {salaryRange}
+        {salaryRange && <div className={classes.salary}>{salaryRange}</div>}
       </Group>
-      {trailing}
+      {trailing && <div className={classes.trailing}>{trailing}</div>}
     </div>
   );
 }

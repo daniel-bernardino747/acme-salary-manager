@@ -1,6 +1,6 @@
 /* The annual salary range: one labelled group, one frame, the currency stamped at its start. */
 .root {
-  width: 420px;
+  width: 100%;
 }
 
 .frame {
@@ -88,10 +88,6 @@
 }
 
 @media (max-width: 48em) {
-  .root {
-    width: 100%;
-  }
-
   .labelStamp {
     display: inline-block;
     margin-left: var(--mantine-spacing-xs);

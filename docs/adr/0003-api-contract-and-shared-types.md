@@ -57,6 +57,7 @@ Everything is under `/api`. The SPA fallback excludes `/api`, so an unknown `/ap
 - **Pagination** is page-based. `page` counts from 1 and defaults to 1. `pageSize` defaults to 25, with a maximum of 100. The response is `{ items, page, pageSize, total }`. A page past the end returns 200 with empty `items`. A non-integer page, or a page size outside 1–100, is a 400.
 - **Search:** `q` is ADR 0002's per-word prefix match. It is trimmed, and its maximum length is 100. An empty or whitespace-only `q` means no search.
 - **Filters:** `country`, `department` and `jobTitle` each take one optional exact value from the reference lists, and they combine with AND.
+- *Amended by the annual salary range (#46):* `GET /api/employees` also takes `minSalaryMinor` and `maxSalaryMinor`, an **annual salary range** (CONTEXT.md). Each is optional, a whole number of minor units from 1 to `MAX_ANNUAL_SALARY_MINOR`, and inclusive. They combine with the other filters and the search using AND. Both bounds are in the currency of the selected country, so a bound without `country` is a 400; nothing is converted, so the comparison is exact. A minimum above the maximum is a 400. The outliers query does not take them: it shares the other filters through `employeeListFiltersSchema`.
 - **Order** is fixed at `name, id`. There is no sort parameter.
 - **Query schemas are strict:** an unknown parameter is a 400, so a typo like `?contry=IN` is not silently ignored.
 

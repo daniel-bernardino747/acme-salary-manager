@@ -38,7 +38,7 @@ All list and question state lives in URL search params. The URL schemas reuse th
 | Path | Screen | Search params |
 |---|---|---|
 | `/` | ~~redirects to `/pay/payroll`: the app opens on the grand total, the first number the HR Manager asks for (ADR 0001)~~ *Amended by the HR Manager redesign (#40):* the **Overview** (see *Overview*); the grand total is still the first number on screen (ADR 0001) | |
-| `/employees` | list | `page, q, country, department, jobTitle` |
+| `/employees` | list | `page, q, country, department, jobTitle`, and *(#46)* `minSalaryMinor, maxSalaryMinor` |
 | `/employees/new` | add | |
 | `/employees/$id` | view | |
 | `/employees/$id/edit` | edit | |
@@ -108,6 +108,11 @@ Every query screen has three states: a skeleton matching the final layout while 
 - Below the table: "26–50 of 9,812" and `Pagination`. The page size is fixed at 25, with no selector.
 - An empty result says "No employees match these filters." with "Clear filters". An empty organization says "No employees yet." with the add button.
 - *Amended by the HR Manager redesign (#40):* on a phone each row is stacked: name; job title · country; salary. With both job title and country filtered, a "Pay statistics for this group" link opens `/pay/statistics?jobTitle=…&country=…`.
+- *Amended by the annual salary range (#46):* once a country is picked, two fields follow it in the filter bar: "Minimum annual salary" and "Maximum annual salary", with the country's currency code as each field's left section and a visually hidden "In EUR" description for screen readers. They are an opt-in of the shared filter bar, so question 4 does not show them.
+  - **Commit on blur or Enter.** The typed text is read like the form's salary (`parseMoney`, then the contract's salary bounds) in the country's currency, and a valid value pushes a history entry, like the other filters. An empty field clears its bound. An invalid amount, or a minimum above the maximum, stays in the field with an inline error, and the URL keeps its last good value. When either bound changes in the URL (a commit, Back or Forward), each field drops what was typed and shows the URL's value.
+  - **Any country change clears both bounds,** even to a country with the same currency: they are never converted or carried over.
+  - **The URL stays lenient:** bounds with no country are dropped, and a minimum above the maximum drops both, so the UI never sends a request the API rejects.
+  - Each bound counts as one filter on the phone's "Filters" badge. Any bound makes the list filtered: the header hides the total, the empty result is "No employees match these filters.", and "Clear filters" removes the bounds.
 
 ### Employee view (`/employees/$id`)
 

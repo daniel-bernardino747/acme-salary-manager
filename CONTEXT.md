@@ -28,6 +28,10 @@ _Avoid_: Team, unit, division
 An employee's annual gross base pay, in the currency of their country. Always greater than zero.
 _Avoid_: Pay, compensation, wage
 
+**Annual salary range**:
+A minimum and/or maximum salary, both inclusive, in the currency of one selected country, that narrows the employee list. Not a pay band: it says nothing about what a role should pay. Not the min-to-max of a peer group either, which pay statistics report.
+_Avoid_: Pay range, salary band, pay band
+
 **Money**:
 A whole number of minor units together with a currency, e.g. 1,250,000 cents in USD. Never a fractional amount.
 _Avoid_: Amount, value, price

@@ -83,6 +83,7 @@ export function EmployeeList() {
       <FilterBar
         filters={search}
         onChange={filter}
+        fill
         salaryRange={
           country && (
             <SalaryRangeFields
@@ -107,7 +108,6 @@ export function EmployeeList() {
               setTyped(event.currentTarget.value);
               sendSearch(event.currentTarget.value);
             }}
-            w={{ base: '100%', sm: 260 }}
           />
         }
         trailing={

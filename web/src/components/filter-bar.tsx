@@ -62,7 +62,7 @@ export function FilterBar({ filters, onChange, leading, trailing, salaryRange }:
         id="filter-fields"
         className={classes.fields}
         data-open={open || undefined}
-        align="flex-end"
+        align="flex-start"
         gap="sm"
       >
         <Select

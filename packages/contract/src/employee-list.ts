@@ -23,12 +23,7 @@ export const employeeListFiltersSchema = z.strictObject({
 });
 
 /** One bound of an annual salary range: whole minor units, as a salary can be (CONTEXT.md). */
-const salaryBound = z.coerce
-  .number()
-  .int()
-  .min(1)
-  .max(MAX_ANNUAL_SALARY_MINOR)
-  .optional();
+const salaryBound = z.coerce.number().int().min(1).max(MAX_ANNUAL_SALARY_MINOR).optional();
 
 /**
  * `GET /api/employees` (ADR 0003, *Listing*): the filters above plus an annual salary range

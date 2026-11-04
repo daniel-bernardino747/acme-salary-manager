@@ -1,5 +1,5 @@
 import type { EmployeeListQuery, EmployeeResponse } from '@acme/contract';
-import { and, count, eq, getTableColumns, sql } from 'drizzle-orm';
+import { and, count, eq, getTableColumns, gte, lte, sql } from 'drizzle-orm';
 import type { Db } from './db';
 import { nameMatch } from './name-match';
 import { employees } from './schema';
@@ -16,7 +16,8 @@ const ftsRow = sql`employees_fts.rowid = ${employees.id}`;
 
 /**
  * One page of employees in `name, id` order, with the total count (ADR 0003, *Listing*). Each
- * filter is an exact value, and they combine with AND, and with the name search. The list and the
+ * filter is an exact value, the annual salary range keeps both of its bounds (#46), and they
+ * combine with AND, and with the name search. The list and the
  * count share the same join and conditions; a search joins the name index, and no search skips it.
  */
 export function listEmployees(db: Db, query: EmployeeListQuery): EmployeeList {
@@ -26,6 +27,12 @@ export function listEmployees(db: Db, query: EmployeeListQuery): EmployeeList {
     query.country && eq(employees.country, query.country),
     query.department && eq(employees.department, query.department),
     query.jobTitle && eq(employees.jobTitle, query.jobTitle),
+    query.minSalaryMinor === undefined
+      ? undefined
+      : gte(employees.annualSalaryMinor, query.minSalaryMinor),
+    query.maxSalaryMinor === undefined
+      ? undefined
+      : lte(employees.annualSalaryMinor, query.maxSalaryMinor),
   );
   const list = db.select(getTableColumns(employees)).from(employees).$dynamic();
   const rows = (match === null ? list : list.innerJoin(employeesFts, ftsRow))

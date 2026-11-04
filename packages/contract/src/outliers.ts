@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { employeeResponseSchema } from './employee.js';
-import { employeeListQuerySchema, pageOf } from './employee-list.js';
+import { employeeListFiltersSchema, pageOf } from './employee-list.js';
 import { ratesSchema } from './exchange-rates.js';
 import { moneySchema, usdMoneySchema } from './money.js';
 
@@ -12,7 +12,7 @@ export type OutlierDirection = z.infer<typeof outlierDirectionSchema>;
  * `GET /api/outliers` (ADR 0003, *Outliers*): the list's paging and filters, with no name search,
  * and an optional direction that ranks only that one. Strict, like every query.
  */
-export const outliersQuerySchema = employeeListQuerySchema
+export const outliersQuerySchema = employeeListFiltersSchema
   .omit({ q: true })
   .extend({ direction: outlierDirectionSchema.optional() });
 export type OutliersQuery = z.infer<typeof outliersQuerySchema>;

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import type { EmployeeListQuery } from '@acme/contract';
 import { insertEmployee } from '../../test/builders';
 import { createDb, type Db } from './db';
 import { listEmployees } from './list-employees';
@@ -151,5 +152,53 @@ describe('listEmployees', () => {
     insertEmployee(db);
 
     expect(listEmployees(db, { page: 2, pageSize: 25 })).toEqual({ items: [], total: 1 });
+  });
+
+  describe('annual salary range', () => {
+    // Four German salaries and one Dutch, all in EUR.
+    beforeEach(() => {
+      for (const [name, country, annualSalaryMinor] of [
+        ['Anna Becker', 'DE', 49_999_99],
+        ['Ben Fischer', 'DE', 50_000_00],
+        ['Clara Hoffmann', 'DE', 80_000_00],
+        ['David Wagner', 'DE', 80_000_01],
+        ['Eva de Vries', 'NL', 60_000_00],
+      ] as const) {
+        insertEmployee(db, { name, country, annualSalaryMinor });
+      }
+    });
+    const names = (query: Partial<EmployeeListQuery>) => {
+      const list = listEmployees(db, { ...firstPage, country: 'DE', ...query });
+      return { names: list.items.map((employee) => employee.name), total: list.total };
+    };
+
+    it('keeps salaries equal to either bound, since both are inclusive', () => {
+      expect(names({ minSalaryMinor: 50_000_00, maxSalaryMinor: 80_000_00 })).toEqual({
+        names: ['Ben Fischer', 'Clara Hoffmann'],
+        total: 2,
+      });
+    });
+
+    it('takes a minimum alone or a maximum alone', () => {
+      expect(names({ minSalaryMinor: 80_000_00 })).toEqual({
+        names: ['Clara Hoffmann', 'David Wagner'],
+        total: 2,
+      });
+      expect(names({ maxSalaryMinor: 50_000_00 })).toEqual({
+        names: ['Anna Becker', 'Ben Fischer'],
+        total: 2,
+      });
+    });
+
+    it('combines with the country and the name search using AND, and counts the same rows', () => {
+      expect(names({ minSalaryMinor: 50_000_00, q: 'clara' })).toEqual({
+        names: ['Clara Hoffmann'],
+        total: 1,
+      });
+      expect(names({ country: 'NL', minSalaryMinor: 50_000_00 })).toEqual({
+        names: ['Eva de Vries'],
+        total: 1,
+      });
+    });
   });
 });

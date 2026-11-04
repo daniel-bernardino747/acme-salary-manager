@@ -58,7 +58,7 @@ The target is a claim about what the app does, so pass or fail is judged on serv
 - **Server time covers the whole request.** A middleware registered first starts the clock when the request arrives and, through `on-headers`, sets `Server-Timing: app;dur=<ms>` when the headers are written. The interval covers routing, guards, pipes, the handler, and JSON serialization (Express serializes the body before writing headers). It excludes the network and the time to send the body.
 - **A script, run by hand, never in CI:** `pnpm perf <baseUrl>`, in plain Node with `fetch`. It runs against the Railway app with the full default seed. There is no load tool: one HR user makes sequential requests, and nobody asked a concurrency question.
 - **Fixed request list:**
-  - `GET /api/employees`: the first page, the last page, a filtered page and a name search.
+  - `GET /api/employees`: the first page, the last page, a filtered page and a name search, and *(#46)* an annual salary range on the largest seeded country.
   - Each question endpoint (`pay-statistics`, `payroll-totals`, `pay-comparison`, `outliers`), with and without filters.
 - **Per endpoint:** the first request of the run is recorded as *cold*, then 3 warm-ups, then 100 sequential timed requests. With 100 samples, p95 is not just the second-worst sample.
 - **Cold column procedure:** restart the service, wait for `/api/health`, then run. The script cannot restart Railway, so it records the first request of the run, and the results label it cold only under this procedure. The cold column is reported, not part of pass or fail.

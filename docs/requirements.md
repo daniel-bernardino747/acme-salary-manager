@@ -12,7 +12,7 @@ The HR Manager keeps salary data for several countries in Excel files. Every pay
 
 ### Manage salary data
 
-- List employees with server-side pagination, search by name, and filters for country, department and job title.
+- List employees with server-side pagination, search by name, and filters for country, department and job title. Once a country is picked, the list also narrows to an annual salary range in that country's currency (#46).
 - View, add, edit (salary included) and remove an employee.
 - Input is validated: required fields, salary greater than zero, country from the supported list.
 

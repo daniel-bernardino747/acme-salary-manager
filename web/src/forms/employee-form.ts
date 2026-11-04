@@ -55,7 +55,7 @@ type SalaryResult = { success: true; amountMinor: number } | { success: false; e
  * The typed salary in minor units of the currency: `parseMoney`, then the contract's
  * own bounds, so the form and the API never disagree on the cap.
  */
-function readSalary(text: string, currency: CurrencyCode): SalaryResult {
+export function readSalary(text: string, currency: CurrencyCode): SalaryResult {
   if (!text.trim()) {
     return { success: false, errors: ['Required'] };
   }

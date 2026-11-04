@@ -179,7 +179,12 @@ describe('changeEmployeesSearch', () => {
     });
   });
 
-  const ranged = { page: 2, country: 'DE', minSalaryMinor: 5_000_000, maxSalaryMinor: 8_000_000 };
+  const ranged = {
+    page: 2,
+    country: 'DE',
+    minSalaryMinor: 5_000_000,
+    maxSalaryMinor: 8_000_000,
+  } as const;
 
   it('sets or clears one salary bound, keeping the other', () => {
     expect(changeEmployeesSearch(ranged, { maxSalaryMinor: 9_000_000 })).toEqual({

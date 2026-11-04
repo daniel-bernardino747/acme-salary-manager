@@ -20,6 +20,19 @@ describe('employeesPath', () => {
     );
   });
 
+  it('passes the annual salary range as minor units', () => {
+    expect(
+      employeesPath({
+        page: 1,
+        country: 'DE',
+        minSalaryMinor: 5_000_000,
+        maxSalaryMinor: 8_000_000,
+      }),
+    ).toBe(
+      '/api/employees?page=1&pageSize=25&country=DE&minSalaryMinor=5000000&maxSalaryMinor=8000000',
+    );
+  });
+
   it('leaves out a blank search', () => {
     expect(employeesPath({ page: 1, q: '  ' })).toBe('/api/employees?page=1&pageSize=25');
   });

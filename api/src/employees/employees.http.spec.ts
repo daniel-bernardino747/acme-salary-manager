@@ -58,6 +58,23 @@ describe('GET /api/employees', () => {
     expect(list.items.map((employee) => employee.id)).toEqual([match]);
   });
 
+  it('narrows a country to an inclusive annual salary range', async () => {
+    const [, low, high] = [49_999_99, 50_000_00, 80_000_00, 80_000_01].map(
+      (annualSalaryMinor) => insertEmployee(t.db, { country: 'DE', annualSalaryMinor }).id,
+    );
+    insertEmployee(t.db, { country: 'NL', annualSalaryMinor: 60_000_00 });
+
+    const res = await t
+      .http()
+      .get('/api/employees')
+      .query({ country: 'DE', minSalaryMinor: '5000000', maxSalaryMinor: '8000000' })
+      .expect(200);
+
+    const list = employeeListResponseSchema.parse(res.body);
+    expect(list.total).toBe(2);
+    expect(list.items.map((employee) => employee.id)).toEqual([low, high]);
+  });
+
   it('searches names with q, trimmed', async () => {
     const priya = insertEmployee(t.db, { name: 'Priya Sharma' }).id;
     insertEmployee(t.db, { name: 'Rohan Mehta' });
@@ -98,6 +115,13 @@ describe('GET /api/employees', () => {
     ['a department not in the list', { department: 'Legal' }, ['department']],
     ['a job title not in the list', { jobTitle: 'Software Engineers' }, ['jobTitle']],
     ['a q over 100 characters once trimmed', { q: 'x'.repeat(101) }, ['q']],
+    ['a salary bound without a country', { minSalaryMinor: '5000000' }, ['country']],
+    [
+      'a minimum salary above the maximum',
+      { country: 'DE', minSalaryMinor: '8000001', maxSalaryMinor: '8000000' },
+      ['minSalaryMinor'],
+    ],
+    ['a salary bound of 0', { country: 'DE', maxSalaryMinor: '0' }, ['maxSalaryMinor']],
   ])('answers %s with a 400 problem', async (_, query, path) => {
     const res = await t.http().get('/api/employees').query(query).expect(400);
 

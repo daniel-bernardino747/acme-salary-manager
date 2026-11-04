@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { FIRST_PAGE, perfRequests } from './requests';
 
 describe('perfRequests', () => {
-  it('lists the employee list four ways and every question endpoint with and without filters', () => {
+  it('lists the employee list five ways and every question endpoint with and without filters', () => {
     expect(perfRequests(10_000)).toEqual([
       FIRST_PAGE,
       { label: 'Employees, last page', path: '/api/employees?page=400' },
@@ -11,6 +11,10 @@ describe('perfRequests', () => {
         path: '/api/employees?country=IN&department=Engineering',
       },
       { label: 'Employees, name search', path: '/api/employees?q=mar' },
+      {
+        label: 'Employees, annual salary range',
+        path: '/api/employees?country=US&minSalaryMinor=12000000&maxSalaryMinor=15000000',
+      },
       {
         label: 'Pay statistics',
         path: '/api/pay-statistics?jobTitle=Software+Engineer+II&country=IN',

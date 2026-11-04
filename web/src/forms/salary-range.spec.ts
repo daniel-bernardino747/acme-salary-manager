@@ -107,6 +107,18 @@ describe('the salary fields', () => {
     expect(salaryFieldText(state.state, 'min')).toBe('50000.00');
   });
 
+  it('shows a bound as money while the field is not being edited, and as plain input while it is', () => {
+    const state = salaryFields(ranged);
+
+    expect(salaryFieldText(state, 'min', { editing: false })).toBe('€50,000.00');
+    expect(salaryFieldText(state, 'min', { editing: true })).toBe('50000.00');
+    expect(salaryFieldText(state, 'max', { editing: false })).toBe('€80,000.00');
+    expect(salaryFieldText(salaryFields(germany), 'max', { editing: false })).toBe('');
+    expect(salaryFieldText(typeSalaryBound(state, 'min', 'abc'), 'min', { editing: false })).toBe(
+      'abc',
+    );
+  });
+
   it('committing a field with nothing typed changes nothing', () => {
     expect(commitSalaryField(salaryFields(ranged), 'max').change).toBeNull();
   });

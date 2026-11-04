@@ -71,6 +71,36 @@ describe('employeesSearchSchema', () => {
   it('ignores unknown parameters', () => {
     expect(parse('?contry=IN')).toEqual({ page: 1 });
   });
+
+  it('keeps an annual salary range with its country, as whole minor units', () => {
+    expect(parse('?country=DE&minSalaryMinor=5000000&maxSalaryMinor=8000000')).toEqual({
+      page: 1,
+      country: 'DE',
+      minSalaryMinor: 5_000_000,
+      maxSalaryMinor: 8_000_000,
+    });
+    expect(parse('?country=DE&minSalaryMinor=8000000&maxSalaryMinor=8000000')).toMatchObject({
+      minSalaryMinor: 8_000_000,
+      maxSalaryMinor: 8_000_000,
+    });
+  });
+
+  it('drops a salary bound that is invalid or has no country, so the API never sees it', () => {
+    expect(parse('?minSalaryMinor=5000000')).toEqual({ page: 1 });
+    expect(parse('?country=UK&maxSalaryMinor=5000000')).toEqual({ page: 1 });
+    expect(parse('?country=DE&minSalaryMinor=0&maxSalaryMinor=1.5')).toEqual({
+      page: 1,
+      country: 'DE',
+    });
+    expect(parse('?country=DE&maxSalaryMinor=900000000001')).toEqual({ page: 1, country: 'DE' });
+  });
+
+  it('drops both bounds when the minimum is above the maximum', () => {
+    expect(parse('?country=DE&minSalaryMinor=8000001&maxSalaryMinor=8000000')).toEqual({
+      page: 1,
+      country: 'DE',
+    });
+  });
 });
 
 describe('outliersSearchSchema', () => {
@@ -146,6 +176,38 @@ describe('changeEmployeesSearch', () => {
     expect(changeEmployeesSearch(current, { country: null, q: '   ' })).toEqual({
       page: 1,
       department: 'Data',
+    });
+  });
+
+  const ranged = { page: 2, country: 'DE', minSalaryMinor: 5_000_000, maxSalaryMinor: 8_000_000 };
+
+  it('sets or clears one salary bound, keeping the other', () => {
+    expect(changeEmployeesSearch(ranged, { maxSalaryMinor: 9_000_000 })).toEqual({
+      ...ranged,
+      page: 1,
+      maxSalaryMinor: 9_000_000,
+    });
+    expect(changeEmployeesSearch(ranged, { minSalaryMinor: null })).toEqual({
+      page: 1,
+      country: 'DE',
+      maxSalaryMinor: 8_000_000,
+    });
+  });
+
+  it('clears both salary bounds on any country change, even to one with the same currency', () => {
+    for (const country of [null, 'US', 'NL', 'DE']) {
+      expect(changeEmployeesSearch(ranged, { country }), String(country)).toEqual(
+        country === null ? { page: 1 } : { page: 1, country },
+      );
+    }
+  });
+
+  it('keeps the salary bounds when another filter or the search changes', () => {
+    expect(changeEmployeesSearch(ranged, { department: 'Data', q: 'ben' })).toEqual({
+      ...ranged,
+      page: 1,
+      department: 'Data',
+      q: 'ben',
     });
   });
 });
@@ -224,6 +286,15 @@ describe('employeesSearchFromOutliers', () => {
 
   it('opens the whole list when no filter is set', () => {
     expect(employeesSearchFromOutliers(outliersSearchSchema.parse({}))).toEqual({ page: 1 });
+  });
+});
+
+describe('activeFilterCount, annual salary range', () => {
+  it('counts each salary bound that is set as one filter', () => {
+    expect(activeFilterCount({ country: 'DE', minSalaryMinor: 5_000_000 })).toBe(2);
+    expect(
+      activeFilterCount({ country: 'DE', minSalaryMinor: 5_000_000, maxSalaryMinor: 8_000_000 }),
+    ).toBe(3);
   });
 });
 

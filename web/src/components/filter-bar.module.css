@@ -38,23 +38,3 @@
     width: 100%;
   }
 }
-
-.salary {
-  width: 190px;
-}
-
-/* Read by screen readers, not shown: the currency code beside the field already says it. */
-.visuallyHidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-@media (max-width: 48em) {
-  .salary {
-    width: 100%;
-  }
-}

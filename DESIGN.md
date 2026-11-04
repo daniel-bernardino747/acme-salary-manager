@@ -290,6 +290,7 @@ Plain and firm.
 ### Inputs / Fields
 - **Style:** Mantine inputs at 4px corners, white, on the ramp's border step. The caret is teal.
 - **Search triggers:** The header trigger is 40px tall and up to 560px wide, with a field-line border, a muted placeholder, a search icon and a Ctrl K hint in the app's face on the right. The Overview find field is 56px tall, uses 1.1875rem text and 6px corners, and carries xs shadow. Its hint is hidden below 36em.
+- **Range field:** The employee list's annual salary range is one labelled group in one 36px frame: the country stamp, a hairline, the minimum, a "to" cell on the tint between hairlines, and the maximum, the two halves equal. The half being edited takes visa wash, and focus is the teal outline on the frame. Committed bounds read as money; editing shows plain input. One error shows under the group in red 8. On a phone the stamp moves beside the label.
 - **Hover:** The border turns visa line and a light shadow appears, over 150ms.
 - **Focus:** The global teal outline.
 

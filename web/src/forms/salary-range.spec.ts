@@ -83,8 +83,8 @@ describe('the salary fields', () => {
     expect(committed.change).toEqual({ minSalaryMinor: 60_000_00 });
     const synced = syncSalaryFields(committed.state, { ...ranged, minSalaryMinor: 60_000_00 });
 
-    expect(salaryFieldText(synced, 'min')).toBe('60000.00');
-    expect(salaryFieldText(synced, 'max')).toBe('abc');
+    expect(salaryFieldText(synced, 'min', { editing: true })).toBe('60000.00');
+    expect(salaryFieldText(synced, 'max', { editing: true })).toBe('abc');
     expect(synced.errors.max).toBe(state.errors.max);
   });
 
@@ -95,8 +95,8 @@ describe('the salary fields', () => {
 
     const back = syncSalaryFields(state, { country: 'DE', minSalaryMinor: 50_000_00 });
 
-    expect(salaryFieldText(back, 'min')).toBe('50000.00');
-    expect(salaryFieldText(back, 'max')).toBe('');
+    expect(salaryFieldText(back, 'min', { editing: true })).toBe('50000.00');
+    expect(salaryFieldText(back, 'max', { editing: true })).toBe('');
     expect(back.errors).toEqual({ min: null, max: null });
   });
 
@@ -104,7 +104,7 @@ describe('the salary fields', () => {
     const state = commitSalaryField(typeSalaryBound(salaryFields(ranged), 'min', '50,000'), 'min');
 
     expect(state.change).toBeNull();
-    expect(salaryFieldText(state.state, 'min')).toBe('50000.00');
+    expect(salaryFieldText(state.state, 'min', { editing: true })).toBe('50000.00');
   });
 
   it('shows a bound as money while the field is not being edited, and as plain input while it is', () => {

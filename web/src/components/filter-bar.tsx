@@ -11,6 +11,8 @@ export interface Filters {
   country?: string;
   department?: string;
   jobTitle?: string;
+  minSalaryMinor?: number;
+  maxSalaryMinor?: number;
 }
 
 interface FilterBarProps {
@@ -25,13 +27,15 @@ interface FilterBarProps {
   leading?: ReactNode;
   /** Shown after the filters on every width, e.g. "Clear filters". */
   trailing?: ReactNode;
+  /** Shown after the country and folded with the filters on a phone: the list's salary range. */
+  salaryRange?: ReactNode;
 }
 
 /**
- * Country, department and job title. On a desktop they sit in one row; on a phone they fold behind
+ * Country, department and job title, and the list's opt-in annual salary range. On a desktop they sit in one row; on a phone they fold behind
  * a "Filters" button showing how many are set (ADR 0004, as amended by #40).
  */
-export function FilterBar({ filters, onChange, leading, trailing }: FilterBarProps) {
+export function FilterBar({ filters, onChange, leading, trailing, salaryRange }: FilterBarProps) {
   const [open, toggle] = useDisclosure(false);
   const count = activeFilterCount(filters);
   return (
@@ -70,6 +74,7 @@ export function FilterBar({ filters, onChange, leading, trailing }: FilterBarPro
           clearable
           className={classes.country}
         />
+        {salaryRange}
         <Select
           label="Department"
           placeholder="Any department"

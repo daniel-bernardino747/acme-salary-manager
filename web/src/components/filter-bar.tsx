@@ -27,7 +27,10 @@ interface FilterBarProps {
   leading?: ReactNode;
   /** Shown after the filters on every width, e.g. "Clear filters". */
   trailing?: ReactNode;
-  /** Shown after the country and folded with the filters on a phone: the list's salary range. */
+  /**
+   * Shown last and folded with the filters on a phone: the list's salary range. Last, so picking a
+   * country never pushes the other filters onto a new line.
+   */
   salaryRange?: ReactNode;
 }
 
@@ -74,7 +77,6 @@ export function FilterBar({ filters, onChange, leading, trailing, salaryRange }:
           clearable
           className={classes.country}
         />
-        {salaryRange}
         <Select
           label="Department"
           placeholder="Any department"
@@ -94,6 +96,7 @@ export function FilterBar({ filters, onChange, leading, trailing, salaryRange }:
           searchable
           className={classes.jobTitle}
         />
+        {salaryRange}
       </Group>
       {trailing}
     </div>

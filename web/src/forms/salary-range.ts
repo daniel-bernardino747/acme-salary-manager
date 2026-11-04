@@ -131,9 +131,23 @@ export function syncSalaryFields(state: SalaryFieldsState, range: SalaryRange): 
     : salaryFields(range);
 }
 
-/** What a field shows: the typed text, or the URL's bound as plain input. */
-export function salaryFieldText(state: SalaryFieldsState, bound: SalaryBound): string {
-  return (
-    state.typed[bound] ?? salaryBoundText(state.range[salaryBoundKey[bound]], state.range.country)
-  );
+/**
+ * What a field shows: the typed text; else the URL's bound, as money (`formatMoney`) while the
+ * field is not being edited, and as `formatMoney`'s plain input while it is, which `parseMoney`
+ * reads back.
+ */
+export function salaryFieldText(
+  state: SalaryFieldsState,
+  bound: SalaryBound,
+  { editing }: { editing: boolean },
+): string {
+  const typed = state.typed[bound];
+  if (typed !== null) {
+    return typed;
+  }
+  const amountMinor = state.range[salaryBoundKey[bound]];
+  if (amountMinor === undefined || editing) {
+    return salaryBoundText(amountMinor, state.range.country);
+  }
+  return formatMoney({ amountMinor, currency: currencyOf(state.range.country) }, 'en');
 }

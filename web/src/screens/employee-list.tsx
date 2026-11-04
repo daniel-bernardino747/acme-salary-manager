@@ -18,6 +18,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { employeesQuery } from '../api/employees-query';
 import { CountryStamp, PageHeader } from '../components/document';
 import { FilterBar } from '../components/filter-bar';
+import { SalaryRangeFields } from '../components/salary-range-fields';
 import { ArrowRightIcon, PlusIcon, SearchIcon } from '../components/icons';
 import { QueryState } from '../components/query-state';
 import rowStyles from '../components/rows.module.css';
@@ -54,7 +55,12 @@ export function EmployeeList() {
     void navigate({ search: { page: 1 } });
   };
   const filtered = Boolean(
-    search.q?.trim() || search.country || search.department || search.jobTitle,
+    search.q?.trim() ||
+    search.country ||
+    search.department ||
+    search.jobTitle ||
+    search.minSalaryMinor !== undefined ||
+    search.maxSalaryMinor !== undefined,
   );
   const { jobTitle, country } = search;
 
@@ -77,6 +83,19 @@ export function EmployeeList() {
       <FilterBar
         filters={search}
         onChange={filter}
+        salaryRange={
+          country && (
+            <SalaryRangeFields
+              key={country}
+              range={{
+                country,
+                minSalaryMinor: search.minSalaryMinor,
+                maxSalaryMinor: search.maxSalaryMinor,
+              }}
+              onChange={filter}
+            />
+          )
+        }
         leading={
           <TextInput
             label="Search"

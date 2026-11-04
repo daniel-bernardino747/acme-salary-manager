@@ -2,6 +2,7 @@ import {
   countrySchema,
   departmentSchema,
   jobTitleSchema,
+  MAX_ANNUAL_SALARY_MINOR,
   type EmployeeListResponse,
 } from '@acme/contract';
 import { z } from 'zod';
@@ -35,26 +36,57 @@ const country = countrySchema.optional().catch(undefined);
 const department = departmentSchema.optional().catch(undefined);
 const jobTitle = jobTitleSchema.optional().catch(undefined);
 
-export const employeesSearchSchema = z.object({ page, q, country, department, jobTitle });
+const salaryBound = z.coerce
+  .number()
+  .int()
+  .min(1)
+  .max(MAX_ANNUAL_SALARY_MINOR)
+  .optional()
+  .catch(undefined);
+
+/**
+ * The annual salary range (#46) is kept only when the API would take it: with a country, and with
+ * the minimum at most the maximum. Otherwise both bounds are dropped.
+ */
+export const employeesSearchSchema = z
+  .object({
+    page,
+    q,
+    country,
+    department,
+    jobTitle,
+    minSalaryMinor: salaryBound,
+    maxSalaryMinor: salaryBound,
+  })
+  .transform((search) => {
+    const { minSalaryMinor: min, maxSalaryMinor: max } = search;
+    const valid =
+      search.country !== undefined && (min === undefined || max === undefined || min <= max);
+    return valid ? search : { ...search, minSalaryMinor: undefined, maxSalaryMinor: undefined };
+  });
 export type EmployeesSearch = z.infer<typeof employeesSearchSchema>;
 
-/** A new search or filter from the list's toolbar; `null` is a cleared filter. */
+/** A new search or filter from the list's toolbar; `null` is a cleared filter or bound. */
 export interface EmployeesSearchChange {
   q?: string;
   country?: string | null;
   department?: string | null;
   jobTitle?: string | null;
+  minSalaryMinor?: number | null;
+  maxSalaryMinor?: number | null;
 }
 
 /**
  * The list's search after a toolbar change: back on the first page, so it never lands past the end
- * (ADR 0004, *Routing*). A blank search or a cleared filter is unset, so it leaves the URL.
+ * (ADR 0004, *Routing*). A blank search or a cleared filter is unset, so it leaves the URL. Any
+ * country change clears the annual salary range, whose bounds are in the old country's currency.
  */
 export function changeEmployeesSearch(
   search: EmployeesSearch,
   change: EmployeesSearchChange,
 ): EmployeesSearch {
-  const next = employeesSearchSchema.parse({ ...search, ...change, page: 1 });
+  const range = 'country' in change ? { minSalaryMinor: undefined, maxSalaryMinor: undefined } : {};
+  const next = employeesSearchSchema.parse({ ...search, ...range, ...change, page: 1 });
   return next.q?.trim() ? next : { ...next, q: undefined };
 }
 
@@ -107,13 +139,24 @@ export function employeesSearchFromOutliers({
   return employeesSearchSchema.parse({ page: 1, country, department, jobTitle });
 }
 
-/** How many of the three filters are set, for the phone's "Filters" button. */
+/**
+ * How many filters are set, for the phone's "Filters" button: country, department, job title and
+ * each salary bound (#46).
+ */
 export function activeFilterCount(filters: {
   country?: string;
   department?: string;
   jobTitle?: string;
+  minSalaryMinor?: number;
+  maxSalaryMinor?: number;
 }): number {
-  return [filters.country, filters.department, filters.jobTitle].filter(Boolean).length;
+  return [
+    filters.country,
+    filters.department,
+    filters.jobTitle,
+    filters.minSalaryMinor,
+    filters.maxSalaryMinor,
+  ].filter((value) => value !== undefined && value !== '').length;
 }
 
 /** Question 1 picks both with no defaults: nothing is fetched until both are set. */

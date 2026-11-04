@@ -19,9 +19,12 @@ const get = (label: string, endpoint: string, query: Record<string, string> = {}
 const jobTitle = 'Software Engineer II';
 const country = 'IN';
 const department = 'Engineering';
+// The US is the seed's largest country (docs/seed/headcount-quotas.md), so its salary range scans
+// the most rows the country index can return: $120,000 to $150,000, in cents.
+const salaryRange = { country: 'US', minSalaryMinor: '12000000', maxSalaryMinor: '15000000' };
 
 /**
- * The fixed request list (ADR 0006, *Measuring the 500 ms target*): the employee list four ways,
+ * The fixed request list (ADR 0006, *Measuring the 500 ms target*): the employee list five ways,
  * then each question endpoint, with and without filters where it takes any. Pay statistics and the
  * pay comparison require theirs, and payroll totals takes none, so each is timed once.
  */
@@ -32,6 +35,7 @@ export function perfRequests(rowCount: number): PerfRequest[] {
     get('Employees, last page', '/api/employees', { page: String(lastPage) }),
     get('Employees, filtered', '/api/employees', { country, department }),
     get('Employees, name search', '/api/employees', { q: 'mar' }),
+    get('Employees, annual salary range', '/api/employees', salaryRange),
     get('Pay statistics', '/api/pay-statistics', { jobTitle, country }),
     get('Payroll totals', '/api/payroll-totals'),
     get('Pay comparison', '/api/pay-comparison', { jobTitle }),

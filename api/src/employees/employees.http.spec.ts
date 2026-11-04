@@ -58,11 +58,10 @@ describe('GET /api/employees', () => {
     expect(list.items.map((employee) => employee.id)).toEqual([match]);
   });
 
-  it('narrows a country to an inclusive annual salary range', async () => {
-    const [, low, high] = [49_999_99, 50_000_00, 80_000_00, 80_000_01].map(
-      (annualSalaryMinor) => insertEmployee(t.db, { country: 'DE', annualSalaryMinor }).id,
-    );
-    insertEmployee(t.db, { country: 'NL', annualSalaryMinor: 60_000_00 });
+  it('passes the annual salary range to the list', async () => {
+    // The bounds' edges are pinned in listEmployees' tests (ADR 0006: each behaviour once).
+    const inRange = insertEmployee(t.db, { country: 'DE', annualSalaryMinor: 60_000_00 }).id;
+    insertEmployee(t.db, { country: 'DE', annualSalaryMinor: 90_000_00 });
 
     const res = await t
       .http()
@@ -71,8 +70,8 @@ describe('GET /api/employees', () => {
       .expect(200);
 
     const list = employeeListResponseSchema.parse(res.body);
-    expect(list.total).toBe(2);
-    expect(list.items.map((employee) => employee.id)).toEqual([low, high]);
+    expect(list.total).toBe(1);
+    expect(list.items.map((employee) => employee.id)).toEqual([inRange]);
   });
 
   it('searches names with q, trimmed', async () => {

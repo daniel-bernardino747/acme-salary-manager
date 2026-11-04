@@ -23,7 +23,7 @@ It leaves out everything before Express has the request (the network, TLS, Railw
 
 The list is fixed in [`requests.ts`](../api/src/perf/requests.ts):
 
-- `GET /api/employees`: the first page, the last page, a page filtered by country and department, and a name search.
+- `GET /api/employees`: the first page, the last page, a page filtered by country and department, a name search, and an annual salary range on the largest seeded country (#46).
 - Each question endpoint, with and without filters where it takes any. Outliers is timed three ways: without parameters, underpaid only as the screen opens (which adds the cost to reach 0.80), and underpaid with filters. Pay statistics and the pay comparison require their parameters and payroll totals takes none, so each of those is timed once.
 
 The filtered reads use Software Engineer II in India, which ties for the seed's largest peer group in [the headcount quotas](seed/headcount-quotas.md), so they are among the heaviest. The last page is found from the row count that the first page returns.

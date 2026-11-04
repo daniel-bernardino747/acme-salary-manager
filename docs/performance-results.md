@@ -7,12 +7,12 @@ run is done, is in [the performance note](performance.md).
 
 | Run | |
 | --- | --- |
-| Date (UTC) | 2026-10-16T18:49:50.911Z |
-| Commit | `241a609 (with uncommitted changes)` |
+| Date (UTC) | 2026-11-04T14:44:41.068Z |
+| Commit | `a8529af (with uncommitted changes)` |
 | Base URL | https://acme-production-08d3.up.railway.app |
 | Railway region | us-east4 |
 | Seed mode | if-empty |
-| Employees | 10000 |
+| Employees | 10001 |
 | Client ran from | Daniel's notebook in Brazil, home connection |
 
 Times in milliseconds. Cold is the first request to the endpoint in the run. p50, p95 and max
@@ -20,13 +20,14 @@ are over 100 sequential requests, after 3 warm-ups.
 
 | Endpoint | Request | Server cold | Server p50 | Server p95 | Server max | Client cold | Client p50 | Client p95 | Client max | Result |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| Employees, first page | `GET /api/employees` | 11.45 | 1.03 | 1.74 | 4.74 | 603.87 | 154.77 | 160.23 | 201.51 | pass |
-| Employees, last page | `GET /api/employees?page=400` | 2.06 | 1.28 | 1.87 | 2.56 | 152.22 | 154.32 | 159.14 | 402.88 | pass |
-| Employees, filtered | `GET /api/employees?country=IN&department=Engineering` | 2.34 | 1.69 | 2.92 | 4.91 | 157.86 | 155.01 | 168.53 | 312.93 | pass |
-| Employees, name search | `GET /api/employees?q=mar` | 2.34 | 1.39 | 1.89 | 3.22 | 149.58 | 153.91 | 180.19 | 401.74 | pass |
-| Pay statistics | `GET /api/pay-statistics?jobTitle=Software+Engineer+II&country=IN` | 2.05 | 1.02 | 1.69 | 6.29 | 155.79 | 153.22 | 176.32 | 233.58 | pass |
-| Payroll totals | `GET /api/payroll-totals` | 15.22 | 5.78 | 11.09 | 16.58 | 164.44 | 156.03 | 169.56 | 403.85 | pass |
-| Pay comparison | `GET /api/pay-comparison?jobTitle=Software+Engineer+II` | 2.76 | 1.44 | 2.18 | 3.24 | 146.99 | 154.22 | 173.01 | 356.57 | pass |
-| Outliers, all | `GET /api/outliers` | 11.59 | 8.42 | 15.32 | 21.65 | 166.27 | 160.15 | 182.73 | 401.68 | pass |
-| Outliers, underpaid | `GET /api/outliers?direction=below` | 8.91 | 8.25 | 13.74 | 19.03 | 168.71 | 156.98 | 172.16 | 408.90 | pass |
-| Outliers, underpaid, filtered | `GET /api/outliers?direction=below&country=IN&department=Engineering` | 3.74 | 3.21 | 6.03 | 14.30 | 146.94 | 154.69 | 162.96 | 364.20 | pass |
+| Employees, first page | `GET /api/employees` | 7.32 | 1.13 | 2.02 | 4.92 | 531.52 | 153.29 | 163.05 | 264.04 | pass |
+| Employees, last page | `GET /api/employees?page=401` | 1.43 | 1.34 | 2.12 | 4.00 | 159.24 | 154.09 | 251.38 | 1086.28 | pass |
+| Employees, filtered | `GET /api/employees?country=IN&department=Engineering` | 2.69 | 1.92 | 3.35 | 8.98 | 146.53 | 152.76 | 163.61 | 385.58 | pass |
+| Employees, name search | `GET /api/employees?q=mar` | 4.75 | 1.59 | 2.56 | 11.54 | 152.71 | 153.72 | 208.64 | 394.38 | pass |
+| Employees, annual salary range | `GET /api/employees?country=US&minSalaryMinor=12000000&maxSalaryMinor=15000000` | 2.24 | 1.54 | 2.80 | 5.54 | 147.20 | 152.40 | 162.93 | 235.57 | pass |
+| Pay statistics | `GET /api/pay-statistics?jobTitle=Software+Engineer+II&country=IN` | 2.77 | 0.91 | 1.81 | 7.28 | 160.59 | 151.45 | 166.82 | 255.14 | pass |
+| Payroll totals | `GET /api/payroll-totals` | 13.41 | 5.76 | 11.85 | 18.15 | 156.46 | 156.62 | 176.94 | 512.14 | pass |
+| Pay comparison | `GET /api/pay-comparison?jobTitle=Software+Engineer+II` | 3.39 | 1.45 | 2.11 | 3.56 | 155.31 | 153.68 | 163.68 | 412.21 | pass |
+| Outliers, all | `GET /api/outliers` | 16.35 | 9.05 | 18.34 | 23.79 | 175.89 | 163.71 | 179.71 | 329.30 | pass |
+| Outliers, underpaid | `GET /api/outliers?direction=below` | 11.07 | 8.86 | 14.63 | 19.78 | 154.76 | 157.51 | 169.14 | 356.94 | pass |
+| Outliers, underpaid, filtered | `GET /api/outliers?direction=below&country=IN&department=Engineering` | 3.74 | 3.27 | 6.66 | 8.72 | 150.62 | 152.79 | 162.18 | 364.09 | pass |

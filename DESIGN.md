@@ -242,7 +242,7 @@ The shell is a Mantine AppShell. On desktop, the navy rail is 240px wide on the 
 
 Every page starts with the same header: the `h1`, its question or date line, optional actions on the right, then the security band 16px below. Screens with two parts use a two-column grid with a 24px gap. On the Overview, the columns are 1.25fr and 1fr. On the employee view, they are 1fr and 1.3fr. The grid collapses to one column below 62em.
 
-Spacing follows the theme scale: 8, 12, 16, 24 and 40px. Use 24px between panels and inside panels, 16px inside panels on phones (below 36em), and 12px between filter fields.
+Spacing follows the theme scale: 8, 12, 16, 24 and 40px. Use 24px between panels and inside panels, 16px inside panels on phones (below 36em), and 12px between filter fields. On the employee list, the filter controls wrap as one row of items, each growing from a base width, so every row of filters reaches the right edge; Outliers keeps fixed widths beside its direction switch.
 
 **The No Sideways Scroll Rule.** Below 48em, tables become stacked records. Each record is a white list on a hairline frame, with a hairline between items and 12px 14px padding. A key figure is never reached by scrolling sideways. The rail becomes a drawer that opens under the header. The filter bar collapses behind a "Filters" button, and its fields stack at full width.
 
